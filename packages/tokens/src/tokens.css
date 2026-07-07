@@ -134,6 +134,13 @@
   }
 }
 
+/* Spinner rotate, used by ToolPill's running glyph. */
+@keyframes bx-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* Accent-tinted text selection. */
 ::selection {
   background: var(--bx-accent, #46c66d);
