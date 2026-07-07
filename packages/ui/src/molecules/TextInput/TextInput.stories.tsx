@@ -5,6 +5,7 @@ import { TextInput } from "./TextInput.tsx";
 const meta: Meta<typeof TextInput> = {
   title: "OCTANT/Molecules/TextInput",
   component: TextInput,
+  tags: ["autodocs"],
   decorators: [
     (Story) => (
       <div style={{ maxWidth: 320 }}>
@@ -12,6 +13,13 @@ const meta: Meta<typeof TextInput> = {
       </div>
     ),
   ],
+  argTypes: {
+    value: { control: "text", description: "Controlled value." },
+    defaultValue: { control: "text" },
+    placeholder: { control: "text" },
+    disabled: { control: "boolean" },
+    onChange: { action: "changed" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof TextInput>;

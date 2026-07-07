@@ -4,6 +4,21 @@ import { Slider } from "./Slider.tsx";
 const meta: Meta<typeof Slider> = {
   title: "OCTANT/Molecules/Slider",
   component: Slider,
+  tags: ["autodocs"],
+  argTypes: {
+    min: { control: { type: "number", min: -1000, max: 1000, step: 1 } },
+    max: { control: { type: "number", min: -1000, max: 100000, step: 1 } },
+    step: { control: { type: "number", min: 0, max: 1000, step: 1 } },
+    value: {
+      control: { type: "number", min: -1000, max: 100000, step: 1 },
+      description: "Controlled value.",
+    },
+    defaultValue: { control: { type: "number", min: -1000, max: 100000, step: 1 } },
+    label: { control: "text" },
+    accentColor: { control: "color" },
+    disabled: { control: "boolean" },
+    onChange: { action: "changed" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof Slider>;

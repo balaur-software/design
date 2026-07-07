@@ -5,7 +5,15 @@ import { SegmentedControl } from "./SegmentedControl.tsx";
 const meta: Meta<typeof SegmentedControl> = {
   title: "OCTANT/Molecules/SegmentedControl",
   component: SegmentedControl,
+  tags: ["autodocs"],
   args: { options: ["LOW", "MED", "HIGH"], "aria-label": "Intensity" },
+  argTypes: {
+    options: { control: "object", description: "Segment labels, left-to-right." },
+    value: { control: "text", description: "Controlled selected option." },
+    defaultValue: { control: "text" },
+    "aria-label": { control: "text" },
+    onChange: { action: "changed" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof SegmentedControl>;

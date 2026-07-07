@@ -1,10 +1,19 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { fn } from "@storybook/test";
 import type { MemoryNode, NodeFilter } from "../../organisms/MemoryExplorer/memory-types";
 import { GraphFilterBar } from "./GraphFilterBar";
 
 const meta: Meta<typeof GraphFilterBar> = {
   title: "OCTANT/Molecules/GraphFilterBar",
   component: GraphFilterBar,
+  tags: ["autodocs"],
+  argTypes: {
+    filter: { control: "object", description: "NodeFilter: { types, statuses, minImportance }." },
+    onFilterChange: { action: "filter-changed" },
+    types: { control: "object", description: "Node types available in the vault." },
+    searchResults: { control: "object", description: "Search results from the caller's recall/search." },
+    onSearchSelect: { action: "search-selected" },
+  },
 };
 export default meta;
 
@@ -35,10 +44,10 @@ export const Default: StoryObj = {
     return (
       <GraphFilterBar
         filter={filter}
-        onFilterChange={() => {}}
+        onFilterChange={fn()}
         types={["memory", "person", "skill", "note", "event"]}
         searchResults={results}
-        onSearchSelect={(id) => alert(`select ${id}`)}
+        onSearchSelect={fn()}
         style={{ width: 460 }}
       />
     );

@@ -4,8 +4,13 @@ import { Breadcrumb } from "./Breadcrumb.tsx";
 const meta: Meta<typeof Breadcrumb> = {
   title: "OCTANT/Molecules/Breadcrumb",
   component: Breadcrumb,
+  tags: ["autodocs"],
   args: {
     items: [{ label: "ROOT" }, { label: "SYSTEM" }, { label: "GLYPHS" }, { label: "OCTANT.MAP" }],
+  },
+  argTypes: {
+    items: { control: "object", description: "Path segments: { label, href? }." },
+    separator: { control: "text" },
   },
 };
 export default meta;

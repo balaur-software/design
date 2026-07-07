@@ -114,6 +114,15 @@ const detailFooter = (close: () => void) => (
 const meta: Meta<typeof Sheet> = {
   title: "OCTANT/Organisms/Sheet",
   component: Sheet,
+  tags: ["autodocs"],
+  argTypes: {
+    open: { control: "boolean", description: "Whether the sheet is mounted and slid in." },
+    side: { control: "radio", options: ["right", "left"] },
+    title: { control: "text" },
+    width: { control: { type: "number", min: 200, max: 900, step: 8 } },
+    trapFocus: { control: "boolean" },
+    onClose: { action: "closed" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof Sheet>;

@@ -4,6 +4,14 @@ import { Table, type TableColumn } from "./Table.tsx";
 const meta: Meta<typeof Table> = {
   title: "OCTANT/Organisms/Table",
   component: Table,
+  tags: ["autodocs"],
+  argTypes: {
+    columns: { control: "object", description: "TableColumn[]: { key, label, color?, align?, sortValue?, render? }." },
+    rows: { control: "object", description: "Row objects keyed by column key." },
+    defaultSortKey: { control: "text" },
+    defaultAsc: { control: "boolean" },
+    label: { control: "text" },
+  },
 };
 export default meta;
 

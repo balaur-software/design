@@ -23,7 +23,14 @@ const items = [
 const meta: Meta<typeof Accordion> = {
   title: "OCTANT/Organisms/Accordion",
   component: Accordion,
+  tags: ["autodocs"],
   args: { items, style: { maxWidth: 560 } },
+  argTypes: {
+    items: { control: "object", description: "Rows: { title, content, defaultOpen? }." },
+    single: { control: "boolean" },
+    openIndices: { control: "object", description: "Controlled set of open indices." },
+    onOpenChange: { action: "open-changed" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof Accordion>;

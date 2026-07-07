@@ -4,7 +4,15 @@ import { Sparkline } from "./Sparkline.tsx";
 const meta: Meta<typeof Sparkline> = {
   title: "OCTANT/Atoms/Sparkline",
   component: Sparkline,
+  tags: ["autodocs"],
   args: { label: "throughput", unit: "MB/s" },
+  argTypes: {
+    label: { control: "text" },
+    unit: { control: "text" },
+    samples: { control: { type: "number", min: 8, max: 128, step: 1 } },
+    color: { control: "color" },
+    spanLabel: { control: "text" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof Sparkline>;

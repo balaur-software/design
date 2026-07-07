@@ -4,7 +4,15 @@ import { DecodeScramble } from "./DecodeScramble.tsx";
 const meta: Meta<typeof DecodeScramble> = {
   title: "OCTANT/Atoms/DecodeScramble",
   component: DecodeScramble,
+  tags: ["autodocs"],
   args: { text: "DESERIALIZE" },
+  argTypes: {
+    text: { control: "text" },
+    trigger: { control: "radio", options: ["click", "hover"] },
+    dur: { control: { type: "number", min: 100, max: 4000, step: 100 } },
+    color: { control: "color" },
+    fontSize: { control: { type: "number", min: 10, max: 80, step: 1 } },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof DecodeScramble>;

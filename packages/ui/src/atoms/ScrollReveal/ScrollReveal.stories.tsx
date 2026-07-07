@@ -4,6 +4,13 @@ import { ScrollReveal } from "./ScrollReveal.tsx";
 const meta: Meta<typeof ScrollReveal> = {
   title: "OCTANT/Atoms/ScrollReveal",
   component: ScrollReveal,
+  tags: ["autodocs"],
+  argTypes: {
+    scramble: { control: "text", description: "Text to glyph-scramble-decode on first view." },
+    y: { control: { type: "number", min: 0, max: 80, step: 1 } },
+    dur: { control: { type: "number", min: 100, max: 3000, step: 50 } },
+    delay: { control: { type: "number", min: 0, max: 2000, step: 20 } },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof ScrollReveal>;

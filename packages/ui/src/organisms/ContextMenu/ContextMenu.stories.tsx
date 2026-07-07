@@ -5,6 +5,7 @@ import { ContextMenu, type ContextMenuItem } from "./ContextMenu.tsx";
 const meta: Meta<typeof ContextMenu> = {
   title: "OCTANT/Organisms/ContextMenu",
   component: ContextMenu,
+  tags: ["autodocs"],
   decorators: [
     (Story) => (
       <ToastProvider>
@@ -12,6 +13,10 @@ const meta: Meta<typeof ContextMenu> = {
       </ToastProvider>
     ),
   ],
+  argTypes: {
+    items: { control: "object", description: "Menu rows: { label, glyph?, toast?, danger?, divider? }." },
+    children: { control: "text", description: "Content of the right-click surface." },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof ContextMenu>;

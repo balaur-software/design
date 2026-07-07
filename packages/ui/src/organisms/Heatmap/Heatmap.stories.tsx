@@ -4,6 +4,7 @@ import { Heatmap } from "./Heatmap.tsx";
 const meta: Meta<typeof Heatmap> = {
   title: "OCTANT/Organisms/Heatmap",
   component: Heatmap,
+  tags: ["autodocs"],
   decorators: [
     (Story) => (
       <div style={{ maxWidth: 640 }}>
@@ -11,6 +12,13 @@ const meta: Meta<typeof Heatmap> = {
       </div>
     ),
   ],
+  argTypes: {
+    rows: { control: { type: "number", min: 1, max: 31, step: 1 } },
+    cols: { control: { type: "number", min: 4, max: 52, step: 1 } },
+    label: { control: "text" },
+    dayLabels: { control: "object", description: "Row labels indexed by row." },
+    color: { control: "color" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof Heatmap>;

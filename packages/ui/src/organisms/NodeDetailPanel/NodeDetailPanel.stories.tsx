@@ -1,10 +1,19 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import type { MemoryEdge, MemoryHistorySnapshot, MemoryNode } from "../MemoryExplorer/memory-types";
+import { fn } from "@storybook/test";
 import { NodeDetailPanel } from "./NodeDetailPanel";
 
 const meta: Meta<typeof NodeDetailPanel> = {
   title: "OCTANT/Organisms/NodeDetailPanel",
   component: NodeDetailPanel,
+  tags: ["autodocs"],
+  argTypes: {
+    node: { control: "object", description: "MemoryNode descriptor." },
+    edges: { control: "object", description: "All edges touching the node (in + out)." },
+    neighbours: { control: "object", description: "Lookup Map<id, MemoryNode> for neighbour titles." },
+    history: { control: "object", description: "Pre-mutation history snapshots." },
+    onNavigate: { action: "navigated" },
+  },
 };
 export default meta;
 
@@ -97,7 +106,7 @@ export const Default: StoryObj = {
       edges={edges}
       neighbours={neighbours}
       history={history}
-      onNavigate={(id) => alert(`nav ${id}`)}
+      onNavigate={fn()}
       style={{ height: 520, width: 360 }}
     />
   ),

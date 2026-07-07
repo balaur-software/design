@@ -5,7 +5,16 @@ import { Pager } from "./Pager.tsx";
 const meta: Meta<typeof Pager> = {
   title: "OCTANT/Molecules/Pager",
   component: Pager,
+  tags: ["autodocs"],
   args: { count: 24, defaultPage: 3 },
+  argTypes: {
+    count: { control: { type: "number", min: 1, max: 200, step: 1 } },
+    page: { control: { type: "number", min: 1, max: 200, step: 1 }, description: "Controlled active page." },
+    defaultPage: { control: { type: "number", min: 1, max: 200, step: 1 } },
+    siblingCount: { control: { type: "number", min: 0, max: 5, step: 1 } },
+    boundaryCount: { control: { type: "number", min: 0, max: 5, step: 1 } },
+    onPageChange: { action: "page-changed" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof Pager>;

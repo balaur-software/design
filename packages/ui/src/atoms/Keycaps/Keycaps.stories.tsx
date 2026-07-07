@@ -4,6 +4,10 @@ import { Keycap, Keycaps, type Shortcut } from "./Keycaps.tsx";
 const meta: Meta<typeof Keycaps> = {
   title: "OCTANT/Atoms/Keycaps",
   component: Keycaps,
+  tags: ["autodocs"],
+  argTypes: {
+    shortcuts: { control: "object", description: "Array of { keys: string[], label, combo? }." },
+  },
 };
 export default meta;
 

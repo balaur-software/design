@@ -4,6 +4,20 @@ import { HoverCard } from "./HoverCard.tsx";
 const meta: Meta<typeof HoverCard> = {
   title: "OCTANT/Molecules/HoverCard",
   component: HoverCard,
+  tags: ["autodocs"],
+  argTypes: {
+    handle: { control: "text" },
+    name: { control: "text" },
+    subtitle: { control: "text" },
+    description: { control: "text" },
+    seed: { control: "text" },
+    avatarColor: { control: "color" },
+    openDelay: { control: { type: "number", min: 0, max: 2000, step: 20 } },
+    closeDelay: { control: { type: "number", min: 0, max: 2000, step: 20 } },
+    width: { control: { type: "number", min: 160, max: 480, step: 8 } },
+    align: { control: "radio", options: ["start", "end"] },
+    defaultOpen: { control: "boolean" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof HoverCard>;

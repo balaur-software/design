@@ -13,6 +13,7 @@ const ACTIONS: DropdownMenuItem[] = [
 const meta: Meta<typeof DropdownMenu> = {
   title: "OCTANT/Organisms/DropdownMenu",
   component: DropdownMenu,
+  tags: ["autodocs"],
   args: { items: ACTIONS },
   decorators: [
     (Story) => (
@@ -21,6 +22,12 @@ const meta: Meta<typeof DropdownMenu> = {
       </ToastProvider>
     ),
   ],
+  argTypes: {
+    label: { control: "text" },
+    items: { control: "object", description: "Rows: { label, glyph?, shortcut?, toast?, danger?, divider? }." },
+    width: { control: { type: "number", min: 120, max: 480, step: 8 } },
+    align: { control: "radio", options: ["start", "end"] },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof DropdownMenu>;

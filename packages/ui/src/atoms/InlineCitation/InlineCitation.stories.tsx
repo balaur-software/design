@@ -4,7 +4,14 @@ import { CitationList, CitationSource, InlineCitation } from "./InlineCitation.t
 const meta: Meta<typeof InlineCitation> = {
   title: "OCTANT/Atoms/InlineCitation",
   component: InlineCitation,
+  tags: ["autodocs"],
   args: { label: "1" },
+  argTypes: {
+    label: { control: "text" },
+    href: { control: "text" },
+    accent: { control: "color" },
+    border: { control: "color" },
+  },
 };
 export default meta;
 

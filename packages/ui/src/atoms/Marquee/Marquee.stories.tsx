@@ -4,6 +4,14 @@ import { Marquee } from "./Marquee.tsx";
 const meta: Meta<typeof Marquee> = {
   title: "OCTANT/Atoms/Marquee",
   component: Marquee,
+  tags: ["autodocs"],
+  argTypes: {
+    items: { control: "object", description: "Inline items separated by the separator." },
+    separator: { control: "text" },
+    speed: { control: { type: "number", min: 0, max: 200, step: 1 } },
+    ambient: { control: { type: "range", min: 0, max: 1, step: 0.05 } },
+    pauseOnHover: { control: "boolean" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof Marquee>;

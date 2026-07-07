@@ -5,7 +5,15 @@ import { ProgressBar } from "./ProgressBar.tsx";
 const meta: Meta<typeof ProgressBar> = {
   title: "OCTANT/Atoms/ProgressBar",
   component: ProgressBar,
+  tags: ["autodocs"],
   args: { value: 0.66, label: "LINK" },
+  argTypes: {
+    value: { control: { type: "range", min: 0, max: 1, step: 0.01 }, description: "Progress fraction 0..1." },
+    label: { control: "text" },
+    color: { control: "color" },
+    showPercent: { control: "boolean" },
+    ease: { control: { type: "range", min: 0, max: 1, step: 0.05 } },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof ProgressBar>;

@@ -4,7 +4,14 @@ import { Avatar } from "./Avatar.tsx";
 const meta: Meta<typeof Avatar> = {
   title: "OCTANT/Atoms/Avatar",
   component: Avatar,
+  tags: ["autodocs"],
   args: { seed: "OCTANT" },
+  argTypes: {
+    seed: { control: "text", description: "Name/id hashed into the identicon." },
+    size: { control: { type: "number", min: 24, max: 160, step: 2 } },
+    color: { control: "color" },
+    fontSize: { control: { type: "number", min: 4, max: 40, step: 1 } },
+  },
 };
 export default meta;
 

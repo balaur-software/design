@@ -4,6 +4,16 @@ import { Typewriter } from "./Typewriter.tsx";
 const meta: Meta<typeof Typewriter> = {
   title: "OCTANT/Atoms/Typewriter",
   component: Typewriter,
+  tags: ["autodocs"],
+  argTypes: {
+    text: { control: "object", description: "A single string or a list of phrases cycled when loop is set." },
+    speed: { control: { type: "number", min: 5, max: 200, step: 1 } },
+    hold: { control: { type: "number", min: 0, max: 4000, step: 50 } },
+    loop: { control: "boolean" },
+    caret: { control: "boolean" },
+    accent: { control: "color" },
+    fontSize: { control: { type: "number", min: 10, max: 64, step: 1 } },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof Typewriter>;

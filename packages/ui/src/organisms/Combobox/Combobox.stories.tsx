@@ -15,9 +15,21 @@ const SYSTEMS = [
 const meta: Meta<typeof Combobox> = {
   title: "OCTANT/Organisms/Combobox",
   component: Combobox,
+  tags: ["autodocs"],
   args: { options: SYSTEMS, placeholder: "search glyph systems…" },
+  argTypes: {
+    options: { control: "object", description: "Full option list, filtered case-insensitively." },
+    value: { control: "text", description: "Controlled input text." },
+    defaultValue: { control: "text" },
+    placeholder: { control: "text" },
+    disabled: { control: "boolean" },
+    width: { control: { type: "number", min: 120, max: 600, step: 8 } },
+    ariaLabel: { control: "text" },
+    onChange: { action: "changed" },
+  },
 };
 export default meta;
+
 type Story = StoryObj<typeof Combobox>;
 
 export const Default: Story = {};

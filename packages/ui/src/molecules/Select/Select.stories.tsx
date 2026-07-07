@@ -11,7 +11,18 @@ const ENCODERS = [
 const meta: Meta<typeof Select> = {
   title: "OCTANT/Molecules/Select",
   component: Select,
+  tags: ["autodocs"],
   args: { options: ENCODERS },
+  argTypes: {
+    options: { control: "object", description: "Options: { value, label }." },
+    value: { control: "text", description: "Controlled selected value." },
+    defaultValue: { control: "text" },
+    placeholder: { control: "text" },
+    disabled: { control: "boolean" },
+    width: { control: { type: "number", min: 120, max: 480, step: 8 } },
+    ariaLabel: { control: "text" },
+    onChange: { action: "changed" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof Select>;

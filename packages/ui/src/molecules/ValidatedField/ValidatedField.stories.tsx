@@ -4,6 +4,18 @@ import { ValidatedField } from "./ValidatedField.tsx";
 const meta: Meta<typeof ValidatedField> = {
   title: "OCTANT/Molecules/ValidatedField",
   component: ValidatedField,
+  tags: ["autodocs"],
+  argTypes: {
+    label: { control: "text" },
+    placeholder: { control: "text" },
+    value: { control: "text", description: "Controlled value." },
+    defaultValue: { control: "text" },
+    maxLength: { control: { type: "number", min: 1, max: 1000, step: 1 } },
+    hint: { control: "text" },
+    validMessage: { control: "text" },
+    invalidMessage: { control: "text" },
+    onChange: { action: "changed" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof ValidatedField>;

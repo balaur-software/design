@@ -10,7 +10,17 @@ const DITHER = [
 const meta: Meta<typeof RadioGroup> = {
   title: "OCTANT/Molecules/RadioGroup",
   component: RadioGroup,
+  tags: ["autodocs"],
   args: { options: DITHER, "aria-label": "Dither mode" },
+  argTypes: {
+    options: { control: "object", description: "Selectable options: { value, label, disabled? }." },
+    value: { control: "text", description: "Controlled selected value." },
+    defaultValue: { control: "text" },
+    fillColor: { control: "color" },
+    disabled: { control: "boolean" },
+    "aria-label": { control: "text" },
+    onChange: { action: "changed" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof RadioGroup>;

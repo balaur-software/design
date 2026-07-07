@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { fn } from "@storybook/test";
 import { ToastProvider } from "../../primitives";
 import { Menubar, type MenubarMenu } from "./Menubar.tsx";
 
@@ -44,6 +45,7 @@ const MENUS: MenubarMenu[] = [
 const meta: Meta<typeof Menubar> = {
   title: "OCTANT/Organisms/Menubar",
   component: Menubar,
+  tags: ["autodocs"],
   args: { menus: MENUS },
   decorators: [
     (Story) => (
@@ -52,6 +54,9 @@ const meta: Meta<typeof Menubar> = {
       </ToastProvider>
     ),
   ],
+  argTypes: {
+    menus: { control: "object", description: "MenubarMenu[]: { label, items[] }." },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof Menubar>;
@@ -110,10 +115,10 @@ export const CustomHandlers: Story = {
       {
         label: "RUN",
         items: [
-          { label: "Build", shortcut: "⌘B", onSelect: () => console.log("build") },
-          { label: "Test", shortcut: "⌘T", onSelect: () => console.log("test") },
+          { label: "Build", shortcut: "⌘B", onSelect: fn() },
+          { label: "Test", shortcut: "⌘T", onSelect: fn() },
           { divider: true },
-          { label: "Deploy", onSelect: () => console.log("deploy") },
+          { label: "Deploy", onSelect: fn() },
         ],
       },
     ],

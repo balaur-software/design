@@ -4,7 +4,17 @@ import { Badge } from "./Badge.tsx";
 const meta: Meta<typeof Badge> = {
   title: "OCTANT/Atoms/Badge",
   component: Badge,
+  tags: ["autodocs"],
   args: { children: "NEW", tone: "accent", count: 4 },
+  argTypes: {
+    tone: {
+      control: "select",
+      options: ["accent", "cyan", "magenta", "yellow", "red", "neutral"],
+      description: "Tinted-border color family.",
+    },
+    children: { control: "text", description: "The label content." },
+    count: { control: "text", description: "Optional trailing count/value." },
+  },
 };
 export default meta;
 

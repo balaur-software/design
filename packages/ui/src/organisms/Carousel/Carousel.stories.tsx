@@ -4,7 +4,18 @@ import { Carousel } from "./Carousel.tsx";
 const meta: Meta<typeof Carousel> = {
   title: "OCTANT/Organisms/Carousel",
   component: Carousel,
+  tags: ["autodocs"],
   parameters: { layout: "padded" },
+  argTypes: {
+    slides: { control: "object", description: "One node per slide." },
+    index: { control: { type: "number", min: 0, max: 20, step: 1 }, description: "Controlled active slide." },
+    defaultIndex: { control: { type: "number", min: 0, max: 20, step: 1 } },
+    autoplay: { control: "boolean" },
+    interval: { control: { type: "number", min: 500, max: 20000, step: 100 } },
+    showDots: { control: "boolean" },
+    showArrows: { control: "boolean" },
+    onIndexChange: { action: "index-changed" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof Carousel>;

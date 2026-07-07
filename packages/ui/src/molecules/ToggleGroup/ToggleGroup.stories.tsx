@@ -4,6 +4,14 @@ import { ToggleGroup } from "./ToggleGroup.tsx";
 const meta: Meta<typeof ToggleGroup> = {
   title: "OCTANT/Molecules/ToggleGroup",
   component: ToggleGroup,
+  tags: ["autodocs"],
+  argTypes: {
+    items: { control: "object", description: "Items: { value, label, title?, style? }." },
+    multi: { control: "boolean" },
+    value: { control: "object", description: "Controlled selection (string[)." },
+    defaultValue: { control: "object" },
+    onChange: { action: "changed" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof ToggleGroup>;

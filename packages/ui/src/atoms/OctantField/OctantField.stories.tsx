@@ -19,12 +19,17 @@ const box = (children: ReactNode) => (
 const meta: Meta<typeof OctantField> = {
   title: "OCTANT/Atoms/OctantField",
   component: OctantField,
+  tags: ["autodocs"],
   decorators: [(Story) => box(<Story />)],
+  argTypes: {
+    accent: { control: "object", description: "RGB triplet, e.g. [70, 198, 109]." },
+    ambient: { control: { type: "range", min: 0, max: 1, step: 0.05 } },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof OctantField>;
 
-export const Green: Story = {};
+export const Default: Story = {};
 export const Cyan: Story = { args: { accent: [43, 217, 217] } };
 export const Amber: Story = { args: { accent: [255, 176, 0] } };
 export const Calm: Story = { args: { ambient: 0.2 } };

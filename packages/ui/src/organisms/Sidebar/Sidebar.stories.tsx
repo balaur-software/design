@@ -4,6 +4,18 @@ import { Sidebar } from "./Sidebar.tsx";
 const meta: Meta<typeof Sidebar> = {
   title: "OCTANT/Organisms/Sidebar",
   component: Sidebar,
+  tags: ["autodocs"],
+  argTypes: {
+    items: { control: "object", description: "SidebarItem[]: { label, glyph, title, sub }." },
+    brand: { control: "text" },
+    operator: { control: "text" },
+    activeIndex: { control: { type: "number", min: 0, max: 20, step: 1 }, description: "Controlled active index." },
+    defaultActiveIndex: { control: { type: "number", min: 0, max: 20, step: 1 } },
+    collapsed: { control: "boolean", description: "Controlled collapsed state." },
+    defaultCollapsed: { control: "boolean" },
+    onActiveIndexChange: { action: "active-changed" },
+    onCollapsedChange: { action: "collapsed-changed" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof Sidebar>;

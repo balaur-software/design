@@ -4,7 +4,14 @@ import { Ticker } from "./Ticker.tsx";
 const meta: Meta<typeof Ticker> = {
   title: "OCTANT/Atoms/Ticker",
   component: Ticker,
+  tags: ["autodocs"],
   args: { to: 256, label: "CELL STATES" },
+  argTypes: {
+    to: { control: { type: "number", min: 0, max: 100000, step: 1 } },
+    label: { control: "text" },
+    barColor: { control: "color" },
+    duration: { control: { type: "number", min: 200, max: 6000, step: 100 } },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof Ticker>;

@@ -4,11 +4,27 @@ import { BarChart } from "./BarChart.tsx";
 const meta: Meta<typeof BarChart> = {
   title: "OCTANT/Organisms/BarChart",
   component: BarChart,
+  tags: ["autodocs"],
+  argTypes: {
+    data: { control: "object", description: "Rows: { label, value (0..1), color? }." },
+    title: { control: "text" },
+    hint: { control: "text" },
+    stagger: { control: { type: "number", min: 0, max: 200, step: 5 } },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof BarChart>;
 
-export const Default: Story = {};
+export const Default: Story = {
+  args: {
+    data: [
+      { label: "ROOT", value: 0.42 },
+      { label: "HOME", value: 0.78 },
+      { label: "VAR", value: 0.19 },
+      { label: "TMP", value: 0.06 },
+    ],
+  },
+};
 
 export const SingleAccent: Story = {
   args: {

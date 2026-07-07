@@ -4,6 +4,17 @@ import { Skeleton } from "./Skeleton.tsx";
 const meta: Meta<typeof Skeleton> = {
   title: "OCTANT/Atoms/Skeleton",
   component: Skeleton,
+  tags: ["autodocs"],
+  argTypes: {
+    label: { control: "text" },
+    avatar: { control: "boolean" },
+    avatarSize: { control: { type: "number", min: 16, max: 128, step: 2 } },
+    lines: { control: "object", description: "Widths of the avatar-row placeholders." },
+    footerLines: { control: "object", description: "Widths of the stacked footer rows." },
+    lineHeight: { control: { type: "number", min: 6, max: 40, step: 1 } },
+    gap: { control: { type: "number", min: 0, max: 40, step: 1 } },
+    color: { control: "color" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof Skeleton>;

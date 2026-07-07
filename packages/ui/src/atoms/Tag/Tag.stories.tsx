@@ -5,7 +5,14 @@ import { Tag } from "./Tag.tsx";
 const meta: Meta<typeof Tag> = {
   title: "OCTANT/Atoms/Tag",
   component: Tag,
+  tags: ["autodocs"],
   args: { label: "NODE-01" },
+  argTypes: {
+    label: { control: "text" },
+    tone: { control: "select", options: ["default", "active", "degraded", "offline"] },
+    removable: { control: "boolean" },
+    onRemove: { action: "removed" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof Tag>;

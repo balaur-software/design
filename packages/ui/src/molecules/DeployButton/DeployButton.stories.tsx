@@ -1,14 +1,24 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { fn } from "@storybook/test";
 import { DeployButton } from "./DeployButton.tsx";
 
 const meta: Meta<typeof DeployButton> = {
   title: "OCTANT/Molecules/DeployButton",
   component: DeployButton,
+  tags: ["autodocs"],
+  argTypes: {
+    label: { control: "text" },
+    accent: { control: "color" },
+    accentBright: { control: "color" },
+    borderColor: { control: "color" },
+    disabled: { control: "boolean" },
+    onDeploy: { action: "deployed" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof DeployButton>;
 
-export const Default: Story = {};
+export const Default: Story = { args: { onDeploy: fn() } };
 
 export const CustomLabel: Story = {
   args: { label: "SHIP ▸" },

@@ -5,6 +5,13 @@ import { Calendar } from "./Calendar.tsx";
 const meta: Meta<typeof Calendar> = {
   title: "OCTANT/Organisms/Calendar",
   component: Calendar,
+  tags: ["autodocs"],
+  argTypes: {
+    value: { control: "date", description: "Controlled selected day." },
+    defaultValue: { control: "date" },
+    defaultMonth: { control: "date" },
+    onSelect: { action: "selected" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof Calendar>;

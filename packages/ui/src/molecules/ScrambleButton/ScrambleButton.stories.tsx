@@ -4,7 +4,14 @@ import { ScrambleButton } from "./ScrambleButton.tsx";
 const meta: Meta<typeof ScrambleButton> = {
   title: "OCTANT/Molecules/ScrambleButton",
   component: ScrambleButton,
+  tags: ["autodocs"],
   args: { text: "DECRYPT" },
+  argTypes: {
+    text: { control: "text" },
+    color: { control: "color" },
+    borderColor: { control: "color" },
+    disabled: { control: "boolean" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof ScrambleButton>;

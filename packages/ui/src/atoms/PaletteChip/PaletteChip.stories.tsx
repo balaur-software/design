@@ -5,6 +5,7 @@ import { Palette, PaletteChip } from "./PaletteChip.tsx";
 const meta: Meta<typeof Palette> = {
   title: "OCTANT/Atoms/PaletteChip",
   component: Palette,
+  tags: ["autodocs"],
 };
 export default meta;
 

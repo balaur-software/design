@@ -4,6 +4,10 @@ import { PresenceStatus } from "./PresenceStatus.tsx";
 const meta: Meta<typeof PresenceStatus> = {
   title: "OCTANT/Atoms/PresenceStatus",
   component: PresenceStatus,
+  tags: ["autodocs"],
+  argTypes: {
+    items: { control: "object", description: "Presence rows: { label, state, meta?, color? }." },
+  },
 };
 export default meta;
 

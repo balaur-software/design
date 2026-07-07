@@ -4,7 +4,14 @@ import { Tooltip } from "./Tooltip.tsx";
 const meta: Meta<typeof Tooltip> = {
   title: "OCTANT/Molecules/Tooltip",
   component: Tooltip,
+  tags: ["autodocs"],
   args: { children: "OCTANT", tip: "2×4 sub-pixel grid · U+1CD00" },
+  argTypes: {
+    children: { control: "text" },
+    tip: { control: "text" },
+    color: { control: "color" },
+    underlineColor: { control: "color" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof Tooltip>;

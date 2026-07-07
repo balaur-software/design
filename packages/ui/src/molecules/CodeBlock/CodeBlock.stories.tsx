@@ -4,6 +4,12 @@ import { CodeBlock } from "./CodeBlock.tsx";
 const meta: Meta<typeof CodeBlock> = {
   title: "OCTANT/Molecules/CodeBlock",
   component: CodeBlock,
+  tags: ["autodocs"],
+  argTypes: {
+    lang: { control: "text" },
+    filename: { control: "text" },
+    children: { control: "text", description: "Code body: plain string or pre-highlighted nodes." },
+  },
 };
 export default meta;
 

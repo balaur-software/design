@@ -4,6 +4,11 @@ import { StatusDots } from "./StatusDots.tsx";
 const meta: Meta<typeof StatusDots> = {
   title: "OCTANT/Atoms/StatusDots",
   component: StatusDots,
+  tags: ["autodocs"],
+  argTypes: {
+    dots: { control: "object", description: "Status entries: { label, color }." },
+    gap: { control: { type: "number", min: 4, max: 60, step: 1 } },
+  },
 };
 export default meta;
 

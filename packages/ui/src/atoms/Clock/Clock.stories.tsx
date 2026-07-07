@@ -4,6 +4,13 @@ import { Clock } from "./Clock.tsx";
 const meta: Meta<typeof Clock> = {
   title: "OCTANT/Atoms/Clock",
   component: Clock,
+  tags: ["autodocs"],
+  argTypes: {
+    showTime: { control: "boolean" },
+    showUptime: { control: "boolean" },
+    uptimeLabel: { control: "text" },
+    interval: { control: { type: "number", min: 100, max: 5000, step: 100 } },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof Clock>;

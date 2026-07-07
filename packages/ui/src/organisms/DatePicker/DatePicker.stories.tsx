@@ -4,6 +4,16 @@ import { DatePicker } from "./DatePicker.tsx";
 const meta: Meta<typeof DatePicker> = {
   title: "OCTANT/Organisms/DatePicker",
   component: DatePicker,
+  tags: ["autodocs"],
+  argTypes: {
+    value: { control: "date", description: "Controlled selected day." },
+    defaultValue: { control: "date" },
+    placeholder: { control: "text" },
+    disabled: { control: "boolean" },
+    width: { control: { type: "number", min: 120, max: 480, step: 8 } },
+    align: { control: "radio", options: ["start", "end"] },
+    onChange: { action: "changed" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof DatePicker>;

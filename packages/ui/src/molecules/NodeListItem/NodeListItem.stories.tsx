@@ -1,17 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { fn } from "@storybook/test";
 import type { MemoryNode } from "../../organisms/MemoryExplorer/memory-types";
 import { NodeListItem } from "./NodeListItem";
 
-const meta: Meta<typeof NodeListItem> = {
-  title: "OCTANT/Molecules/NodeListItem",
-  component: NodeListItem,
-};
-export default meta;
-
-const mk = (over: Partial<MemoryNode>): MemoryNode => ({
-  id: over.id ?? "x",
+const baseNode: MemoryNode = {
+  id: "1",
   type: "memory",
-  title: "untitled",
+  title: "Lake house trip",
   status: "active",
   surfacing: "always",
   importance: 3,
@@ -21,8 +16,29 @@ const mk = (over: Partial<MemoryNode>): MemoryNode => ({
   useCount: 0,
   origin: "",
   author: "",
-  ...over,
-});
+};
+
+const meta: Meta<typeof NodeListItem> = {
+  title: "OCTANT/Molecules/NodeListItem",
+  component: NodeListItem,
+  tags: ["autodocs"],
+  args: { node: baseNode, selected: true },
+  argTypes: {
+    node: { control: "object", description: "MemoryNode descriptor." },
+    selected: { control: "boolean" },
+    hovered: { control: "boolean" },
+    meta: { control: "text", description: "Right-aligned meta text." },
+    onSelect: { action: "selected" },
+    onHover: { action: "hovered" },
+  },
+};
+export default meta;
+
+type Story = StoryObj<typeof NodeListItem>;
+
+export const Default: Story = { args: { onSelect: fn(), onHover: fn() } };
+
+const mk = (over: Partial<MemoryNode>): MemoryNode => ({ ...baseNode, ...over });
 
 const items: MemoryNode[] = [
   mk({ id: "1", title: "Lake house trip", type: "memory", status: "active" }),
@@ -31,7 +47,7 @@ const items: MemoryNode[] = [
   mk({ id: "4", title: "old note", type: "note", status: "archived" }),
 ];
 
-export const List: StoryObj = {
+export const List: Story = {
   render: () => (
     <div
       style={{

@@ -4,6 +4,14 @@ import { MessageBubble } from "./MessageBubble.tsx";
 const meta: Meta<typeof MessageBubble> = {
   title: "OCTANT/Molecules/MessageBubble",
   component: MessageBubble,
+  tags: ["autodocs"],
+  argTypes: {
+    role: { control: "radio", options: ["user", "agent"] },
+    name: { control: "text" },
+    time: { control: "text" },
+    avatar: { control: "text" },
+    children: { control: "text" },
+  },
 };
 export default meta;
 

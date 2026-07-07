@@ -4,6 +4,7 @@ import { GlyphReference } from "./GlyphReference.tsx";
 const meta: Meta<typeof GlyphReference> = {
   title: "OCTANT/Atoms/GlyphReference",
   component: GlyphReference,
+  tags: ["autodocs"],
 };
 export default meta;
 

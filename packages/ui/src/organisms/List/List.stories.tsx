@@ -12,7 +12,14 @@ const FILES: ListItem[] = [
 const meta: Meta<typeof List> = {
   title: "OCTANT/Organisms/List",
   component: List,
+  tags: ["autodocs"],
   args: { items: FILES },
+  argTypes: {
+    items: { control: "object", description: "Rows: { glyph?, label, meta? }." },
+    selected: { control: { type: "number", min: 0, max: 50, step: 1 }, description: "Controlled selected index." },
+    defaultSelected: { control: { type: "number", min: 0, max: 50, step: 1 } },
+    onSelect: { action: "selected" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof List>;

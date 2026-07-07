@@ -2,13 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import type { MemoryNode } from "../../organisms/MemoryExplorer/memory-types";
 import { NodeGlyph } from "./NodeGlyph";
 
-const meta: Meta<typeof NodeGlyph> = {
-  title: "OCTANT/Atoms/NodeGlyph",
-  component: NodeGlyph,
-};
-export default meta;
-
-const node = (over: Partial<MemoryNode> = {}): MemoryNode => ({
+const baseNode: MemoryNode = {
   id: "n",
   type: "memory",
   title: "lake house",
@@ -21,8 +15,38 @@ const node = (over: Partial<MemoryNode> = {}): MemoryNode => ({
   useCount: 2,
   origin: "turn:abc",
   author: "",
-  ...over,
-});
+};
+
+const meta: Meta<typeof NodeGlyph> = {
+  title: "OCTANT/Atoms/NodeGlyph",
+  component: NodeGlyph,
+  tags: ["autodocs"],
+  args: { node: baseNode, x: 60, y: 60, selected: true, showLabel: true },
+  argTypes: {
+    node: { control: "object", description: "MemoryNode descriptor." },
+    x: { control: { type: "number", min: 0, max: 600, step: 1 } },
+    y: { control: { type: "number", min: 0, max: 400, step: 1 } },
+    selected: { control: "boolean" },
+    hovered: { control: "boolean" },
+    dimmed: { control: "boolean" },
+    pinned: { control: "boolean" },
+    showLabel: { control: "boolean" },
+    zoom: { control: { type: "number", min: 0.5, max: 4, step: 0.1 } },
+  },
+  render: (args) => (
+    <svg width={400} height={160} style={{ background: "var(--bx-bg, #0a0b0e)" }}>
+      <title>Node glyph</title>
+      <NodeGlyph {...args} />
+    </svg>
+  ),
+};
+export default meta;
+
+type Story = StoryObj<typeof NodeGlyph>;
+
+export const Default: Story = {};
+
+const node = (over: Partial<MemoryNode> = {}): MemoryNode => ({ ...baseNode, ...over });
 
 const STATUSES = [
   "active",
@@ -34,7 +58,7 @@ const STATUSES = [
   "merged",
 ] as const;
 
-export const States: StoryObj = {
+export const States: Story = {
   render: () => (
     <svg width={520} height={180} style={{ background: "var(--bx-bg, #0a0b0e)" }}>
       <title>Node glyph states</title>

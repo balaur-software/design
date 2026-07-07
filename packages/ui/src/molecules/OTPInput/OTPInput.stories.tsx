@@ -6,6 +6,7 @@ import { OTPInput } from "./OTPInput.tsx";
 const meta: Meta<typeof OTPInput> = {
   title: "OCTANT/Molecules/OTPInput",
   component: OTPInput,
+  tags: ["autodocs"],
   decorators: [
     (Story) => (
       <ToastProvider>
@@ -13,6 +14,14 @@ const meta: Meta<typeof OTPInput> = {
       </ToastProvider>
     ),
   ],
+  argTypes: {
+    length: { control: { type: "number", min: 2, max: 12, step: 1 } },
+    value: { control: "text", description: "Controlled value (digits only)." },
+    defaultValue: { control: "text" },
+    disabled: { control: "boolean" },
+    onChange: { action: "changed" },
+    onComplete: { action: "completed" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof OTPInput>;

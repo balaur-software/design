@@ -1,12 +1,25 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { fn } from "@storybook/test";
 import type { Block } from "../../organisms/ChatPanel/chat-types";
 import { BlockRenderer } from "./BlockRenderer";
+
+const textBlock: Block = { type: "text", text: "Hello **world**, see `bar8`." };
 
 const meta: Meta<typeof BlockRenderer> = {
   title: "OCTANT/Molecules/BlockRenderer",
   component: BlockRenderer,
+  tags: ["autodocs"],
+  args: { block: textBlock, onArtifactOpen: fn() },
+  argTypes: {
+    block: { control: "object", description: "A ChatPanel Block (text|reasoning|tool_call|code|artifact)." },
+    onArtifactOpen: { action: "artifact-opened" },
+  },
 };
 export default meta;
+
+type Story = StoryObj<typeof BlockRenderer>;
+
+export const Default: Story = {};
 
 const blocks: { name: string; block: Block }[] = [
   { name: "text", block: { type: "text", text: "Hello **world**, see `bar8`." } },
@@ -29,7 +42,7 @@ const blocks: { name: string; block: Block }[] = [
   },
 ];
 
-export const Gallery: StoryObj = {
+export const Gallery: Story = {
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 14, maxWidth: 520 }}>
       {blocks.map(({ name, block }) => (

@@ -5,6 +5,18 @@ import { Stepper } from "./Stepper.tsx";
 const meta: Meta<typeof Stepper> = {
   title: "OCTANT/Molecules/Stepper",
   component: Stepper,
+  tags: ["autodocs"],
+  argTypes: {
+    value: { control: { type: "number", min: 0, max: 999, step: 1 }, description: "Controlled value." },
+    defaultValue: { control: { type: "number", min: 0, max: 999, step: 1 } },
+    min: { control: { type: "number", min: -999, max: 999, step: 1 } },
+    max: { control: { type: "number", min: 0, max: 9999, step: 1 } },
+    step: { control: { type: "number", min: 1, max: 100, step: 1 } },
+    label: { control: "text" },
+    fillColor: { control: "color" },
+    disabled: { control: "boolean" },
+    onChange: { action: "changed" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof Stepper>;

@@ -4,7 +4,15 @@ import { IndeterminateBar } from "./IndeterminateBar.tsx";
 const meta: Meta<typeof IndeterminateBar> = {
   title: "OCTANT/Atoms/IndeterminateBar",
   component: IndeterminateBar,
+  tags: ["autodocs"],
   args: { label: "STREAM · indeterminate" },
+  argTypes: {
+    cells: { control: { type: "number", min: 4, max: 96, step: 1 } },
+    color: { control: "color" },
+    size: { control: { type: "number", min: 8, max: 48, step: 1 } },
+    speed: { control: { type: "number", min: 0.1, max: 6, step: 0.1 } },
+    label: { control: "text" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof IndeterminateBar>;

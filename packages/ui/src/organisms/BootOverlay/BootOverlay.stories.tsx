@@ -5,6 +5,15 @@ import { BootOverlay } from "./BootOverlay.tsx";
 const meta: Meta<typeof BootOverlay> = {
   title: "OCTANT/Organisms/BootOverlay",
   component: BootOverlay,
+  tags: ["autodocs"],
+  argTypes: {
+    open: { control: "boolean", description: "Controlled visibility." },
+    defaultOpen: { control: "boolean" },
+    lines: { control: "object", description: "Boot-log lines." },
+    accent: { control: "color" },
+    onOpenChange: { action: "open-changed" },
+    onDone: { action: "done" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof BootOverlay>;

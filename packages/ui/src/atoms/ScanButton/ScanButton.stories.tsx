@@ -4,7 +4,15 @@ import { ScanButton } from "./ScanButton.tsx";
 const meta: Meta<typeof ScanButton> = {
   title: "OCTANT/Atoms/ScanButton",
   component: ScanButton,
+  tags: ["autodocs"],
   args: { children: "SCAN" },
+  argTypes: {
+    children: { control: "text" },
+    scanColor: { control: "color" },
+    borderColor: { control: "color" },
+    disabled: { control: "boolean" },
+    onClick: { action: "clicked" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof ScanButton>;

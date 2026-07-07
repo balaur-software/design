@@ -1,9 +1,20 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { fn } from "@storybook/test";
 import { LogStream } from "./LogStream.tsx";
 
 const meta: Meta<typeof LogStream> = {
   title: "OCTANT/Organisms/LogStream",
   component: LogStream,
+  tags: ["autodocs"],
+  argTypes: {
+    messages: { control: "object", description: "Pool of messages randomly appended to the stream." },
+    title: { control: "text" },
+    interval: { control: { type: "number", min: 100, max: 10000, step: 100 } },
+    maxLines: { control: { type: "number", min: 3, max: 200, step: 1 } },
+    initialCount: { control: { type: "number", min: 0, max: 50, step: 1 } },
+    placeholder: { control: "text" },
+    onCommand: { action: "command" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof LogStream>;
@@ -48,13 +59,7 @@ export const CustomFeed: Story = {
 export const WithCommandHandler: Story = {
   render: () => (
     <div style={{ maxWidth: 560 }}>
-      <LogStream
-        title="CONSOLE"
-        onCommand={(c) => {
-          // eslint-disable-next-line no-console
-          console.log("command:", c);
-        }}
-      />
+      <LogStream title="CONSOLE" onCommand={fn()} />
     </div>
   ),
 };

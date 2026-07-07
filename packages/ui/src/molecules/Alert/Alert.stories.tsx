@@ -4,12 +4,16 @@ import { Alert } from "./Alert.tsx";
 const meta: Meta<typeof Alert> = {
   title: "OCTANT/Molecules/Alert",
   component: Alert,
+  tags: ["autodocs"],
   args: {
     kind: "info",
     children: "Octant glyphs detected — rendering with native U+1CD00 cells.",
   },
   argTypes: {
     kind: { control: "inline-radio", options: ["ok", "info", "warn", "err"] },
+    children: { control: "text" },
+    dismissible: { control: "boolean" },
+    onDismiss: { action: "dismissed" },
   },
 };
 export default meta;

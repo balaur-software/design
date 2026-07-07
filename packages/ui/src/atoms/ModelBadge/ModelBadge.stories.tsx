@@ -4,6 +4,12 @@ import { ModelBadge } from "./ModelBadge.tsx";
 const meta: Meta<typeof ModelBadge> = {
   title: "OCTANT/Atoms/ModelBadge",
   component: ModelBadge,
+  tags: ["autodocs"],
+  argTypes: {
+    model: { control: "text" },
+    glyph: { control: "text" },
+    meta: { control: "object", description: "Secondary neutral meta tags." },
+  },
 };
 export default meta;
 

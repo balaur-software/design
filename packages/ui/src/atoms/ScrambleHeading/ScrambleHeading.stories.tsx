@@ -4,7 +4,15 @@ import { ScrambleHeading } from "./ScrambleHeading.tsx";
 const meta: Meta<typeof ScrambleHeading> = {
   title: "OCTANT/Atoms/ScrambleHeading",
   component: ScrambleHeading,
+  tags: ["autodocs"],
   args: { text: "COMPONENT INDEX" },
+  argTypes: {
+    text: { control: "text" },
+    as: { control: "select", options: ["h1", "h2", "h3", "h4", "h5", "h6"] },
+    accent: { control: "boolean" },
+    dur: { control: { type: "number", min: 100, max: 4000, step: 100 } },
+    delay: { control: { type: "number", min: 0, max: 2000, step: 20 } },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof ScrambleHeading>;

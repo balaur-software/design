@@ -1,10 +1,20 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { fn } from "@storybook/test";
 import type { Agent, ChatMessageData } from "../../organisms/ChatPanel/chat-types";
 import { ChatMessage } from "./ChatMessage";
 
 const meta: Meta<typeof ChatMessage> = {
   title: "OCTANT/Molecules/ChatMessage",
   component: ChatMessage,
+  tags: ["autodocs"],
+  argTypes: {
+    message: {
+      control: "object",
+      description: "ChatMessageData: { id, role, time?, agentId?, blocks, status? }.",
+    },
+    agent: { control: "object", description: "Agent descriptor for agent messages." },
+    onArtifactOpen: { action: "artifact-opened" },
+  },
 };
 export default meta;
 
@@ -45,6 +55,8 @@ const toolMsg: ChatMessageData = {
     },
   ],
 };
+
+export const Default: StoryObj = { args: { message: userMsg, onArtifactOpen: fn() } };
 
 export const User: StoryObj = { args: { message: userMsg } };
 export const AgentStreaming: StoryObj = { args: { message: agentMsg, agent } };

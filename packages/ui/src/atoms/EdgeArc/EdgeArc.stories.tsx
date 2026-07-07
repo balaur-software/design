@@ -1,15 +1,41 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { EdgeArc } from "./EdgeArc";
 
+const EDGE_TYPES = ["links", "supersedes", "merged_into", "derived_from", "on_day", "no_match"];
+
 const meta: Meta<typeof EdgeArc> = {
   title: "OCTANT/Atoms/EdgeArc",
   component: EdgeArc,
+  tags: ["autodocs"],
+  args: { x1: 20, y1: 30, x2: 400, y2: 30, edgeType: "links", highlighted: true },
+  argTypes: {
+    edgeType: { control: "select", options: EDGE_TYPES },
+    x1: { control: { type: "number", min: 0, max: 400, step: 1 } },
+    y1: { control: { type: "number", min: 0, max: 240, step: 1 } },
+    x2: { control: { type: "number", min: 0, max: 400, step: 1 } },
+    y2: { control: { type: "number", min: 0, max: 240, step: 1 } },
+    curve: { control: { type: "range", min: -0.5, max: 0.5, step: 0.01 } },
+    strokeWidth: { control: { type: "number", min: 0.5, max: 6, step: 0.5 } },
+    closed: { control: "boolean" },
+    highlighted: { control: "boolean" },
+    onClick: { action: "clicked" },
+  },
+  render: (args) => (
+    <svg width={420} height={120} style={{ background: "var(--bx-bg, #0a0b0e)" }}>
+      <title>Edge arc</title>
+      <EdgeArc {...args} />
+    </svg>
+  ),
 };
 export default meta;
 
-const TYPES = ["links", "supersedes", "merged_into", "derived_from", "on_day", "no_match"];
+type Story = StoryObj<typeof EdgeArc>;
 
-export const Types: StoryObj = {
+export const Default: Story = {};
+
+const TYPES = EDGE_TYPES;
+
+export const Types: Story = {
   render: () => (
     <svg width={420} height={240} style={{ background: "var(--bx-bg, #0a0b0e)" }}>
       <title>Edge types</title>
@@ -20,7 +46,7 @@ export const Types: StoryObj = {
   ),
 };
 
-export const States: StoryObj = {
+export const States: Story = {
   render: () => (
     <svg width={420} height={180} style={{ background: "var(--bx-bg, #0a0b0e)" }}>
       <title>Edge arc states</title>

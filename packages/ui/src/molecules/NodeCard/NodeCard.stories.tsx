@@ -1,12 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { fn } from "@storybook/test";
 import type { MemoryNode } from "../../organisms/MemoryExplorer/memory-types";
 import { NodeCard } from "./NodeCard";
-
-const meta: Meta<typeof NodeCard> = {
-  title: "OCTANT/Molecules/NodeCard",
-  component: NodeCard,
-};
-export default meta;
 
 const node: MemoryNode = {
   id: "n1",
@@ -24,11 +19,23 @@ const node: MemoryNode = {
   aliases: ["lake house", "cabin"],
 };
 
-export const Default: StoryObj = {
+const meta: Meta<typeof NodeCard> = {
+  title: "OCTANT/Molecules/NodeCard",
+  component: NodeCard,
+  tags: ["autodocs"],
   args: { node, style: { width: 320 } },
+  argTypes: {
+    node: { control: "object", description: "MemoryNode descriptor." },
+    onClick: { action: "clicked" },
+  },
 };
+export default meta;
 
-export const Proposed: StoryObj = {
+type Story = StoryObj<typeof NodeCard>;
+
+export const Default: Story = { args: { onClick: fn() } };
+
+export const Proposed: Story = {
   render: () => (
     <NodeCard
       node={{ ...node, status: "proposed", importance: 2, origin: "turn:abc", author: "" }}
@@ -37,7 +44,7 @@ export const Proposed: StoryObj = {
   ),
 };
 
-export const Quarantined: StoryObj = {
+export const Quarantined: Story = {
   render: () => (
     <NodeCard
       node={{ ...node, status: "quarantined", surfacing: "ask", importance: 5, when: null }}

@@ -4,7 +4,14 @@ import { Steps } from "./Steps.tsx";
 const meta: Meta<typeof Steps> = {
   title: "OCTANT/Molecules/Steps",
   component: Steps,
+  tags: ["autodocs"],
   args: { steps: ["DECODE", "DITHER", "RENDER", "EXPORT"], defaultStep: 2 },
+  argTypes: {
+    steps: { control: "object", description: "Ordered stage labels." },
+    step: { control: { type: "number", min: 0, max: 20, step: 1 }, description: "Controlled active index." },
+    defaultStep: { control: { type: "number", min: 0, max: 20, step: 1 } },
+    onStepChange: { action: "step-changed" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof Steps>;

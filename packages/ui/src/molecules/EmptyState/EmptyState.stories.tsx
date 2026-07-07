@@ -4,10 +4,18 @@ import { EmptyState } from "./EmptyState.tsx";
 const meta: Meta<typeof EmptyState> = {
   title: "OCTANT/Molecules/EmptyState",
   component: EmptyState,
+  tags: ["autodocs"],
   args: {
     title: "NO CELLS LIT",
     description: "The octant buffer is empty. Seed it with random cells or start drawing to begin.",
     cta: "SEED RANDOM ▸",
+  },
+  argTypes: {
+    title: { control: "text" },
+    description: { control: "text" },
+    art: { control: "text", description: "ASCII art above the title." },
+    cta: { control: "text" },
+    onCtaClick: { action: "cta-clicked" },
   },
 };
 export default meta;

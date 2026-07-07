@@ -4,6 +4,15 @@ import { ResizableSplit } from "./ResizableSplit.tsx";
 const meta: Meta<typeof ResizableSplit> = {
   title: "OCTANT/Organisms/ResizableSplit",
   component: ResizableSplit,
+  tags: ["autodocs"],
+  argTypes: {
+    split: { control: { type: "range", min: 0, max: 100, step: 1 }, description: "Controlled left-panel width (%)." },
+    defaultSplit: { control: { type: "range", min: 0, max: 100, step: 1 } },
+    min: { control: { type: "number", min: 0, max: 100, step: 1 } },
+    max: { control: { type: "number", min: 0, max: 100, step: 1 } },
+    height: { control: { type: "number", min: 80, max: 1200, step: 8 } },
+    onSplitChange: { action: "split-changed" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof ResizableSplit>;

@@ -5,6 +5,13 @@ import { ChatThread } from "./ChatThread";
 const meta: Meta<typeof ChatThread> = {
   title: "OCTANT/Organisms/ChatThread",
   component: ChatThread,
+  tags: ["autodocs"],
+  argTypes: {
+    messages: { control: "object", description: "ChatMessageData[] (id, role, time?, agentId?, blocks)." },
+    agents: { control: "object", description: "Agent lookup indexed by id." },
+    streaming: { control: "boolean" },
+    onArtifactOpen: { action: "artifact-opened" },
+  },
 };
 export default meta;
 
@@ -50,6 +57,15 @@ const messages: ChatMessageData[] = [
     blocks: [{ type: "text", text: "I can extend it — want a dither pass too?" }],
   },
 ];
+
+export const Default: StoryObj = {
+  args: { messages: messages.slice(0, 2), agents },
+  render: (args) => (
+    <div style={{ height: 420, border: "1px solid var(--bx-border, #1c1d24)" }}>
+      <ChatThread {...args} />
+    </div>
+  ),
+};
 
 export const MultiTurn: StoryObj = {
   render: () => (

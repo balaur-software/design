@@ -5,6 +5,7 @@ import { Toast } from "./Toast.tsx";
 const meta: Meta<typeof Toast> = {
   title: "OCTANT/Molecules/Toast",
   component: Toast,
+  tags: ["autodocs"],
   decorators: [
     (Story) => (
       <ToastProvider>

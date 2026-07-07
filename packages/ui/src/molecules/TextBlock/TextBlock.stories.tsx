@@ -4,6 +4,11 @@ import { TextBlock } from "./TextBlock";
 const meta: Meta<typeof TextBlock> = {
   title: "OCTANT/Molecules/TextBlock",
   component: TextBlock,
+  tags: ["autodocs"],
+  argTypes: {
+    text: { control: "text" },
+    streaming: { control: "boolean" },
+  },
 };
 export default meta;
 

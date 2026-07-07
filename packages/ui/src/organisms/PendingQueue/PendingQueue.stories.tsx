@@ -1,10 +1,19 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import type { MemoryNode } from "../MemoryExplorer/memory-types";
+import { fn } from "@storybook/test";
 import { PendingQueue } from "./PendingQueue";
 
 const meta: Meta<typeof PendingQueue> = {
   title: "OCTANT/Organisms/PendingQueue",
   component: PendingQueue,
+  tags: ["autodocs"],
+  argTypes: {
+    items: { control: "object", description: "Proposed MemoryNode[] awaiting verdict." },
+    selectedId: { control: "text" },
+    header: { control: "object", description: "Optional header node above the list." },
+    onSelect: { action: "selected" },
+    onVerdict: { action: "verdict" },
+  },
 };
 export default meta;
 
@@ -32,12 +41,7 @@ const items: MemoryNode[] = [
 
 export const Default: StoryObj = {
   render: () => (
-    <PendingQueue
-      items={items}
-      onSelect={(id) => alert(`select ${id}`)}
-      onVerdict={(id, v) => alert(`verdict ${v} on ${id}`)}
-      style={{ width: 380 }}
-    />
+    <PendingQueue items={items} onSelect={fn()} onVerdict={fn()} style={{ width: 380 }} />
   ),
 };
 

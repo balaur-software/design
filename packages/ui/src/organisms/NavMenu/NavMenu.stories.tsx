@@ -26,7 +26,11 @@ const ITEMS: NavMenuItem[] = [
 const meta: Meta<typeof NavMenu> = {
   title: "OCTANT/Organisms/NavMenu",
   component: NavMenu,
+  tags: ["autodocs"],
   args: { items: ITEMS },
+  argTypes: {
+    items: { control: "object", description: "NavMenuItem[]: { label, cards?[], links?[], href? }." },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof NavMenu>;

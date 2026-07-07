@@ -1,12 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import type { PlanStep } from "../ChatPanel/chat-types";
+import { fn } from "@storybook/test";
 import { AgentPlan } from "./AgentPlan";
-
-const meta: Meta<typeof AgentPlan> = {
-  title: "OCTANT/Organisms/AgentPlan",
-  component: AgentPlan,
-};
-export default meta;
 
 const steps: PlanStep[] = [
   { id: "1", label: "Read the buffer", status: "done" },
@@ -17,11 +12,27 @@ const steps: PlanStep[] = [
   { id: "6", label: "Flush stream", status: "pending" },
 ];
 
-export const MidExecution: StoryObj = { args: { steps } };
-export const AllDone: StoryObj = {
+const meta: Meta<typeof AgentPlan> = {
+  title: "OCTANT/Organisms/AgentPlan",
+  component: AgentPlan,
+  tags: ["autodocs"],
+  args: { steps, onStepClick: fn() },
+  argTypes: {
+    steps: { control: "object", description: "PlanStep[]: { id, label, status, detail? }." },
+    onStepClick: { action: "step-clicked" },
+  },
+};
+export default meta;
+
+type Story = StoryObj<typeof AgentPlan>;
+
+export const Default: Story = {};
+
+export const MidExecution: Story = { args: { steps } };
+export const AllDone: Story = {
   args: { steps: steps.map((s) => ({ ...s, status: "done" as const, detail: undefined })) },
 };
-export const WithError: StoryObj = {
+export const WithError: Story = {
   args: {
     steps: [
       ...steps.slice(0, 3),

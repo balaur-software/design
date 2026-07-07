@@ -4,6 +4,15 @@ import { Equalizer } from "./Equalizer.tsx";
 const meta: Meta<typeof Equalizer> = {
   title: "OCTANT/Atoms/Equalizer",
   component: Equalizer,
+  tags: ["autodocs"],
+  argTypes: {
+    bands: { control: { type: "number", min: 2, max: 64, step: 1 } },
+    motion: { control: { type: "range", min: 0, max: 1, step: 0.05 } },
+    colors: { control: "object", description: "Colours cycled across the bands." },
+    height: { control: { type: "number", min: 32, max: 240, step: 4 } },
+    fontSize: { control: { type: "number", min: 12, max: 96, step: 1 } },
+    label: { control: "text" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof Equalizer>;

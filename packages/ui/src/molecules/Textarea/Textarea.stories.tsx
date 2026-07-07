@@ -4,6 +4,16 @@ import { Textarea } from "./Textarea.tsx";
 const meta: Meta<typeof Textarea> = {
   title: "OCTANT/Molecules/Textarea",
   component: Textarea,
+  tags: ["autodocs"],
+  argTypes: {
+    value: { control: "text", description: "Controlled value." },
+    defaultValue: { control: "text" },
+    maxLength: { control: { type: "number", min: 1, max: 10000, step: 1 } },
+    hint: { control: "text" },
+    placeholder: { control: "text" },
+    disabled: { control: "boolean" },
+    onChange: { action: "changed" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof Textarea>;

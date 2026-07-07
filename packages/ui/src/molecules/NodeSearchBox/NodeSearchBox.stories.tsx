@@ -1,12 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { fn } from "@storybook/test";
 import type { MemoryNode } from "../../organisms/MemoryExplorer/memory-types";
 import { NodeSearchBox } from "./NodeSearchBox";
-
-const meta: Meta<typeof NodeSearchBox> = {
-  title: "OCTANT/Molecules/NodeSearchBox",
-  component: NodeSearchBox,
-};
-export default meta;
 
 const results: MemoryNode[] = [
   {
@@ -53,17 +48,31 @@ const results: MemoryNode[] = [
   },
 ];
 
-export const WithResults: StoryObj = {
-  render: () => (
-    <NodeSearchBox
-      defaultValue="ana"
-      results={results}
-      onSelect={(id) => alert(`select ${id}`)}
-      style={{ width: 360 }}
-    />
-  ),
+const meta: Meta<typeof NodeSearchBox> = {
+  title: "OCTANT/Molecules/NodeSearchBox",
+  component: NodeSearchBox,
+  tags: ["autodocs"],
+  argTypes: {
+    value: { control: "text" },
+    defaultValue: { control: "text" },
+    results: { control: "object", description: "Search results from the caller's recall/search." },
+    onSelect: { action: "selected" },
+    onValueChange: { action: "value-changed" },
+    placeholder: { control: "text" },
+  },
+};
+export default meta;
+
+type Story = StoryObj<typeof NodeSearchBox>;
+
+export const Default: Story = {
+  render: () => <NodeSearchBox results={results} onSelect={fn()} style={{ width: 360 }} />,
 };
 
-export const Empty: StoryObj = {
+export const WithResults: Story = {
+  render: () => <NodeSearchBox defaultValue="ana" results={results} onSelect={fn()} style={{ width: 360 }} />,
+};
+
+export const Empty: Story = {
   render: () => <NodeSearchBox results={[]} style={{ width: 360 }} />,
 };

@@ -5,6 +5,7 @@ import { Popover } from "./Popover.tsx";
 const meta: Meta<typeof Popover> = {
   title: "OCTANT/Molecules/Popover",
   component: Popover,
+  tags: ["autodocs"],
   decorators: [
     (Story) => (
       <ToastProvider>
@@ -12,6 +13,19 @@ const meta: Meta<typeof Popover> = {
       </ToastProvider>
     ),
   ],
+  argTypes: {
+    label: { control: "text" },
+    title: { control: "text" },
+    description: { control: "text" },
+    options: { control: "object", description: "Single-select toggle options." },
+    value: { control: "text", description: "Controlled selected option." },
+    defaultValue: { control: "text" },
+    applyLabel: { control: "text" },
+    toastMessage: { control: "text" },
+    width: { control: { type: "number", min: 160, max: 480, step: 8 } },
+    align: { control: "radio", options: ["start", "end"] },
+    onChange: { action: "changed" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof Popover>;

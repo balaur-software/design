@@ -1,11 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { fn } from "@storybook/test";
 import { ArtifactPanel } from "./ArtifactPanel";
-
-const meta: Meta<typeof ArtifactPanel> = {
-  title: "OCTANT/Molecules/ArtifactPanel",
-  component: ArtifactPanel,
-};
-export default meta;
 
 const code = {
   type: "artifact" as const,
@@ -24,8 +19,28 @@ const doc = {
   content: "# Plan\n- rasterise field\n- dither output\n",
 };
 
-export const Code: StoryObj = { args: { block: code } };
-export const Document: StoryObj = { args: { block: doc } };
-export const Image: StoryObj = {
+const meta: Meta<typeof ArtifactPanel> = {
+  title: "OCTANT/Molecules/ArtifactPanel",
+  component: ArtifactPanel,
+  tags: ["autodocs"],
+  args: { block: code, onOpen: fn() },
+  argTypes: {
+    block: {
+      control: "object",
+      description: "ArtifactBlockData: { type, id, title, kind, language?, content }.",
+    },
+    previewMaxHeight: { control: { type: "number", min: 80, max: 800, step: 8 } },
+    onOpen: { action: "opened" },
+  },
+};
+export default meta;
+
+type Story = StoryObj<typeof ArtifactPanel>;
+
+export const Default: Story = {};
+
+export const Code: Story = { args: { block: code } };
+export const Document: Story = { args: { block: doc } };
+export const Image: Story = {
   args: { block: { type: "artifact", id: "a3", title: "frame.png", kind: "image", content: "" } },
 };

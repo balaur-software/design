@@ -4,6 +4,15 @@ import { BrailleSpinner } from "./BrailleSpinner.tsx";
 const meta: Meta<typeof BrailleSpinner> = {
   title: "OCTANT/Atoms/BrailleSpinner",
   component: BrailleSpinner,
+  tags: ["autodocs"],
+  args: { variant: "wave" },
+  argTypes: {
+    variant: { control: "select", options: ["wave", "pulse", "orbit", "grow"] },
+    color: { control: "color" },
+    size: { control: { type: "number", min: 8, max: 96, step: 1 } },
+    speed: { control: { type: "number", min: 0.1, max: 4, step: 0.1 } },
+    label: { control: "text" },
+  },
 };
 export default meta;
 

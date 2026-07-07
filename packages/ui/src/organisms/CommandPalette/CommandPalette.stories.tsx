@@ -1,10 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { fn } from "@storybook/test";
 import { ToastProvider } from "../../primitives";
 import { type CommandGroup, CommandPalette } from "./CommandPalette.tsx";
 
 const meta: Meta<typeof CommandPalette> = {
   title: "OCTANT/Organisms/CommandPalette",
   component: CommandPalette,
+  tags: ["autodocs"],
   decorators: [
     (Story) => (
       <ToastProvider>
@@ -27,6 +29,17 @@ const meta: Meta<typeof CommandPalette> = {
       </ToastProvider>
     ),
   ],
+  argTypes: {
+    commands: { control: "object", description: "CommandGroup[]: { group, items[] }." },
+    open: { control: "boolean", description: "Controlled open state." },
+    defaultOpen: { control: "boolean" },
+    showTrigger: { control: "boolean" },
+    placeholder: { control: "text" },
+    triggerLabel: { control: "text" },
+    onOpenChange: { action: "open-changed" },
+    onNavigate: { action: "navigated" },
+    onSelect: { action: "selected" },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof CommandPalette>;
@@ -63,8 +76,7 @@ export const CustomCommands: Story = {
   args: {
     commands: DEPLOY_COMMANDS,
     triggerLabel: "Search deploy actions…",
-    // eslint-disable-next-line no-console
-    onNavigate: (to) => console.log("navigate:", to),
+    onNavigate: fn(),
   },
 };
 
