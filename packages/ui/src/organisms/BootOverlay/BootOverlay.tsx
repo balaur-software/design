@@ -149,7 +149,25 @@ export function BootOverlay({
         ...style,
       }}
     >
+      {/* Stable live-region text: the animated log below mutates every frame,
+          so it is aria-hidden and screen readers hear only the milestones. */}
+      <span
+        style={{
+          position: "absolute",
+          width: 1,
+          height: 1,
+          padding: 0,
+          margin: -1,
+          overflow: "hidden",
+          clipPath: "inset(50%)",
+          whiteSpace: "nowrap",
+          border: 0,
+        }}
+      >
+        {complete ? "Boot complete" : "Booting…"}
+      </span>
       <div
+        aria-hidden="true"
         style={{
           margin: 0,
           fontFamily: "var(--bx-font-mono, ui-monospace, monospace)",

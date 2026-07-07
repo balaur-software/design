@@ -1,10 +1,10 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, waitFor } from "storybook/test";
 import { DecodeScramble } from "./DecodeScramble.tsx";
 
-const meta: Meta<typeof DecodeScramble> = {
+const meta = {
   title: "OCTANT/Atoms/DecodeScramble",
   component: DecodeScramble,
-  tags: ["autodocs"],
   args: { text: "DESERIALIZE" },
   argTypes: {
     text: { control: "text" },
@@ -13,11 +13,19 @@ const meta: Meta<typeof DecodeScramble> = {
     color: { control: "color" },
     fontSize: { control: { type: "number", min: 10, max: 80, step: 1 } },
   },
-};
+} satisfies Meta<typeof DecodeScramble>;
 export default meta;
-type Story = StoryObj<typeof DecodeScramble>;
+type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
+/** Click to replay: the scramble sweep resolves back into the exact text. */
+export const Default: Story = {
+  play: async ({ canvas, userEvent }) => {
+    const el = canvas.getByRole("button", { name: "DESERIALIZE" });
+    await userEvent.click(el);
+    // The replayed sweep must settle on the exact target text.
+    await waitFor(() => expect(el).toHaveTextContent(/^DESERIALIZE$/), { timeout: 3000 });
+  },
+};
 
 export const Hover: Story = {
   args: { text: "REPLICATE", trigger: "hover" },

@@ -1,4 +1,4 @@
-import { type CSSProperties, type PointerEvent as ReactPointerEvent, useRef } from "react";
+import { type CSSProperties, type PointerEvent as ReactPointerEvent, useId, useRef } from "react";
 import { useBar8Fill } from "../../hooks/useBar8Fill";
 import { useControllableState } from "../../hooks/useControllableState";
 
@@ -46,6 +46,7 @@ export function Slider({
   style,
 }: SliderProps) {
   const [val, setVal] = useControllableState(value, defaultValue, onChange);
+  const labelId = useId();
   const trackRef = useRef<HTMLDivElement>(null);
   const fillRef = useRef<HTMLPreElement>(null);
   const draggingRef = useRef(false);
@@ -107,7 +108,7 @@ export function Slider({
           marginBottom: 16,
         }}
       >
-        <span>{label}</span>
+        <span id={labelId}>{label}</span>
         <span style={{ color: accentColor }}>{formatValue(clamped, fraction)}</span>
       </div>
       <div
@@ -116,6 +117,8 @@ export function Slider({
         aria-valuemin={min}
         aria-valuemax={max}
         aria-valuenow={clamped}
+        aria-valuetext={formatValue(clamped, fraction)}
+        aria-labelledby={labelId}
         aria-disabled={disabled}
         tabIndex={disabled ? -1 : 0}
         onPointerDown={onPointerDown}

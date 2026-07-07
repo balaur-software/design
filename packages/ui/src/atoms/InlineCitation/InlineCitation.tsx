@@ -9,6 +9,8 @@ export interface InlineCitationProps {
   accent?: string;
   /** Chip border color. Defaults to the accent-border token. */
   border?: string;
+  className?: string;
+  style?: CSSProperties;
 }
 
 /**
@@ -21,9 +23,11 @@ export function InlineCitation({
   href = "#",
   accent = "var(--bx-accent,#46c66d)",
   border = "var(--bx-border-accent,#2a3320)",
+  className,
+  style,
 }: InlineCitationProps) {
   return (
-    <a href={href} style={{ textDecoration: "none" }}>
+    <a href={href} className={className} style={{ textDecoration: "none", ...style }}>
       <span
         style={{
           border: `1px solid ${border}`,

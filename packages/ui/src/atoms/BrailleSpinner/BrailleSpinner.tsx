@@ -56,7 +56,7 @@ export function BrailleSpinner({
 
   return (
     <div
-      role="img"
+      role="status"
       aria-label={label ? `${label} loading` : "loading"}
       style={{ textAlign: "center", ...style }}
     >

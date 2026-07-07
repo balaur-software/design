@@ -1,22 +1,31 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, waitFor } from "storybook/test";
 import { ScrambleButton } from "./ScrambleButton.tsx";
 
-const meta: Meta<typeof ScrambleButton> = {
+const meta = {
   title: "OCTANT/Molecules/ScrambleButton",
   component: ScrambleButton,
-  tags: ["autodocs"],
-  args: { text: "DECRYPT" },
+  args: { text: "DECRYPT", onClick: fn() },
   argTypes: {
     text: { control: "text" },
     color: { control: "color" },
     borderColor: { control: "color" },
     disabled: { control: "boolean" },
   },
-};
+} satisfies Meta<typeof ScrambleButton>;
 export default meta;
-type Story = StoryObj<typeof ScrambleButton>;
+type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
+/** Hovering scrambles the label into place; the button stays a plain clickable button. */
+export const Default: Story = {
+  play: async ({ canvas, userEvent, args }) => {
+    const button = canvas.getByRole("button");
+    await userEvent.click(button);
+    await expect(args.onClick).toHaveBeenCalledOnce();
+    // after the 560ms scramble resolves the label reads its true text again
+    await waitFor(() => expect(button).toHaveTextContent("DECRYPT"), { timeout: 1500 });
+  },
+};
 
 export const Cyan: Story = {
   args: { text: "DECODE", color: "#2bd9d9", borderColor: "#1d3540" },
@@ -30,8 +39,15 @@ export const Accent: Story = {
   },
 };
 
+/** Disabled: never scrambles and swallows clicks. */
 export const Disabled: Story = {
   args: { text: "LOCKED", disabled: true },
+  play: async ({ canvas, userEvent, args }) => {
+    const button = canvas.getByRole("button", { name: /locked/i });
+    await expect(button).toBeDisabled();
+    await userEvent.click(button);
+    await expect(args.onClick).not.toHaveBeenCalled();
+  },
 };
 
 export const Row: Story = {

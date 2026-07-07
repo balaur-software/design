@@ -164,13 +164,14 @@ export function Timeline({ events = DEFAULT_EVENTS, max = 6, interval = 5200, st
               height: 7,
               background: "var(--bx-accent, #46c66d)",
               display: "inline-block",
-              animation: "bx-blink 1.4s steps(1) infinite",
+              animation: reduced ? "none" : "bx-blink 1.4s steps(1) infinite",
             }}
           />
           LIVE
         </span>
       </div>
-      <div ref={listRef}>
+      {/* role="log" (implicit aria-live) so streamed entries are announced. */}
+      <div ref={listRef} role="log">
         {entries.map((entry) => (
           <TimelineEntry key={entry.id} entry={entry} />
         ))}

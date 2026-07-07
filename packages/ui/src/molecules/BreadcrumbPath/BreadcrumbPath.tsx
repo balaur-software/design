@@ -14,9 +14,13 @@ export interface BreadcrumbPathProps {
   style?: CSSProperties;
 }
 
-const link: CSSProperties = { color: "#7b8290", cursor: "pointer", textDecoration: "none" };
+const link: CSSProperties = {
+  color: "var(--bx-text-5, #7b8290)",
+  cursor: "pointer",
+  textDecoration: "none",
+};
 const current: CSSProperties = { color: "var(--bx-accent, #46c66d)" };
-const sep: CSSProperties = { color: "#3f424d" };
+const sep: CSSProperties = { color: "var(--bx-text-dim, #3f424d)" };
 
 /**
  * A node-title breadcrumb for the memory explorer: `MEMORY ▸ type ▸ title`,

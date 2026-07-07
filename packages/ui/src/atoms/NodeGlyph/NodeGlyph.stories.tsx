@@ -1,4 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 import type { MemoryNode } from "../../organisms/MemoryExplorer/memory-types";
 import { NodeGlyph } from "./NodeGlyph";
 
@@ -17,11 +18,10 @@ const baseNode: MemoryNode = {
   author: "",
 };
 
-const meta: Meta<typeof NodeGlyph> = {
+const meta = {
   title: "OCTANT/Atoms/NodeGlyph",
   component: NodeGlyph,
-  tags: ["autodocs"],
-  args: { node: baseNode, x: 60, y: 60, selected: true, showLabel: true },
+  args: { node: baseNode, x: 60, y: 60, selected: true, showLabel: true, onClick: fn() },
   argTypes: {
     node: { control: "object", description: "MemoryNode descriptor." },
     x: { control: { type: "number", min: 0, max: 600, step: 1 } },
@@ -39,12 +39,18 @@ const meta: Meta<typeof NodeGlyph> = {
       <NodeGlyph {...args} />
     </svg>
   ),
-};
+} satisfies Meta<typeof NodeGlyph>;
 export default meta;
 
-type Story = StoryObj<typeof NodeGlyph>;
+type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
+/** A selected, labelled marker — clicking it reports the node id. */
+export const Default: Story = {
+  play: async ({ args, canvas, userEvent }) => {
+    await userEvent.click(canvas.getByText("lake house"));
+    await expect(args.onClick).toHaveBeenCalledWith("n");
+  },
+};
 
 const node = (over: Partial<MemoryNode> = {}): MemoryNode => ({ ...baseNode, ...over });
 
@@ -58,6 +64,7 @@ const STATUSES = [
   "merged",
 ] as const;
 
+/** Every status colour plus the selected / hovered / pinned / dimmed variants. */
 export const States: Story = {
   render: () => (
     <svg width={520} height={180} style={{ background: "var(--bx-bg, #0a0b0e)" }}>

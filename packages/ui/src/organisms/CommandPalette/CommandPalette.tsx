@@ -240,6 +240,7 @@ export function CommandPalette({
           <input
             type="text"
             role="combobox"
+            aria-label="Search commands"
             aria-expanded={open}
             aria-controls={listId}
             aria-activedescendant={flat.length > 0 ? `${baseId}-opt-${hi}` : undefined}
@@ -298,9 +299,11 @@ export function CommandPalette({
           role="listbox"
           style={{ maxHeight: 340, overflowY: "auto", padding: 6 }}
         >
-          {groups.map(({ group, items }) => (
-            <div key={group}>
+          {groups.map(({ group, items }, gi) => (
+            <div key={group} role="group" aria-labelledby={`${baseId}-grp-${gi}`}>
               <div
+                id={`${baseId}-grp-${gi}`}
+                role="presentation"
                 style={{
                   color: "var(--bx-text-dim, #3f424d)",
                   fontSize: 10,

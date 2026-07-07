@@ -1,4 +1,4 @@
-import { type CSSProperties, useRef } from "react";
+import { type CSSProperties, type KeyboardEvent, useRef } from "react";
 import { useControllableState } from "../../hooks/useControllableState";
 import { useSlidingIndicator } from "../../hooks/useSlidingIndicator";
 
@@ -18,7 +18,8 @@ export interface SegmentedControlProps {
  * to the active segment. Selection is via `useControllableState`; the underline's
  * position is measured with `useSlidingIndicator` (offsetLeft/offsetWidth of the
  * active `[data-slide-item]`), so it renders empty on the server and eases into
- * place after mount once layout is known.
+ * place after mount once layout is known. Follows the APG radio-group pattern:
+ * a roving tabindex with arrow keys moving both selection and focus (wrapping).
  */
 export function SegmentedControl({
   options,
@@ -33,11 +34,30 @@ export function SegmentedControl({
   const active = Math.max(0, options.indexOf(selected));
   const indicator = useSlidingIndicator(ref, active);
 
+  const focusIndex = (i: number) => {
+    ref.current?.querySelectorAll<HTMLElement>("[data-slide-item]")[i]?.focus();
+  };
+
+  const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (options.length === 0) return;
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "ArrowUp" || e.key === "ArrowDown") {
+      e.preventDefault();
+      const dir = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : -1;
+      const next = (active + dir + options.length) % options.length;
+      const opt = options[next];
+      if (opt !== undefined) {
+        setSelected(opt);
+        focusIndex(next);
+      }
+    }
+  };
+
   return (
     <div
       ref={ref}
       role="radiogroup"
       aria-label={ariaLabel}
+      onKeyDown={onKeyDown}
       style={{
         position: "relative",
         display: "inline-flex",
@@ -55,6 +75,7 @@ export function SegmentedControl({
             data-slide-item
             role="radio"
             aria-checked={on}
+            tabIndex={on ? 0 : -1}
             onClick={() => setSelected(opt)}
             style={{
               fontFamily: "inherit",

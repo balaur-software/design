@@ -1,32 +1,54 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 import { ResizableSplit } from "./ResizableSplit.tsx";
 
-const meta: Meta<typeof ResizableSplit> = {
+const meta = {
   title: "OCTANT/Organisms/ResizableSplit",
   component: ResizableSplit,
-  tags: ["autodocs"],
+  args: { onSplitChange: fn() },
   argTypes: {
-    split: { control: { type: "range", min: 0, max: 100, step: 1 }, description: "Controlled left-panel width (%)." },
+    split: {
+      control: { type: "range", min: 0, max: 100, step: 1 },
+      description: "Controlled left-panel width (%).",
+    },
     defaultSplit: { control: { type: "range", min: 0, max: 100, step: 1 } },
     min: { control: { type: "number", min: 0, max: 100, step: 1 } },
     max: { control: { type: "number", min: 0, max: 100, step: 1 } },
     height: { control: { type: "number", min: 80, max: 1200, step: 8 } },
-    onSplitChange: { action: "split-changed" },
+  },
+} satisfies Meta<typeof ResizableSplit>;
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+/** The reference inspector/preview row — drag the divider or nudge it with arrow keys. */
+export const Default: Story = {
+  play: async ({ canvas, userEvent, args }) => {
+    const handle = canvas.getByRole("separator");
+    await expect(handle).toHaveAttribute("aria-valuenow", "42");
+
+    // Arrow keys nudge the focused divider by 2%.
+    handle.focus();
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(handle).toHaveAttribute("aria-valuenow", "44");
+    await expect(args.onSplitChange).toHaveBeenCalledWith(44);
+
+    await userEvent.keyboard("{ArrowLeft}{ArrowLeft}");
+    await expect(handle).toHaveAttribute("aria-valuenow", "40");
+    await expect(args.onSplitChange).toHaveBeenCalledWith(40);
   },
 };
-export default meta;
-type Story = StoryObj<typeof ResizableSplit>;
 
-export const Default: Story = {};
-
+/** Starts balanced 50/50. */
 export const EvenSplit: Story = {
   args: { defaultSplit: 50 },
 };
 
+/** Loosened bounds — the divider travels between 8% and 92%. */
 export const WideBounds: Story = {
   args: { defaultSplit: 60, min: 8, max: 92 },
 };
 
+/** Custom panel content on both sides of the divider. */
 export const CustomPanels: Story = {
   args: {
     height: 240,

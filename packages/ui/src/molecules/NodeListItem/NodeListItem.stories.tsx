@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import { fn } from "@storybook/test";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 import type { MemoryNode } from "../../organisms/MemoryExplorer/memory-types";
 import { NodeListItem } from "./NodeListItem";
 
@@ -18,25 +18,31 @@ const baseNode: MemoryNode = {
   author: "",
 };
 
-const meta: Meta<typeof NodeListItem> = {
+const meta = {
   title: "OCTANT/Molecules/NodeListItem",
   component: NodeListItem,
-  tags: ["autodocs"],
   args: { node: baseNode, selected: true },
   argTypes: {
     node: { control: "object", description: "MemoryNode descriptor." },
     selected: { control: "boolean" },
     hovered: { control: "boolean" },
     meta: { control: "text", description: "Right-aligned meta text." },
-    onSelect: { action: "selected" },
-    onHover: { action: "hovered" },
   },
-};
+} satisfies Meta<typeof NodeListItem>;
 export default meta;
 
-type Story = StoryObj<typeof NodeListItem>;
+type Story = StoryObj<typeof meta>;
 
-export const Default: Story = { args: { onSelect: fn(), onHover: fn() } };
+/** A selected row; hovering fires `onHover`, clicking fires `onSelect` with the node id. */
+export const Default: Story = {
+  args: { onSelect: fn(), onHover: fn() },
+  play: async ({ canvas, userEvent, args }) => {
+    const row = canvas.getByRole("button", { name: /lake house trip/i });
+    await userEvent.click(row);
+    await expect(args.onHover).toHaveBeenCalledWith("1");
+    await expect(args.onSelect).toHaveBeenCalledWith("1");
+  },
+};
 
 const mk = (over: Partial<MemoryNode>): MemoryNode => ({ ...baseNode, ...over });
 
@@ -47,6 +53,7 @@ const items: MemoryNode[] = [
   mk({ id: "4", title: "old note", type: "note", status: "archived" }),
 ];
 
+/** A bordered stack of rows across node types and statuses, second row selected. */
 export const List: Story = {
   render: () => (
     <div

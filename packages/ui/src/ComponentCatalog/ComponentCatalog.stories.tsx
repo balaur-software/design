@@ -1,17 +1,34 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
+import { expect, fn } from "storybook/test";
 import { CATALOG_GROUPS, ComponentCatalog } from "./ComponentCatalog.tsx";
 
-const meta: Meta<typeof ComponentCatalog> = {
+const meta = {
   title: "OCTANT/ComponentCatalog",
   component: ComponentCatalog,
-};
+  args: {
+    onFilterChange: fn(),
+    onJump: fn(),
+  },
+} satisfies Meta<typeof ComponentCatalog>;
 export default meta;
 
-type Story = StoryObj<typeof ComponentCatalog>;
+type Story = StoryObj<typeof meta>;
 
 /** The full index, uncontrolled. Type in the filter to narrow the live count. */
-export const Default: Story = {};
+export const Default: Story = {
+  play: async ({ canvas, userEvent, args }) => {
+    const filter = canvas.getByRole("textbox", { name: /filter components/i });
+    await userEvent.type(filter, "chart");
+    await expect(args.onFilterChange).toHaveBeenLastCalledWith("chart");
+    // "Bar Chart" + "Line Chart" survive the filter; the live count reflects it.
+    await expect(canvas.getByText(/2 \/ \d+ match/i)).toBeVisible();
+    await expect(canvas.getAllByRole("button", { name: /chart/i })).toHaveLength(2);
+
+    await userEvent.click(canvas.getByRole("button", { name: /bar chart/i }));
+    await expect(args.onJump).toHaveBeenCalledWith("charts");
+  },
+};
 
 /** Pre-filtered on mount via `defaultFilter` (uncontrolled). */
 export const Prefiltered: Story = {

@@ -67,15 +67,19 @@ export function Modal({
 
   useScramble(titleRef, title, { dur: 540, delay: 90, active: open });
 
-  // Entrance: fade + lift once the panel has mounted.
+  // Entrance: fade + lift once the panel has mounted; reduced-motion snaps it in.
   useEffect(() => {
     if (!open) {
       setShown(false);
       return;
     }
+    if (reduced) {
+      setShown(true);
+      return;
+    }
     const raf = requestAnimationFrame(() => setShown(true));
     return () => cancelAnimationFrame(raf);
-  }, [open]);
+  }, [open, reduced]);
 
   // Dither materialisation pass: fill the panel with random glyphs, fade to nothing.
   useEffect(() => {
@@ -134,7 +138,7 @@ export function Modal({
         boxShadow: "0 24px 60px rgba(0,0,0,0.6)",
         opacity: shown ? 1 : 0,
         transform: shown ? "translateY(0)" : "translateY(10px)",
-        transition: "opacity .22s ease, transform .22s cubic-bezier(.5,0,.2,1)",
+        transition: reduced ? "none" : "opacity .22s ease, transform .22s cubic-bezier(.5,0,.2,1)",
         ...panelStyle,
       }}
     >

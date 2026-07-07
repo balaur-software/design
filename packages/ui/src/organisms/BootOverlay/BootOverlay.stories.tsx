@@ -1,25 +1,33 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
+import { expect, fn, waitFor } from "storybook/test";
 import { BootOverlay } from "./BootOverlay.tsx";
 
-const meta: Meta<typeof BootOverlay> = {
+const meta = {
   title: "OCTANT/Organisms/BootOverlay",
   component: BootOverlay,
-  tags: ["autodocs"],
+  args: { onOpenChange: fn(), onDone: fn() },
   argTypes: {
     open: { control: "boolean", description: "Controlled visibility." },
     defaultOpen: { control: "boolean" },
     lines: { control: "object", description: "Boot-log lines." },
     accent: { control: "color" },
-    onOpenChange: { action: "open-changed" },
-    onDone: { action: "done" },
   },
-};
+} satisfies Meta<typeof BootOverlay>;
 export default meta;
-type Story = StoryObj<typeof BootOverlay>;
+type Story = StoryObj<typeof meta>;
 
 /** The default OCTANT.OS BIOS sequence — boots on mount, then self-dismisses. */
-export const Default: Story = {};
+export const Default: Story = {
+  play: async ({ canvas, userEvent, args }) => {
+    await expect(canvas.getByRole("status", { name: /system boot/i })).toBeVisible();
+    // Any keypress skips the boot; the overlay fades out then reports dismissal.
+    await userEvent.keyboard("{Enter}");
+    await waitFor(() => expect(args.onDone).toHaveBeenCalled());
+    await waitFor(() => expect(args.onOpenChange).toHaveBeenCalledWith(false));
+    await expect(canvas.queryByRole("status")).not.toBeInTheDocument();
+  },
+};
 
 /** A custom boot log. */
 export const CustomLines: Story = {
@@ -70,5 +78,12 @@ export const Replayable: Story = {
         <BootOverlay open={open} onOpenChange={setOpen} />
       </div>
     );
+  },
+  play: async ({ canvas, userEvent }) => {
+    // Skip the initial boot, then replay it from the button.
+    await userEvent.keyboard("{Enter}");
+    await waitFor(() => expect(canvas.queryByRole("status")).not.toBeInTheDocument());
+    await userEvent.click(canvas.getByRole("button", { name: /reboot/i }));
+    await expect(canvas.getByRole("status", { name: /system boot/i })).toBeVisible();
   },
 };

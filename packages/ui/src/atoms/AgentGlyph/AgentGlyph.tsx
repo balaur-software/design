@@ -30,6 +30,8 @@ export interface AgentGlyphProps {
   size?: number;
   /** Show the agent name beneath the mosaic. Default true. */
   showLabel?: boolean;
+  className?: string;
+  style?: CSSProperties;
 }
 
 /**
@@ -37,7 +39,7 @@ export interface AgentGlyphProps {
  * agent in a multi-agent thread gets a stable, distinct glyph + ANSI hue.
  * Pure static markup — deterministic across server and client.
  */
-export function AgentGlyph({ agent, size = 15, showLabel = true }: AgentGlyphProps) {
+export function AgentGlyph({ agent, size = 15, showLabel = true, className, style }: AgentGlyphProps) {
   const mosaic = agent.glyph ?? agentMosaic(agent);
   const accent = agentAccent(agent);
   const preStyle: CSSProperties = {
@@ -50,7 +52,7 @@ export function AgentGlyph({ agent, size = 15, showLabel = true }: AgentGlyphPro
     fontFamily: "var(--bx-font-mono, 'DepartureMono', ui-monospace, monospace)",
   };
   return (
-    <div style={{ textAlign: "center" }}>
+    <div className={className} style={{ textAlign: "center", ...style }}>
       <pre aria-hidden="true" style={preStyle}>
         {mosaic}
       </pre>

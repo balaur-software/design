@@ -1,12 +1,11 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import { fn } from "@storybook/test";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, waitFor, within } from "storybook/test";
 import { ToastProvider } from "../../primitives";
 import { type CommandGroup, CommandPalette } from "./CommandPalette.tsx";
 
-const meta: Meta<typeof CommandPalette> = {
+const meta = {
   title: "OCTANT/Organisms/CommandPalette",
   component: CommandPalette,
-  tags: ["autodocs"],
   decorators: [
     (Story) => (
       <ToastProvider>
@@ -29,6 +28,7 @@ const meta: Meta<typeof CommandPalette> = {
       </ToastProvider>
     ),
   ],
+  args: { onOpenChange: fn(), onNavigate: fn(), onSelect: fn() },
   argTypes: {
     commands: { control: "object", description: "CommandGroup[]: { group, items[] }." },
     open: { control: "boolean", description: "Controlled open state." },
@@ -36,20 +36,41 @@ const meta: Meta<typeof CommandPalette> = {
     showTrigger: { control: "boolean" },
     placeholder: { control: "text" },
     triggerLabel: { control: "text" },
-    onOpenChange: { action: "open-changed" },
-    onNavigate: { action: "navigated" },
-    onSelect: { action: "selected" },
   },
-};
+} satisfies Meta<typeof CommandPalette>;
 export default meta;
-type Story = StoryObj<typeof CommandPalette>;
+type Story = StoryObj<typeof meta>;
 
 /** The default palette: click the trigger or hit ⌘K, filter, arrow + Enter. */
-export const Default: Story = {};
+export const Default: Story = {
+  play: async ({ canvas, userEvent, args }) => {
+    await userEvent.click(canvas.getByRole("button", { name: /search commands/i }));
+    // The palette portals to document.body, outside the story canvas.
+    const body = within(document.body);
+    const input = await body.findByRole("combobox");
+    await expect(args.onOpenChange).toHaveBeenLastCalledWith(true);
+
+    await userEvent.type(input, "console");
+    await expect(body.getByRole("option", { name: /go to console/i })).toBeVisible();
+    await userEvent.keyboard("{Enter}");
+
+    await expect(args.onNavigate).toHaveBeenCalledWith("console");
+    await expect(args.onSelect).toHaveBeenCalled();
+    await waitFor(() => expect(body.queryByRole("combobox")).not.toBeInTheDocument());
+  },
+};
 
 /** Opens mounted so the panel, filter list and highlight are visible at rest. */
 export const OpenByDefault: Story = {
   args: { defaultOpen: true, showTrigger: false },
+  play: async ({ userEvent, args }) => {
+    const body = within(document.body);
+    // The panel fades in on the next animation frame, so wait for full visibility.
+    await waitFor(async () => expect(await body.findByRole("combobox")).toBeVisible());
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(args.onOpenChange).toHaveBeenLastCalledWith(false));
+    await waitFor(() => expect(body.queryByRole("combobox")).not.toBeInTheDocument());
+  },
 };
 
 const DEPLOY_COMMANDS: CommandGroup[] = [
@@ -76,7 +97,6 @@ export const CustomCommands: Story = {
   args: {
     commands: DEPLOY_COMMANDS,
     triggerLabel: "Search deploy actions…",
-    onNavigate: fn(),
   },
 };
 

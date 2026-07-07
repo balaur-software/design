@@ -82,13 +82,9 @@ export function MemoryExplorer({
   onMetricClick,
   style,
 }: MemoryExplorerProps) {
-  const [sel, setSel] = useControllableState<string | null>(
-    selectedId ?? null,
-    defaultSelectedId ?? null,
-    (id) => {
-      if (id !== null) onSelect?.(id);
-    },
-  );
+  const [sel, setSel] = useControllableState<string | null>(selectedId, defaultSelectedId ?? null, (id) => {
+    if (id !== null) onSelect?.(id);
+  });
   const [flt, setFlt] = useControllableState<NodeFilter>(filter, defaultFilter, onFilterChange);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const { hoveredId, pinnedIds, setHovered, togglePin, isPinned } = useGraphSelection();

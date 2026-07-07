@@ -36,6 +36,8 @@ export interface AvatarProps {
    * (≈ size / 5.1, matching the reference's 9px glyphs in a 46px frame).
    */
   fontSize?: number;
+  className?: string;
+  style?: CSSProperties;
 }
 
 /**
@@ -44,7 +46,14 @@ export interface AvatarProps {
  * markup — the grid is computed during render, so it is stable across the
  * server/client boundary.
  */
-export function Avatar({ seed, size = 46, color = "var(--bx-accent, #46c66d)", fontSize }: AvatarProps) {
+export function Avatar({
+  seed,
+  size = 46,
+  color = "var(--bx-accent, #46c66d)",
+  fontSize,
+  className,
+  style,
+}: AvatarProps) {
   const frame: CSSProperties = {
     width: size,
     height: size,
@@ -55,6 +64,7 @@ export function Avatar({ seed, size = 46, color = "var(--bx-accent, #46c66d)", f
     alignItems: "center",
     justifyContent: "center",
     overflow: "hidden",
+    ...style,
   };
   const grid: CSSProperties = {
     margin: 0,
@@ -67,8 +77,10 @@ export function Avatar({ seed, size = 46, color = "var(--bx-accent, #46c66d)", f
     fontFamily: "var(--bx-font-mono, 'DepartureMono', ui-monospace, monospace)",
   };
   return (
-    <div style={frame}>
-      <pre style={grid}>{avatarMosaic(seed)}</pre>
+    <div role="img" aria-label={seed} className={className} style={frame}>
+      <pre aria-hidden="true" style={grid}>
+        {avatarMosaic(seed)}
+      </pre>
     </div>
   );
 }

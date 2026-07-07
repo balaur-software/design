@@ -33,6 +33,17 @@ describe("accentVars", () => {
       "--bx-accent-bright": "#123456",
     });
   });
+
+  test("inherited Object.prototype keys are not accent names", () => {
+    expect(accentVars("toString")).toEqual({
+      "--bx-accent": "toString",
+      "--bx-accent-bright": "toString",
+    });
+    expect(accentVars("constructor")).toEqual({
+      "--bx-accent": "constructor",
+      "--bx-accent-bright": "constructor",
+    });
+  });
 });
 
 describe("accent constants", () => {

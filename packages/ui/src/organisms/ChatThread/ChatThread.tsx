@@ -54,7 +54,9 @@ export function ChatThread({
 
   if (messages.length === 0 && !streaming) {
     return (
-      <EmptyState title="NO MESSAGES" description="Start a conversation — the agent will respond here." />
+      <div style={{ position: "relative", height: "100%", ...style }}>
+        <EmptyState title="NO MESSAGES" description="Start a conversation — the agent will respond here." />
+      </div>
     );
   }
 
@@ -62,6 +64,8 @@ export function ChatThread({
     <div style={{ position: "relative", height: "100%", ...style }}>
       <div
         ref={scrollRef}
+        role="log"
+        aria-label="Chat messages"
         onScroll={onScroll}
         style={{
           overflowY: "auto",

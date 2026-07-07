@@ -1,4 +1,4 @@
-import { type CSSProperties, useState } from "react";
+import { type CSSProperties, useId, useState } from "react";
 import { useControllableState } from "../../hooks/useControllableState";
 import { FloatingPanel } from "../../primitives";
 import { Calendar } from "../Calendar/Calendar";
@@ -21,6 +21,8 @@ export interface DatePickerProps {
   width?: CSSProperties["width"];
   /** Which edge the popup anchors to. Default "start". */
   align?: "start" | "end";
+  /** Accessible name for the field (aria-label on the input). Default "Date". */
+  ariaLabel?: string;
   style?: CSSProperties;
 }
 
@@ -41,6 +43,7 @@ export function DatePicker({
   disabled,
   width = 240,
   align = "start",
+  ariaLabel = "Date",
   style,
 }: DatePickerProps) {
   const [selected, setSelected] = useControllableState<Date | null>(
@@ -49,6 +52,7 @@ export function DatePicker({
     onChange ? (d) => d && onChange(d) : undefined,
   );
   const [open, setOpen] = useState(false);
+  const panelId = useId();
 
   const fmt = format ?? isoDate;
   const display = selected ? fmt(selected) : "";
@@ -63,6 +67,9 @@ export function DatePicker({
       open={isOpen}
       onOpenChange={setOpen}
       align={align}
+      role="dialog"
+      panelId={panelId}
+      ariaLabel="Choose date"
       panelStyle={{
         background: "var(--bx-surface-3, #0c0d11)",
         border: "1px solid var(--bx-border-accent, #2a3320)",
@@ -78,6 +85,8 @@ export function DatePicker({
           role="combobox"
           aria-haspopup="dialog"
           aria-expanded={isOpen}
+          aria-controls={panelId}
+          aria-label={ariaLabel}
           placeholder={placeholder}
           value={display}
           onClick={toggle}

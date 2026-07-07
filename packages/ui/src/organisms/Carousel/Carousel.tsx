@@ -51,7 +51,10 @@ export interface CarouselProps {
   index?: number;
   defaultIndex?: number;
   onIndexChange?: (index: number) => void;
-  /** Auto-advance while the pointer is not over the carousel. Disabled under reduced-motion. */
+  /**
+   * Auto-advance while the carousel is not hovered, focused or paused via the
+   * rotation-control button. Disabled under reduced-motion.
+   */
   autoplay?: boolean;
   /** Auto-advance interval in ms. */
   interval?: number;
@@ -79,7 +82,10 @@ export function Carousel({
 }: CarouselProps) {
   const count = slides.length;
   const [active, setActive] = useControllableState(index, defaultIndex, onIndexChange);
-  const [paused, setPaused] = useState(false);
+  const [hoverPaused, setHoverPaused] = useState(false);
+  const [focusPaused, setFocusPaused] = useState(false);
+  const [userPaused, setUserPaused] = useState(false);
+  const paused = hoverPaused || focusPaused || userPaused;
   const reduced = useReducedMotion();
   const startX = useRef<number | null>(null);
 
@@ -95,7 +101,6 @@ export function Carousel({
     const id = setInterval(() => goTo(current + 1), interval);
     return () => clearInterval(id);
     // goTo/current are captured from this render; re-running on `current` change resets the timer.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoplay, paused, reduced, count, current, interval]);
 
   return (
@@ -103,9 +108,38 @@ export function Carousel({
       role="group"
       aria-roledescription="carousel"
       style={{ position: "relative", ...style }}
-      onPointerEnter={() => setPaused(true)}
-      onPointerLeave={() => setPaused(false)}
+      onPointerEnter={() => setHoverPaused(true)}
+      onPointerLeave={() => setHoverPaused(false)}
+      onFocusCapture={() => setFocusPaused(true)}
+      onBlurCapture={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFocusPaused(false);
+      }}
     >
+      {autoplay && count > 1 && (
+        <button
+          type="button"
+          aria-label={userPaused ? "Start auto-rotation" : "Pause auto-rotation"}
+          aria-pressed={userPaused}
+          onClick={() => setUserPaused((p) => !p)}
+          style={{
+            position: "absolute",
+            top: 10,
+            right: 10,
+            zIndex: 1,
+            fontFamily: "inherit",
+            fontSize: 12,
+            width: 28,
+            height: 28,
+            background: "rgba(8,8,10,0.7)",
+            border: "1px solid #2a2c34",
+            color: "#c8cdd6",
+            cursor: "pointer",
+            padding: 0,
+          }}
+        >
+          {userPaused ? "▸" : "❚❚"}
+        </button>
+      )}
       <div
         style={{
           overflow: "hidden",
@@ -132,9 +166,12 @@ export function Carousel({
         >
           {slides.map((slide, i) => (
             <div
-              // biome-ignore lint/suspicious/noArrayIndexKey: slides are positional, no stable id
               key={i}
+              role="group"
+              aria-roledescription="slide"
+              aria-label={`${i + 1} of ${count}`}
               aria-hidden={i !== current}
+              inert={i !== current}
               style={{ flex: "0 0 100%", minWidth: 0 }}
             >
               {slide}
@@ -168,7 +205,6 @@ export function Carousel({
         <div style={{ display: "flex", justifyContent: "center", gap: 7, marginTop: 14 }}>
           {slides.map((_, i) => (
             <button
-              // biome-ignore lint/suspicious/noArrayIndexKey: slides are positional, no stable id
               key={i}
               type="button"
               aria-label={`Go to slide ${i + 1}`}

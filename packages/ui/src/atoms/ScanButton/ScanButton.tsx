@@ -33,6 +33,8 @@ export function ScanButton({
   borderColor = "#3a3520",
   disabled,
   style,
+  onPointerEnter,
+  onPointerLeave,
   ...rest
 }: ScanButtonProps) {
   const btnRef = useRef<HTMLButtonElement>(null);
@@ -64,8 +66,14 @@ export function ScanButton({
       type="button"
       disabled={disabled}
       {...rest}
-      onPointerEnter={() => setHover(true)}
-      onPointerLeave={() => setHover(false)}
+      onPointerEnter={(e) => {
+        onPointerEnter?.(e);
+        setHover(true);
+      }}
+      onPointerLeave={(e) => {
+        onPointerLeave?.(e);
+        setHover(false);
+      }}
       style={{
         position: "relative",
         overflow: "hidden",

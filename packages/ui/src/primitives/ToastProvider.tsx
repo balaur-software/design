@@ -1,4 +1,13 @@
-import { createContext, type ReactNode, useCallback, useContext, useMemo, useRef, useState } from "react";
+import {
+  createContext,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 export type ToastKind = "ok" | "err" | "info";
 export interface ToastOptions {
@@ -33,12 +42,27 @@ export function useToast(): (opts: ToastOptions) => void {
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const idRef = useRef(0);
+  const timersRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
 
   const spawn = useCallback((opts: ToastOptions) => {
     const id = ++idRef.current;
     const kind = opts.kind ?? "info";
     setToasts((list) => [...list, { id, kind, message: opts.message }]);
-    setTimeout(() => setToasts((list) => list.filter((t) => t.id !== id)), opts.duration ?? 3200);
+    const timer = setTimeout(() => {
+      timersRef.current.delete(timer);
+      setToasts((list) => list.filter((t) => t.id !== id));
+    }, opts.duration ?? 3200);
+    timersRef.current.add(timer);
+  }, []);
+
+  // Clear pending auto-dismiss timers on unmount so they don't fire against an
+  // unmounted provider (and don't retain their closures).
+  useEffect(() => {
+    const timers = timersRef.current;
+    return () => {
+      for (const timer of timers) clearTimeout(timer);
+      timers.clear();
+    };
   }, []);
 
   const value = useMemo(() => spawn, [spawn]);

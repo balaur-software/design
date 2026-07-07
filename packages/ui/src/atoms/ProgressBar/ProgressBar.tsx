@@ -42,7 +42,7 @@ export function ProgressBar({
       aria-valuemin={0}
       aria-valuemax={100}
       aria-valuenow={pct}
-      aria-label={label}
+      aria-label={label ?? "progress"}
       style={{ minWidth: 0, ...style }}
     >
       {hasHeader ? (

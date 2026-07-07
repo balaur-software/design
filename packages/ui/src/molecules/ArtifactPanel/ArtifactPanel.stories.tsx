@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import { fn } from "@storybook/test";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 import { ArtifactPanel } from "./ArtifactPanel";
 
 const code = {
@@ -19,10 +19,9 @@ const doc = {
   content: "# Plan\n- rasterise field\n- dither output\n",
 };
 
-const meta: Meta<typeof ArtifactPanel> = {
+const meta = {
   title: "OCTANT/Molecules/ArtifactPanel",
   component: ArtifactPanel,
-  tags: ["autodocs"],
   args: { block: code, onOpen: fn() },
   argTypes: {
     block: {
@@ -30,17 +29,25 @@ const meta: Meta<typeof ArtifactPanel> = {
       description: "ArtifactBlockData: { type, id, title, kind, language?, content }.",
     },
     previewMaxHeight: { control: { type: "number", min: 80, max: 800, step: 8 } },
-    onOpen: { action: "opened" },
   },
-};
+} satisfies Meta<typeof ArtifactPanel>;
 export default meta;
 
-type Story = StoryObj<typeof ArtifactPanel>;
+type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
+/** A code artifact card — clicking "open ↗" hands the artifact id to onOpen. */
+export const Default: Story = {
+  play: async ({ args, canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: /open/i }));
+    await expect(args.onOpen).toHaveBeenCalledWith("a1");
+  },
+};
 
+/** Code artifact — renders the body inside a CodeBlock. */
 export const Code: Story = { args: { block: code } };
+/** Document artifact — renders the body as wrapped preformatted text. */
 export const Document: Story = { args: { block: doc } };
+/** Image artifact — renders a glyph placeholder instead of the content. */
 export const Image: Story = {
   args: { block: { type: "artifact", id: "a3", title: "frame.png", kind: "image", content: "" } },
 };

@@ -63,7 +63,9 @@ export function IndeterminateBar({
 
   return (
     <div role="progressbar" aria-label={label ?? "loading"} aria-busy="true" style={style}>
-      {label && <div style={{ fontSize: 11, color: "#5b616e", marginBottom: 4 }}>{label}</div>}
+      {label && (
+        <div style={{ fontSize: 11, color: "var(--bx-text-3, #5b616e)", marginBottom: 4 }}>{label}</div>
+      )}
       <div
         ref={barRef}
         aria-hidden="true"

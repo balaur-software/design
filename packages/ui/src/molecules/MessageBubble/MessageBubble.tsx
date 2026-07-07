@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 const AVATARS = {
   user: "▙▟\n▙▟",
@@ -18,6 +18,7 @@ export interface MessageBubbleProps {
   avatar?: string;
   /** Message body. */
   children?: ReactNode;
+  style?: CSSProperties;
 }
 
 /**
@@ -26,7 +27,7 @@ export interface MessageBubbleProps {
  * body. Agent messages are accent-tinted and left-aligned; user messages are
  * neutral and right-aligned. Pure static markup.
  */
-export function MessageBubble({ role = "user", name, time, avatar, children }: MessageBubbleProps) {
+export function MessageBubble({ role = "user", name, time, avatar, children, style }: MessageBubbleProps) {
   const isAgent = role === "agent";
   const label = name ?? (isAgent ? "OCTANT" : "USER");
   const mosaic = avatar ?? AVATARS[role];
@@ -81,6 +82,7 @@ export function MessageBubble({ role = "user", name, time, avatar, children }: M
         gap: 12,
         justifyContent: isAgent ? "flex-start" : "flex-end",
         fontFamily: mono,
+        ...style,
       }}
     >
       {isAgent ? (

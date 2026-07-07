@@ -1,10 +1,11 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, waitFor } from "storybook/test";
 import { HoverCard } from "./HoverCard.tsx";
 
-const meta: Meta<typeof HoverCard> = {
+const meta = {
   title: "OCTANT/Molecules/HoverCard",
   component: HoverCard,
-  tags: ["autodocs"],
+  args: { onOpenChange: fn() },
   argTypes: {
     handle: { control: "text" },
     name: { control: "text" },
@@ -18,12 +19,22 @@ const meta: Meta<typeof HoverCard> = {
     align: { control: "radio", options: ["start", "end"] },
     defaultOpen: { control: "boolean" },
   },
-};
+} satisfies Meta<typeof HoverCard>;
 export default meta;
-type Story = StoryObj<typeof HoverCard>;
+type Story = StoryObj<typeof meta>;
 
 /** The reference handle — hover `@octant-core` and the entity-preview card fades in above it. */
-export const Default: Story = {};
+export const Default: Story = {
+  play: async ({ canvas, userEvent, args }) => {
+    const handle = canvas.getByText("@octant-core");
+    await userEvent.hover(handle);
+    await waitFor(() => expect(canvas.getByText("glyph systems team")).toBeVisible());
+    await expect(args.onOpenChange).toHaveBeenCalledWith(true);
+    await userEvent.unhover(handle);
+    await waitFor(() => expect(canvas.getByText("glyph systems team")).not.toBeVisible());
+    await expect(args.onOpenChange).toHaveBeenLastCalledWith(false);
+  },
+};
 
 /** In flowing prose, exactly as in the reference: the dotted handle sits inline in a sentence. */
 export const InSentence: Story = {

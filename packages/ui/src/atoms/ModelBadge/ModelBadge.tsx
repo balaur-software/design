@@ -26,6 +26,8 @@ export interface ModelBadgeProps {
    * temperature, etc. (e.g. `CTX 128K`, `TEMP 0.7`).
    */
   meta?: readonly string[];
+  className?: string;
+  style?: CSSProperties;
 }
 
 /**
@@ -38,9 +40,11 @@ export function ModelBadge({
   model = "OCTANT-4",
   glyph = "▚",
   meta = ["CTX 128K", "TEMP 0.7"],
+  className,
+  style,
 }: ModelBadgeProps) {
   return (
-    <div style={row}>
+    <div className={className} style={{ ...row, ...style }}>
       <span
         data-accent="1"
         style={{

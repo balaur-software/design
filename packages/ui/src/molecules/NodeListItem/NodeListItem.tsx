@@ -11,6 +11,11 @@ export interface NodeListItemProps {
   onHover?: (id: string | null) => void;
   /** Right-aligned meta text (e.g. a relative time). */
   meta?: string;
+  /** Overrides so composites (e.g. NodeSearchBox) can expose listbox/option semantics. */
+  id?: string;
+  role?: string;
+  tabIndex?: number;
+  "aria-selected"?: boolean;
   style?: CSSProperties;
 }
 
@@ -18,11 +23,28 @@ export interface NodeListItemProps {
  * A compact selectable row for a memory node — status glyph + title + type tag +
  * faint meta. Used in search results, the consent queue, and sidebar lists.
  */
-export function NodeListItem({ node, selected, hovered, onSelect, onHover, meta, style }: NodeListItemProps) {
+export function NodeListItem({
+  node,
+  selected,
+  hovered,
+  onSelect,
+  onHover,
+  meta,
+  id,
+  role,
+  tabIndex,
+  "aria-selected": ariaSelected,
+  style,
+}: NodeListItemProps) {
   const bg = selected ? "#15161e" : hovered ? "#0f1014" : "transparent";
   return (
+    // biome-ignore lint/a11y/useAriaPropsSupportedByRole: role/aria-selected are only supplied together (role="option" in NodeSearchBox's listbox)
     <button
       type="button"
+      id={id}
+      role={role}
+      tabIndex={tabIndex}
+      aria-selected={ariaSelected}
       onClick={onSelect ? () => onSelect(node.id) : undefined}
       onPointerEnter={onHover ? () => onHover(node.id) : undefined}
       onPointerLeave={onHover ? () => onHover(null) : undefined}

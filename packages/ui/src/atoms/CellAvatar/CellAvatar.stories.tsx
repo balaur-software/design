@@ -1,10 +1,9 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { CellAvatar, CellAvatarRow } from "./CellAvatar.tsx";
 
-const meta: Meta<typeof CellAvatar> = {
+const meta = {
   title: "OCTANT/Atoms/CellAvatar",
   component: CellAvatar,
-  tags: ["autodocs"],
   args: { kind: "agent" },
   argTypes: {
     kind: { control: "select", options: ["agent", "user", "tool", "system"] },
@@ -12,18 +11,20 @@ const meta: Meta<typeof CellAvatar> = {
     color: { control: "color" },
     size: { control: { type: "number", min: 8, max: 48, step: 1 } },
   },
-};
+} satisfies Meta<typeof CellAvatar>;
 export default meta;
 
-type Story = StoryObj<typeof CellAvatar>;
+type Story = StoryObj<typeof meta>;
 
+/** The agent archetype with its default glyph and label. */
 export const Default: Story = {};
 
 export const Tool: Story = { args: { kind: "tool" } };
 
 export const System: Story = { args: { kind: "system" } };
 
-export const AllArchetypes: StoryObj = {
+/** All four archetypes rendered via `CellAvatarRow`. */
+export const AllArchetypes: Story = {
   render: () => <CellAvatarRow />,
 };
 

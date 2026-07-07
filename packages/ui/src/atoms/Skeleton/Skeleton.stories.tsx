@@ -1,10 +1,9 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Skeleton } from "./Skeleton.tsx";
 
-const meta: Meta<typeof Skeleton> = {
+const meta = {
   title: "OCTANT/Atoms/Skeleton",
   component: Skeleton,
-  tags: ["autodocs"],
   argTypes: {
     label: { control: "text" },
     avatar: { control: "boolean" },
@@ -15,9 +14,9 @@ const meta: Meta<typeof Skeleton> = {
     gap: { control: { type: "number", min: 0, max: 40, step: 1 } },
     color: { control: "color" },
   },
-};
+} satisfies Meta<typeof Skeleton>;
 export default meta;
-type Story = StoryObj<typeof Skeleton>;
+type Story = StoryObj<typeof meta>;
 
 /** The reference card: an avatar block, three header rows, two footer rows. */
 export const Default: Story = {};

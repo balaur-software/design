@@ -28,6 +28,8 @@ export interface CellAvatarProps {
   color?: string;
   /** Glyph font-size in px. Default `15`. */
   size?: number;
+  className?: string;
+  style?: CSSProperties;
 }
 
 /**
@@ -35,7 +37,7 @@ export interface CellAvatarProps {
  * that reads as a distinct sigil per presence archetype (agent / user / tool /
  * system), with an archetype label beneath it. Pure static markup.
  */
-export function CellAvatar({ kind = "agent", label, color, size = 15 }: CellAvatarProps) {
+export function CellAvatar({ kind = "agent", label, color, size = 15, className, style }: CellAvatarProps) {
   const preset = PRESETS[kind];
   const preStyle: CSSProperties = {
     margin: "0 0 8px",
@@ -47,7 +49,7 @@ export function CellAvatar({ kind = "agent", label, color, size = 15 }: CellAvat
     fontFamily: "var(--bx-font-mono, 'DepartureMono', ui-monospace, monospace)",
   };
   return (
-    <div style={{ textAlign: "center" }}>
+    <div className={className} style={{ textAlign: "center", ...style }}>
       <pre aria-hidden="true" {...(preset.accent ? { "data-accent": "1" } : {})} style={preStyle}>
         {preset.mosaic}
       </pre>

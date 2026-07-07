@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import { type CSSProperties, type KeyboardEvent, type ReactNode, useRef } from "react";
 import { useControllableState } from "../../hooks/useControllableState";
 
 export interface ToggleGroupItem {
@@ -32,7 +32,9 @@ const AC = "var(--bx-accent, #46c66d)";
  * A row of terminal-styled toggle buttons. In single mode clicking an item lights
  * it and clears the rest; in `multi` mode each item toggles independently. State
  * flows through `useControllableState`, so the lit styling is deterministic on the
- * server and needs no post-mount imperative fill.
+ * server and needs no post-mount imperative fill. Single mode exposes APG radio
+ * semantics (radiogroup / radio + aria-checked) with a roving tabindex and arrow
+ * keys moving selection; multi mode keeps aria-pressed toggle buttons.
  */
 export function ToggleGroup({
   items,
@@ -43,6 +45,7 @@ export function ToggleGroup({
   style,
 }: ToggleGroupProps) {
   const [selected, setSelected] = useControllableState<string[]>(value, defaultValue ?? [], onChange);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const isOn = (v: string) => selected.includes(v);
 
@@ -54,15 +57,48 @@ export function ToggleGroup({
     }
   };
 
+  // Roving tabindex anchor for single-select mode: the lit item, else the first.
+  const activeIndex = Math.max(
+    0,
+    items.findIndex((item) => isOn(item.value)),
+  );
+
+  const focusIndex = (i: number) => {
+    containerRef.current?.querySelector<HTMLElement>(`[data-toggle-index="${i}"]`)?.focus();
+  };
+
+  const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (multi || items.length === 0) return;
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "ArrowUp" || e.key === "ArrowDown") {
+      e.preventDefault();
+      const dir = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : -1;
+      const next = (activeIndex + dir + items.length) % items.length;
+      const item = items[next];
+      if (item) {
+        setSelected([item.value]);
+        focusIndex(next);
+      }
+    }
+  };
+
   return (
-    <div role="group" style={{ display: "inline-flex", gap: 6, ...style }}>
-      {items.map((item) => {
+    // biome-ignore lint/a11y/noStaticElementInteractions: APG radio-group pattern — arrow-key navigation is handled on the group container
+    <div
+      ref={containerRef}
+      role={multi ? "group" : "radiogroup"}
+      onKeyDown={onKeyDown}
+      style={{ display: "inline-flex", gap: 6, ...style }}
+    >
+      {items.map((item, i) => {
         const on = isOn(item.value);
         return (
           <button
             key={item.value}
             type="button"
-            aria-pressed={on}
+            data-toggle-index={i}
+            {...(multi
+              ? { "aria-pressed": on }
+              : { role: "radio", "aria-checked": on, tabIndex: i === activeIndex ? 0 : -1 })}
             title={item.title}
             onClick={() => toggle(item.value)}
             style={{

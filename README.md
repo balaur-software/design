@@ -15,31 +15,35 @@ A Bun-workspace monorepo with three packages:
 
 ## Using it (Bun — by design)
 
-The packages ship raw TypeScript — Bun consumes them natively; there is no
-build step and no Node entry, deliberately. For parallel development
-against a host (e.g. `balaur-software/harness`), link the local
-checkout so edits land instantly without re-pinning:
+The package ships raw TypeScript — Bun consumes it natively; there is no
+build step and no Node entry, deliberately. It is published as a **single
+package**, `@balaur/octant`, from the repo root: the tarball carries a fixed
+`files` list (each package's `src/`, no stories or tests) and exposes the
+three layers via subpath `exports` (`.` = UI, `./tokens`, `./core`).
 
 ```bash
 # in balaur-design/
 bun install                            # resolve the workspace
 bun run check                          # typecheck + lint + test
 bun run storybook                      # component workshop on :6006
-
-# register each package globally for linking
-cd packages/octant-core && bun link && cd ../..
-cd packages/tokens && bun link && cd ../..
-cd packages/ui && bun link && cd ../..
-
-# in the host (e.g. balaur-life/)
-bun link @balaur/octant-core
-bun link @balaur/tokens
-bun link @balaur/ui
 ```
 
-The host's `package.json` should declare each package via `link:<name>`
-so the dev setup is explicit; see [docs/RELEASE.md](docs/RELEASE.md) for
-the runbook and the "fresh checkout" recovery flow.
+```jsonc
+// host package.json — committed state pins a release tag
+"dependencies": {
+  "@balaur/octant": "github:balaur-software/design#vX.Y.Z"
+}
+
+// host package.json — active design iteration against a local checkout
+"@balaur/octant": "file:../design"    // re-run `bun install` after edits
+```
+
+Do **not** `bun link` the packages (individually or as `@balaur/octant`) —
+linking resolves `react` inside this repo's own module graph and produces two
+React instances in the host, crashing hooks with `resolveDispatcher() is null`.
+`file:../design` is the safe dev override. See
+[docs/CONSUMING.md](docs/CONSUMING.md) for the full consumption guide and
+[docs/RELEASE.md](docs/RELEASE.md) for the tag-and-release runbook.
 
 ## Scripts
 

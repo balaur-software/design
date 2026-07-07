@@ -54,7 +54,7 @@ function byHex(hex: string): Accent | undefined {
 
 /** Type guard: is `input` one of the known accent names? */
 function isAccentName(input: string): input is AccentName {
-  return input in ACCENTS;
+  return Object.hasOwn(ACCENTS, input);
 }
 
 /**

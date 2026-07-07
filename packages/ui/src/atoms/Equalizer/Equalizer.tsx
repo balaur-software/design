@@ -59,7 +59,6 @@ export function Equalizer({
   // Under reduced motion the rAF loop never runs; paint one resting frame.
   useEffect(() => {
     if (reduced) paint(0);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduced, bands, sp]);
 
   return (
@@ -79,11 +78,11 @@ export function Equalizer({
       </div>
       <div
         ref={rootRef}
+        aria-hidden="true"
         style={{ display: "flex", alignItems: "flex-end", gap: 4, height, fontSize, lineHeight: 0.8 }}
       >
         {Array.from({ length: bands }, (_, i) => (
           <span
-            // biome-ignore lint/suspicious/noArrayIndexKey: fixed-length band list
             key={i}
             ref={(el) => {
               spansRef.current[i] = el;

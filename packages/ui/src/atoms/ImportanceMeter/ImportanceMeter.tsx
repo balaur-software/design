@@ -30,6 +30,11 @@ export function ImportanceMeter({
   const v = Math.max(0, Math.min(max, Math.round(importance)));
   return (
     <span
+      role="meter"
+      aria-label="importance"
+      aria-valuemin={0}
+      aria-valuemax={max}
+      aria-valuenow={v}
       style={{
         display: "inline-flex",
         alignItems: "center",

@@ -53,7 +53,7 @@ const DEFAULT_COLUMNS: TableColumn<NodeRow>[] = [
     key: "status",
     label: "STATUS",
     sortValue: (r) => r.status[0],
-    render: (r) => <span style={{ color: r.status[1], fontSize: 11 }}>{"■ " + r.status[0]}</span>,
+    render: (r) => <span style={{ color: r.status[1], fontSize: 11 }}>{`■ ${r.status[0]}`}</span>,
   },
   {
     key: "load",
@@ -141,22 +141,35 @@ export function Table<T = NodeRow>({
                 return (
                   <th
                     key={col.key}
-                    onClick={() => onSort(col.key)}
+                    scope="col"
                     aria-sort={active ? (asc ? "ascending" : "descending") : "none"}
-                    style={{
-                      textAlign: col.align ?? "left",
-                      fontWeight: "normal",
-                      color: active ? "#c8cdd6" : "#5b616e",
-                      padding: "9px 12px",
-                      cursor: "pointer",
-                      letterSpacing: "0.06em",
-                      userSelect: "none",
-                    }}
+                    style={{ fontWeight: "normal", padding: 0 }}
                   >
-                    {col.label}{" "}
-                    <span style={{ color: "var(--bx-accent, #46c66d)" }}>
-                      {active ? (asc ? "▲" : "▼") : " "}
-                    </span>
+                    {/* A real button (APG sortable-table pattern) so sorting works from the keyboard. */}
+                    <button
+                      type="button"
+                      onClick={() => onSort(col.key)}
+                      style={{
+                        display: "block",
+                        width: "100%",
+                        fontFamily: "inherit",
+                        fontSize: "inherit",
+                        fontWeight: "inherit",
+                        textAlign: col.align ?? "left",
+                        background: "transparent",
+                        border: 0,
+                        color: active ? "#c8cdd6" : "#5b616e",
+                        padding: "9px 12px",
+                        cursor: "pointer",
+                        letterSpacing: "0.06em",
+                        userSelect: "none",
+                      }}
+                    >
+                      {col.label}{" "}
+                      <span style={{ color: "var(--bx-accent, #46c66d)" }}>
+                        {active ? (asc ? "▲" : "▼") : " "}
+                      </span>
+                    </button>
                   </th>
                 );
               })}
@@ -165,7 +178,6 @@ export function Table<T = NodeRow>({
           <tbody>
             {sorted.map((row, i) => (
               <tr
-                // biome-ignore lint/suspicious/noArrayIndexKey: sorted rows have no stable id
                 key={i}
                 style={{
                   borderTop: "1px solid #15161e",

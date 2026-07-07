@@ -1,4 +1,5 @@
-import { type CSSProperties, useRef } from "react";
+import { type CSSProperties, useEffect, useRef } from "react";
+import { useInView } from "../../hooks/useInView";
 import { useRafLoop } from "../../hooks/useRafLoop";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 
@@ -34,6 +35,7 @@ export function WaveText({
   style,
 }: WaveTextProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref);
   const reduced = useReducedMotion();
   const chars = [...text];
 
@@ -48,11 +50,25 @@ export function WaveText({
       s.style.transform = `translateY(${(Math.sin(phase) * amplitude).toFixed(2)}px)`;
       s.style.opacity = (0.55 + 0.45 * Math.cos(phase)).toFixed(2);
     }
-  }, !reduced);
+  }, inView && !reduced);
+
+  // When reduced-motion parks the loop mid-ripple, level the word back out so
+  // it freezes legible (flat, full opacity) instead of at arbitrary offsets.
+  useEffect(() => {
+    if (!reduced) return;
+    const el = ref.current;
+    if (!el) return;
+    for (const child of el.children) {
+      const s = child as HTMLElement;
+      s.style.transform = "";
+      s.style.opacity = "";
+    }
+  }, [reduced]);
 
   return (
     <div
       ref={ref}
+      role="img"
       aria-label={text}
       style={{
         display: "flex",
@@ -67,7 +83,6 @@ export function WaveText({
     >
       {chars.map((ch, i) => (
         <span
-          // biome-ignore lint/suspicious/noArrayIndexKey: glyph position is the identity
           key={i}
           aria-hidden="true"
           style={{ display: "inline-block", willChange: "transform", whiteSpace: "pre" }}

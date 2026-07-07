@@ -1,5 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { type ReactNode, useState } from "react";
+import { expect, fn, waitFor, within } from "storybook/test";
 import { FillButton } from "../../atoms/FillButton/FillButton.tsx";
 import { Sheet, type SheetProps } from "./Sheet.tsx";
 
@@ -71,18 +72,31 @@ function NodeDetails() {
 /** Interactive harness: an OPEN SHEET button + a self-contained Sheet. */
 function SheetDemo({
   trigger = "OPEN SHEET",
+  open: _open,
+  onClose,
   children,
   footer,
   ...props
-}: Partial<SheetProps> & { trigger?: string; children?: ReactNode }) {
+}: Omit<SheetProps, "footer"> & {
+  trigger?: string;
+  footer?: ReactNode | ((close: () => void) => ReactNode);
+}) {
   const [open, setOpen] = useState(false);
-  const close = () => setOpen(false);
+  const close = () => {
+    setOpen(false);
+    onClose();
+  };
   return (
     <div>
       <button type="button" onClick={() => setOpen(true)} style={openBtnStyle}>
         {trigger} {"▸"}
       </button>
-      <Sheet open={open} onClose={close} title="NODE DETAILS" footer={footer} {...props}>
+      <Sheet
+        {...props}
+        open={open}
+        onClose={close}
+        footer={typeof footer === "function" ? footer(close) : footer}
+      >
         {children ?? <NodeDetails />}
       </Sheet>
     </div>
@@ -111,47 +125,54 @@ const detailFooter = (close: () => void) => (
   </>
 );
 
-const meta: Meta<typeof Sheet> = {
+const meta = {
   title: "OCTANT/Organisms/Sheet",
   component: Sheet,
-  tags: ["autodocs"],
+  args: {
+    open: false,
+    onClose: fn(),
+    title: "NODE DETAILS",
+  },
   argTypes: {
     open: { control: "boolean", description: "Whether the sheet is mounted and slid in." },
     side: { control: "radio", options: ["right", "left"] },
     title: { control: "text" },
     width: { control: { type: "number", min: 200, max: 900, step: 8 } },
     trapFocus: { control: "boolean" },
-    onClose: { action: "closed" },
   },
-};
+} satisfies Meta<typeof Sheet>;
 export default meta;
-type Story = StoryObj<typeof Sheet>;
+type Story = StoryObj<typeof meta>;
 
 /** Right-docked drawer with the reference node-details body and a two-action footer. */
 export const Default: Story = {
-  render: () => {
-    function Demo() {
-      const [open, setOpen] = useState(false);
-      const close = () => setOpen(false);
-      return (
-        <div>
-          <button type="button" onClick={() => setOpen(true)} style={openBtnStyle}>
-            OPEN SHEET {"▸"}
-          </button>
-          <Sheet open={open} onClose={close} title="NODE DETAILS" footer={detailFooter(close)}>
-            <NodeDetails />
-          </Sheet>
-        </div>
-      );
-    }
-    return <Demo />;
+  render: (args) => <SheetDemo {...args} footer={detailFooter} />,
+  play: async ({ canvas, userEvent, args }) => {
+    const body = within(document.body);
+    await userEvent.click(canvas.getByRole("button", { name: /open sheet/i }));
+    const dialog = await body.findByRole("dialog");
+    await expect(dialog).toBeVisible();
+    await expect(within(dialog).getByText("NODE DETAILS")).toBeVisible();
+    await expect(within(dialog).getByText("OCTANT-01")).toBeVisible();
+
+    // The footer CLOSE action dismisses the drawer.
+    await userEvent.click(within(dialog).getByRole("button", { name: "CLOSE" }));
+    await waitFor(() => expect(body.queryByRole("dialog")).toBeNull());
+    await expect(args.onClose).toHaveBeenCalledTimes(1);
+
+    // Escape dismisses too.
+    await userEvent.click(canvas.getByRole("button", { name: /open sheet/i }));
+    await body.findByRole("dialog");
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(body.queryByRole("dialog")).toBeNull());
   },
 };
 
 /** Docks and slides in from the left edge instead of the right. */
 export const LeftEdge: Story = {
-  render: () => (
-    <SheetDemo trigger="OPEN LEFT" side="left" title="FILTERS">
+  args: { side: "left", title: "FILTERS" },
+  render: (args) => (
+    <SheetDemo trigger="OPEN LEFT" {...args}>
       <div style={{ color: "var(--bx-text-2, #9aa0ad)", fontSize: 13, lineHeight: 1.8 }}>
         A left-docked sheet reads well as a nav or filter rail. It slides in from the leading edge and traps
         focus until dismissed via the scrim, Escape, or the × control.
@@ -162,8 +183,9 @@ export const LeftEdge: Story = {
 
 /** No footer bar — just a header and a scrolling body of log lines. */
 export const ScrollingBody: Story = {
-  render: () => (
-    <SheetDemo trigger="OPEN LOG" title="EVENT LOG">
+  args: { title: "EVENT LOG" },
+  render: (args) => (
+    <SheetDemo trigger="OPEN LOG" {...args}>
       <div style={{ fontSize: 12, lineHeight: 1.9, color: "var(--bx-text-2, #9aa0ad)" }}>
         {Array.from({ length: 40 }, (_, i) => (
           <div key={i} style={{ borderBottom: "1px dotted var(--bx-border, #1c1d24)", padding: "4px 0" }}>
@@ -178,8 +200,9 @@ export const ScrollingBody: Story = {
 
 /** Rendered open so the docked panel and its layout are visible without interaction. */
 export const AlwaysOpen: Story = {
-  render: () => (
-    <Sheet open onClose={() => {}} title="NODE DETAILS" footer={detailFooter(() => {})}>
+  args: { open: true, footer: detailFooter(() => {}) },
+  render: (args) => (
+    <Sheet {...args}>
       <NodeDetails />
     </Sheet>
   ),

@@ -83,7 +83,7 @@ export function Skeleton({
   const paint = (t: number) => {
     const metas = metaRef.current;
     preRefs.current.forEach((el, i) => {
-      if (!el || !el.isConnected) return;
+      if (!el?.isConnected) return;
       const meta = metas[i] ?? { cols: 20, rows: 1 };
       const off = i * 2.3;
       const span = meta.cols + 12;
@@ -102,7 +102,7 @@ export function Skeleton({
       if (!first) return;
       const { cw, ch } = measureCell(first);
       pres.forEach((el, i) => {
-        if (!el || !el.isConnected) return;
+        if (!el?.isConnected) return;
         const r = el.getBoundingClientRect();
         if (r.width < 2) return;
         metaRef.current[i] = {
@@ -135,7 +135,6 @@ export function Skeleton({
   // Under reduced motion the rAF loop never runs; paint a single resting frame.
   useEffect(() => {
     if (reduced) paint(0);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduced, avatar, avatarSize, lineHeight, linesKey, footerKey]);
 
   const boxStyle = (w: string | number): CSSProperties => ({
@@ -190,7 +189,6 @@ export function Skeleton({
           {lines.length > 0 && (
             <div style={{ flex: 1, display: "flex", flexDirection: "column", gap, minWidth: 0 }}>
               {lines.map((w, i) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: fixed positional row list
                 <div key={`l${i}`} style={boxStyle(w)}>
                   <pre ref={setPre(baseIndex + i)} aria-hidden="true" style={preStyle(false)} />
                 </div>
@@ -203,7 +201,6 @@ export function Skeleton({
       {footerLines.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap }}>
           {footerLines.map((w, i) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: fixed positional row list
             <div key={`f${i}`} style={boxStyle(w)}>
               <pre ref={setPre(footerBase + i)} aria-hidden="true" style={preStyle(false)} />
             </div>

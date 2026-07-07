@@ -12,10 +12,10 @@
  */
 
 import { ACCENTS, DEFAULT_ACCENT_NAME } from "./accent.ts";
-import { borders, surfaces, text, textDim, tints } from "./colors.ts";
+import { borders, fg, surfaces, text, textDim, tints } from "./colors.ts";
 import { PALETTE } from "./palette.ts";
-import { blink, easing, space } from "./space.ts";
-import { fontSize, fonts } from "./type.ts";
+import { blink, border, duration, easing, radius, space } from "./space.ts";
+import { fontSize, fonts, lineHeight } from "./type.ts";
 
 export type { Accent, AccentName, AccentOption, AccentVars } from "./accent.ts";
 export {
@@ -43,12 +43,16 @@ export const tokens = {
   surfaces,
   /** Border / hairline colors. */
   border: borders,
+  /** Border widths (`--bx-border-width`, `--bx-border-width-strong`). */
+  borderWidth: border,
   /** Status-tint background washes. */
   tints,
   /** Text ramp, brightest -> dimmest. */
   text,
   /** Off-ramp interstitial text grays (brightest -> dimmest). */
   textDim,
+  /** Named foreground roles pulled from the text ramp. */
+  fg,
   /** Accent system: default hue + selectable options. */
   accent: {
     default: ACCENTS[DEFAULT_ACCENT_NAME],
@@ -58,12 +62,17 @@ export const tokens = {
   font: fonts,
   /** Font-size scale. */
   type: fontSize,
+  /** Line-height scale. */
+  lineHeight,
   /** Spacing scale. */
   space,
+  /** Corner radius — always 0. */
+  radius,
   /** Motion tokens. */
   motion: {
     blink,
     easing,
+    duration,
   },
 } as const;
 

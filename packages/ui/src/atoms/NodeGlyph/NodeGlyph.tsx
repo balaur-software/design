@@ -1,4 +1,8 @@
-import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
+import type {
+  CSSProperties,
+  KeyboardEvent as ReactKeyboardEvent,
+  PointerEvent as ReactPointerEvent,
+} from "react";
 import { type MemoryNode, nodeRadius, STATUS_STYLE } from "../../organisms/MemoryExplorer/memory-types";
 import { typeAccent, typeGlyph } from "../NodeTypeTag/NodeTypeTag";
 
@@ -66,15 +70,32 @@ export function NodeGlyph({
     strokeWidth: 1.25,
   } as const;
 
+  const interactive = Boolean(onPointerDown || onClick);
+
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: SVG group carries full APG button semantics (role/tabIndex/aria-label/keydown) when interactive
     <g
       transform={`translate(${x} ${y})`}
       opacity={opacity}
-      style={{ cursor: onPointerDown || onClick ? "grab" : "default", ...style }}
+      role={interactive ? "button" : "img"}
+      aria-label={`${node.type} ${node.title} — ${status.label}`}
+      tabIndex={interactive ? 0 : undefined}
+      focusable={interactive ? undefined : "false"}
+      style={{ cursor: interactive ? "grab" : "default", ...style }}
       onPointerDown={onPointerDown ? (e) => onPointerDown(e, node.id) : undefined}
       onPointerEnter={onPointerEnter ? () => onPointerEnter(node.id) : undefined}
       onPointerLeave={onPointerLeave ? () => onPointerLeave(node.id) : undefined}
       onClick={onClick ? () => onClick(node.id) : undefined}
+      onKeyDown={
+        onClick
+          ? (e: ReactKeyboardEvent<SVGGElement>) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onClick(node.id);
+              }
+            }
+          : undefined
+      }
     >
       {ring && <circle r={r + 4} fill="none" stroke={ringColor} strokeWidth={1} strokeOpacity={0.8} />}
       {pinned ? (

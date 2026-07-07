@@ -1,10 +1,9 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { BrailleSpinner } from "./BrailleSpinner.tsx";
 
-const meta: Meta<typeof BrailleSpinner> = {
+const meta = {
   title: "OCTANT/Atoms/BrailleSpinner",
   component: BrailleSpinner,
-  tags: ["autodocs"],
   args: { variant: "wave" },
   argTypes: {
     variant: { control: "select", options: ["wave", "pulse", "orbit", "grow"] },
@@ -13,11 +12,12 @@ const meta: Meta<typeof BrailleSpinner> = {
     speed: { control: { type: "number", min: 0.1, max: 4, step: 0.1 } },
     label: { control: "text" },
   },
-};
+} satisfies Meta<typeof BrailleSpinner>;
 export default meta;
 
-type Story = StoryObj<typeof BrailleSpinner>;
+type Story = StoryObj<typeof meta>;
 
+/** The default wave pattern. */
 export const Default: Story = {};
 
 export const Pulse: Story = { args: { variant: "pulse" } };
@@ -26,6 +26,7 @@ export const Orbit: Story = { args: { variant: "orbit" } };
 
 export const Grow: Story = { args: { variant: "grow", label: "FILL" } };
 
+/** All four braille animation patterns side by side. */
 export const AllVariants: Story = {
   render: () => (
     <div

@@ -1,11 +1,10 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useEffect, useState } from "react";
 import { ProgressBar } from "./ProgressBar.tsx";
 
-const meta: Meta<typeof ProgressBar> = {
+const meta = {
   title: "OCTANT/Atoms/ProgressBar",
   component: ProgressBar,
-  tags: ["autodocs"],
   args: { value: 0.66, label: "LINK" },
   argTypes: {
     value: { control: { type: "range", min: 0, max: 1, step: 0.01 }, description: "Progress fraction 0..1." },
@@ -14,16 +13,19 @@ const meta: Meta<typeof ProgressBar> = {
     showPercent: { control: "boolean" },
     ease: { control: { type: "range", min: 0, max: 1, step: 0.05 } },
   },
-};
+} satisfies Meta<typeof ProgressBar>;
 export default meta;
-type Story = StoryObj<typeof ProgressBar>;
+type Story = StoryObj<typeof meta>;
 
+/** Two-thirds full with the default accent. */
 export const Default: Story = {};
 
+/** Amber bar at 40%. */
 export const Hash: Story = {
   args: { value: 0.4, label: "HASH", color: "#f2c94c" },
 };
 
+/** Empty and full bars — the range endpoints. */
 export const Endpoints: Story = {
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 13, width: 320 }}>
@@ -33,6 +35,7 @@ export const Endpoints: Story = {
   ),
 };
 
+/** Several bars stacked with different colours. */
 export const Stack: Story = {
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 13, width: 320 }}>
@@ -66,6 +69,7 @@ function LoopingBars() {
   );
 }
 
+/** Continuously looping values to show the eased fill animation. */
 export const Animated: Story = {
   render: () => <LoopingBars />,
 };

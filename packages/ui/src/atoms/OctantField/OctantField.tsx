@@ -82,8 +82,10 @@ export function OctantField({ accent = [47, 158, 87], ambient = 0.8, className, 
   );
 
   return (
+    // biome-ignore lint/a11y/noAriaHiddenOnFocusable: decorative background canvas — never focusable (no tabIndex, no fallback content)
     <canvas
       ref={canvasRef}
+      aria-hidden="true"
       className={className}
       style={{ display: "block", width: "100%", height: "100%", imageRendering: "pixelated", ...style }}
     />

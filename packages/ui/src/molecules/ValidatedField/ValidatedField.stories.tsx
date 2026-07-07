@@ -1,10 +1,11 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 import { ValidatedField } from "./ValidatedField.tsx";
 
-const meta: Meta<typeof ValidatedField> = {
+const meta = {
   title: "OCTANT/Molecules/ValidatedField",
   component: ValidatedField,
-  tags: ["autodocs"],
+  args: { onChange: fn() },
   argTypes: {
     label: { control: "text" },
     placeholder: { control: "text" },
@@ -14,22 +15,37 @@ const meta: Meta<typeof ValidatedField> = {
     hint: { control: "text" },
     validMessage: { control: "text" },
     invalidMessage: { control: "text" },
-    onChange: { action: "changed" },
+  },
+} satisfies Meta<typeof ValidatedField>;
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+/** Empty field; typing revalidates live against the NAME-NUMBER pattern. */
+export const Default: Story = {
+  play: async ({ canvas, userEvent, args }) => {
+    const input = canvas.getByRole("textbox");
+    const status = canvas.getByRole("status");
+    await expect(status).toHaveTextContent("Format: NAME-NUMBER (e.g. NODE-01)");
+    await userEvent.type(input, "node 1");
+    await expect(status).toHaveTextContent("Must match NAME-NUMBER, e.g. RELAY-7");
+    await userEvent.clear(input);
+    await userEvent.type(input, "NODE-01");
+    await expect(status).toHaveTextContent("Valid node identifier");
+    await expect(args.onChange).toHaveBeenLastCalledWith("NODE-01");
   },
 };
-export default meta;
-type Story = StoryObj<typeof ValidatedField>;
 
-export const Default: Story = {};
-
+/** Prefilled with a value that passes the default pattern. */
 export const PrefilledValid: Story = {
   args: { defaultValue: "RELAY-7" },
 };
 
+/** Prefilled with a value that fails the default pattern. */
 export const PrefilledInvalid: Story = {
   args: { defaultValue: "relay 7" },
 };
 
+/** Custom pattern, cap and messages for an email address. */
 export const EmailField: Story = {
   args: {
     label: "OPERATOR EMAIL",
@@ -42,6 +58,7 @@ export const EmailField: Story = {
   },
 };
 
+/** Valid, invalid and empty fields stacked. */
 export const Stack: Story = {
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 14, maxWidth: 360 }}>

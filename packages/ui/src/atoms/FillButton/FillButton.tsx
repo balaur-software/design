@@ -21,6 +21,8 @@ export function FillButton({
   borderColor = "var(--bx-border-accent, #2a3320)",
   disabled,
   style,
+  onPointerEnter,
+  onPointerLeave,
   ...rest
 }: FillButtonProps) {
   const fillRef = useRef<HTMLPreElement>(null);
@@ -32,8 +34,14 @@ export function FillButton({
       type="button"
       disabled={disabled}
       {...rest}
-      onPointerEnter={() => setCharged(true)}
-      onPointerLeave={() => setCharged(false)}
+      onPointerEnter={(e) => {
+        onPointerEnter?.(e);
+        setCharged(true);
+      }}
+      onPointerLeave={(e) => {
+        onPointerLeave?.(e);
+        setCharged(false);
+      }}
       style={{
         position: "relative",
         overflow: "hidden",

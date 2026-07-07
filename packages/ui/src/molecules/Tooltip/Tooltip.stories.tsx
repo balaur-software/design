@@ -1,10 +1,10 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, waitFor } from "storybook/test";
 import { Tooltip } from "./Tooltip.tsx";
 
-const meta: Meta<typeof Tooltip> = {
+const meta = {
   title: "OCTANT/Molecules/Tooltip",
   component: Tooltip,
-  tags: ["autodocs"],
   args: { children: "OCTANT", tip: "2×4 sub-pixel grid · U+1CD00" },
   argTypes: {
     children: { control: "text" },
@@ -12,12 +12,26 @@ const meta: Meta<typeof Tooltip> = {
     color: { control: "color" },
     underlineColor: { control: "color" },
   },
-};
+} satisfies Meta<typeof Tooltip>;
 export default meta;
-type Story = StoryObj<typeof Tooltip>;
+type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
+/** Hovering the trigger scrambles the tip text into the floating bubble. */
+export const Default: Story = {
+  play: async ({ canvas, userEvent }) => {
+    const bubble = canvas.getByRole("tooltip", { hidden: true });
+    await expect(bubble).not.toBeVisible();
+    await userEvent.hover(canvas.getByText("OCTANT"));
+    await waitFor(() => expect(bubble).toBeVisible(), { timeout: 2000 });
+    await waitFor(() => expect(bubble).toHaveTextContent("2×4 sub-pixel grid · U+1CD00"), {
+      timeout: 2000,
+    });
+    await userEvent.unhover(canvas.getByText("OCTANT"));
+    await waitFor(() => expect(bubble).not.toBeVisible());
+  },
+};
 
+/** Cyan accent variant. */
 export const Cyan: Story = {
   args: {
     children: "DITHER",
@@ -27,6 +41,7 @@ export const Cyan: Story = {
   },
 };
 
+/** Magenta accent variant. */
 export const Magenta: Story = {
   args: {
     children: "ANSI",
@@ -36,6 +51,7 @@ export const Magenta: Story = {
   },
 };
 
+/** Several triggers in a row — hover each to reveal its tip. */
 export const Row: Story = {
   render: () => (
     <div style={{ display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap", paddingTop: 40 }}>

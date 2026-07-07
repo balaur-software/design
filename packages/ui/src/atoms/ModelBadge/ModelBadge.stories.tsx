@@ -1,22 +1,23 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ModelBadge } from "./ModelBadge.tsx";
 
-const meta: Meta<typeof ModelBadge> = {
+const meta = {
   title: "OCTANT/Atoms/ModelBadge",
   component: ModelBadge,
-  tags: ["autodocs"],
   argTypes: {
     model: { control: "text" },
     glyph: { control: "text" },
     meta: { control: "object", description: "Secondary neutral meta tags." },
   },
-};
+} satisfies Meta<typeof ModelBadge>;
 export default meta;
 
-type Story = StoryObj<typeof ModelBadge>;
+type Story = StoryObj<typeof meta>;
 
+/** Built-in default model name and meta tags. */
 export const Default: Story = {};
 
+/** Custom model name with sampling-parameter meta tags. */
 export const CustomModel: Story = {
   args: {
     model: "OCTANT-4-TURBO",
@@ -24,6 +25,7 @@ export const CustomModel: Story = {
   },
 };
 
+/** Model name only, with no meta tags. */
 export const ModelOnly: Story = {
   args: {
     model: "OCTANT-MINI",
@@ -31,6 +33,7 @@ export const ModelOnly: Story = {
   },
 };
 
+/** Alternate leading glyph. */
 export const CustomGlyph: Story = {
   args: {
     model: "OCTANT-VISION",

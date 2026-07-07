@@ -101,7 +101,9 @@ export function Sidebar({
           }}
         >
           <span style={{ display: "flex", alignItems: "center", gap: 9, whiteSpace: "nowrap" }}>
-            <span style={{ color: AC }}>█</span>
+            <span aria-hidden="true" style={{ color: AC }}>
+              █
+            </span>
             <span
               style={{
                 ...labelStyle,
@@ -146,10 +148,10 @@ export function Sidebar({
             const bg = on ? "#15161e" : hover === i ? "#0f1014" : "transparent";
             return (
               <button
-                // biome-ignore lint/suspicious/noArrayIndexKey: items are a stable, ordered list
                 key={i}
                 type="button"
                 aria-current={on ? "true" : undefined}
+                aria-label={it.label}
                 onClick={() => setActive(i)}
                 onPointerEnter={() => setHover(i)}
                 onPointerLeave={() => setHover((h) => (h === i ? null : h))}
@@ -171,6 +173,7 @@ export function Sidebar({
                 }}
               >
                 <span
+                  aria-hidden="true"
                   style={{
                     color: on ? AC : "#5b616e",
                     fontSize: 14,
@@ -198,6 +201,7 @@ export function Sidebar({
           }}
         >
           <span
+            aria-hidden="true"
             style={{
               width: 28,
               height: 28,

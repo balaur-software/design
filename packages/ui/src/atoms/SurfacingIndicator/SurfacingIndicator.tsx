@@ -19,6 +19,9 @@ export function SurfacingIndicator({ surfacing, showLabel = false, style }: Surf
   const s = SURFACING_STYLE[surfacing];
   return (
     <span
+      // Without the visible label the aria-hidden glyph is the only content;
+      // expose the policy text to AT via role="img" + aria-label.
+      {...(showLabel ? {} : { role: "img", "aria-label": s.label })}
       style={{
         display: "inline-flex",
         alignItems: "center",

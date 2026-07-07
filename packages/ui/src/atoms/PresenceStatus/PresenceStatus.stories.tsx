@@ -1,17 +1,16 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { PresenceStatus } from "./PresenceStatus.tsx";
 
-const meta: Meta<typeof PresenceStatus> = {
+const meta = {
   title: "OCTANT/Atoms/PresenceStatus",
   component: PresenceStatus,
-  tags: ["autodocs"],
   argTypes: {
     items: { control: "object", description: "Presence rows: { label, state, meta?, color? }." },
   },
-};
+} satisfies Meta<typeof PresenceStatus>;
 export default meta;
 
-type Story = StoryObj<typeof PresenceStatus>;
+type Story = StoryObj<typeof meta>;
 
 /** The default ONLINE / THINKING / IDLE trio, with the live blinking ONLINE dot. */
 export const Default: Story = {};

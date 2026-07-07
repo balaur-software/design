@@ -3,11 +3,13 @@
  *
  * The exact indexed palette from the reference (renderVals): eight base hues
  * (idx 00-07) plus their bright variants (idx 08-15). These map 1:1 to the
- * `--ansi-00` .. `--ansi-15` CSS custom properties in tokens.css.
+ * `--bx-ansi-0` .. `--bx-ansi-15` CSS custom properties in tokens.css, which
+ * also defines zero-padded aliases (`--bx-ansi-00` .. `--bx-ansi-09`) so
+ * `--bx-ansi-${idx}` resolves for every entry.
  */
 
 export interface PaletteColor {
-  /** Zero-padded ANSI index, e.g. "00" .. "15". Matches the CSS var suffix. */
+  /** Zero-padded ANSI index, e.g. "00" .. "15". `--bx-ansi-${idx}` resolves in tokens.css. */
   readonly idx: string;
   /** Human name, e.g. "green" or "br.green". */
   readonly name: string;

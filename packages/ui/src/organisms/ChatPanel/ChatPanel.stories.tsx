@@ -1,28 +1,7 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import { useState } from "react";
-import { fn } from "@storybook/test";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 import { ChatPanel } from "./ChatPanel";
 import type { Agent, Block, ChatMessageData } from "./chat-types";
-
-const meta: Meta<typeof ChatPanel> = {
-  title: "OCTANT/Organisms/ChatPanel",
-  component: ChatPanel,
-  tags: ["autodocs"],
-  argTypes: {
-    messages: { control: "object", description: "ChatMessageData[] (id, role, time?, agentId?, blocks)." },
-    agents: { control: "object", description: "Agent lookup indexed by id." },
-    artifacts: { control: "object", description: "Artifact blocks shown in the side panel." },
-    streaming: { control: "boolean" },
-    composerValue: { control: "text", description: "Controlled composer value." },
-    defaultComposerValue: { control: "text" },
-    presence: { control: "object", description: "Header presence rows." },
-    onSend: { action: "sent" },
-    onStop: { action: "stopped" },
-    onArtifactOpen: { action: "artifact-opened" },
-    onComposerValueChange: { action: "composer-changed" },
-  },
-};
-export default meta;
 
 const agents: Record<string, Agent> = {
   router: { id: "router", name: "ROUTER" },
@@ -57,42 +36,58 @@ const messages: ChatMessageData[] = [
   },
 ];
 
-export const Default: StoryObj = {
-  render: () => {
-    const [v, setV] = useState("");
-    return (
-      <ChatPanel
-        messages={messages.slice(0, 1)}
-        agents={agents}
-        composerValue={v}
-        onComposerValueChange={setV}
-        onSend={fn()}
-        onStop={fn()}
-      />
-    );
+const meta = {
+  title: "OCTANT/Organisms/ChatPanel",
+  component: ChatPanel,
+  args: {
+    messages: messages.slice(0, 1),
+    agents,
+    onSend: fn(),
+    onStop: fn(),
+    onArtifactOpen: fn(),
+    onComposerValueChange: fn(),
+  },
+  argTypes: {
+    messages: { control: "object", description: "ChatMessageData[] (id, role, time?, agentId?, blocks)." },
+    agents: { control: "object", description: "Agent lookup indexed by id." },
+    artifacts: { control: "object", description: "Artifact blocks shown in the side panel." },
+    streaming: { control: "boolean" },
+    composerValue: { control: "text", description: "Controlled composer value." },
+    defaultComposerValue: { control: "text" },
+    presence: { control: "object", description: "Header presence rows." },
+  },
+} satisfies Meta<typeof ChatPanel>;
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+/** A single user turn plus the composer; typing and sending fires `onSend` and clears the field. */
+export const Default: Story = {
+  play: async ({ canvas, userEvent, args }) => {
+    const input = canvas.getByRole("textbox");
+    await userEvent.type(input, "render the field");
+    await expect(args.onComposerValueChange).toHaveBeenLastCalledWith("render the field");
+    await userEvent.click(canvas.getByRole("button", { name: /send/i }));
+    await expect(args.onSend).toHaveBeenCalledWith("render the field");
+    await expect(input).toHaveValue("");
   },
 };
 
-export const Full: StoryObj = {
-  render: () => {
-    const [v, setV] = useState("");
-    return (
-      <ChatPanel
-        messages={messages}
-        agents={agents}
-        artifacts={[artifact]}
-        composerValue={v}
-        onComposerValueChange={setV}
-        onSend={fn()}
-        onStop={fn()}
-        onArtifactOpen={fn()}
-      />
-    );
+/** The full surface: thread, reasoning block, composer and the artifact side panel. */
+export const Full: Story = {
+  args: {
+    messages,
+    artifacts: [artifact],
   },
 };
 
-export const Streaming: StoryObj = {
-  render: () => (
-    <ChatPanel messages={messages.slice(0, 1)} agents={agents} streaming onSend={fn()} onStop={fn()} />
-  ),
+/** While the agent streams, the composer disables and shows the Stop control. */
+export const Streaming: Story = {
+  args: {
+    streaming: true,
+  },
+  play: async ({ canvas, userEvent, args }) => {
+    await expect(canvas.getByRole("textbox")).toBeDisabled();
+    await userEvent.click(canvas.getByRole("button", { name: /stop generation/i }));
+    await expect(args.onStop).toHaveBeenCalled();
+  },
 };

@@ -1,4 +1,4 @@
-import { type CSSProperties, type ReactNode, useState } from "react";
+import { type CSSProperties, type ReactNode, useId, useRef, useState } from "react";
 import { EdgeRow } from "../../molecules/EdgeRow/EdgeRow";
 import { EmptyState } from "../../molecules/EmptyState/EmptyState";
 import { NodeCard } from "../../molecules/NodeCard/NodeCard";
@@ -50,6 +50,33 @@ export function NodeDetailPanel({
   style,
 }: NodeDetailPanelProps) {
   const [tab, setTab] = useState<TabKey>("edges");
+  const baseId = useId();
+  const stripRef = useRef<HTMLDivElement>(null);
+
+  // Roving tabindex + arrow keys across the strip (same pattern as organisms/Tabs).
+  const moveTab = (next: number) => {
+    const t = TABS[next];
+    if (!t) return;
+    setTab(t.key);
+    stripRef.current?.querySelectorAll<HTMLElement>("[role='tab']")[next]?.focus();
+  };
+
+  const onTabKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const idx = TABS.findIndex((t) => t.key === tab);
+    if (e.key === "ArrowRight") {
+      e.preventDefault();
+      moveTab((idx + 1) % TABS.length);
+    } else if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      moveTab((idx - 1 + TABS.length) % TABS.length);
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      moveTab(0);
+    } else if (e.key === "End") {
+      e.preventDefault();
+      moveTab(TABS.length - 1);
+    }
+  };
 
   const outgoing = edges.filter((e) => e.source === node.id);
   const incoming = edges.filter((e) => e.target === node.id);
@@ -183,13 +210,24 @@ export function NodeDetailPanel({
       }}
     >
       <NodeCard node={node} {...(onNavigate ? { onClick: () => onNavigate(node.id) } : {})} />
-      <div style={{ display: "flex", borderBottom: "1px solid var(--bx-border, #1c1d24)" }}>
+      <div
+        ref={stripRef}
+        role="tablist"
+        aria-label="Node detail"
+        onKeyDown={onTabKeyDown}
+        style={{ display: "flex", borderBottom: "1px solid var(--bx-border, #1c1d24)" }}
+      >
         {TABS.map((t) => {
           const on = t.key === tab;
           return (
             <button
               key={t.key}
               type="button"
+              role="tab"
+              id={`${baseId}-tab-${t.key}`}
+              aria-selected={on}
+              aria-controls={`${baseId}-panel`}
+              tabIndex={on ? 0 : -1}
               onClick={() => setTab(t.key)}
               style={{
                 flex: 1,
@@ -209,7 +247,14 @@ export function NodeDetailPanel({
           );
         })}
       </div>
-      <div style={{ flex: 1, overflowY: "auto" }}>{body}</div>
+      <div
+        id={`${baseId}-panel`}
+        role="tabpanel"
+        aria-labelledby={`${baseId}-tab-${tab}`}
+        style={{ flex: 1, overflowY: "auto" }}
+      >
+        {body}
+      </div>
     </div>
   );
 }

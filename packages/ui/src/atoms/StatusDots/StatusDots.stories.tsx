@@ -1,18 +1,17 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { StatusDots } from "./StatusDots.tsx";
 
-const meta: Meta<typeof StatusDots> = {
+const meta = {
   title: "OCTANT/Atoms/StatusDots",
   component: StatusDots,
-  tags: ["autodocs"],
   argTypes: {
     dots: { control: "object", description: "Status entries: { label, color }." },
     gap: { control: { type: "number", min: 4, max: 60, step: 1 } },
   },
-};
+} satisfies Meta<typeof StatusDots>;
 export default meta;
 
-type Story = StoryObj<typeof StatusDots>;
+type Story = StoryObj<typeof meta>;
 
 /** The default ONLINE / IDLE / BUSY / OFFLINE legend. */
 export const Default: Story = {};

@@ -1,4 +1,4 @@
-import { type CSSProperties, type ReactNode, useRef, useState } from "react";
+import { type CSSProperties, type ReactNode, useEffect, useRef, useState } from "react";
 import { useOnVisible, useReducedMotion, useScramble } from "../../hooks";
 
 export interface ScrollRevealProps {
@@ -34,11 +34,15 @@ export function ScrollReveal({ children, scramble, y = 12, dur = 520, delay = 0,
   const textRef = useRef<HTMLSpanElement>(null);
   const reduced = useReducedMotion();
   const [active, setActive] = useState(false);
+  // SSR (and no-JS) must show the content: the hidden pre-reveal state only
+  // applies after mount, once the IntersectionObserver gate is actually live.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   useOnVisible(wrapRef, () => setActive(true));
   useScramble(textRef, scramble ?? "", { dur, delay, active: active && scramble !== undefined });
 
-  const shown = reduced || active;
+  const shown = !mounted || reduced || active;
 
   return (
     <div

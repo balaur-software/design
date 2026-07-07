@@ -1,10 +1,9 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ImportanceMeter } from "./ImportanceMeter";
 
-const meta: Meta<typeof ImportanceMeter> = {
+const meta = {
   title: "OCTANT/Atoms/ImportanceMeter",
   component: ImportanceMeter,
-  tags: ["autodocs"],
   args: { importance: 4 },
   argTypes: {
     importance: {
@@ -16,13 +15,15 @@ const meta: Meta<typeof ImportanceMeter> = {
     trackColor: { control: "color" },
     showValue: { control: "boolean" },
   },
-};
+} satisfies Meta<typeof ImportanceMeter>;
 export default meta;
 
-type Story = StoryObj<typeof ImportanceMeter>;
+type Story = StoryObj<typeof meta>;
 
+/** Four of five segments filled, with the numeric value shown. */
 export const Default: Story = {};
 
+/** Every importance level from 0 (n/a) to 5. */
 export const Scale: Story = {
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -33,6 +34,7 @@ export const Scale: Story = {
   ),
 };
 
+/** Meter without the trailing numeric value. */
 export const NoValue: Story = {
   args: { importance: 4, showValue: false },
 };

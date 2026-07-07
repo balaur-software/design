@@ -1,20 +1,20 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { BarChart } from "./BarChart.tsx";
 
-const meta: Meta<typeof BarChart> = {
+const meta = {
   title: "OCTANT/Organisms/BarChart",
   component: BarChart,
-  tags: ["autodocs"],
   argTypes: {
     data: { control: "object", description: "Rows: { label, value (0..1), color? }." },
     title: { control: "text" },
     hint: { control: "text" },
     stagger: { control: { type: "number", min: 0, max: 200, step: 5 } },
   },
-};
+} satisfies Meta<typeof BarChart>;
 export default meta;
-type Story = StoryObj<typeof BarChart>;
+type Story = StoryObj<typeof meta>;
 
+/** Four accent-coloured bars with the default sweep-in stagger. */
 export const Default: Story = {
   args: {
     data: [
@@ -26,6 +26,7 @@ export const Default: Story = {
   },
 };
 
+/** Adds the title + hint header row above the bars. */
 export const SingleAccent: Story = {
   args: {
     title: "BAR · disk usage",
@@ -39,6 +40,7 @@ export const SingleAccent: Story = {
   },
 };
 
+/** Per-row colours with a tightened 30ms stagger. */
 export const FastSweep: Story = {
   args: {
     title: "BAR · cache hit",
@@ -53,6 +55,7 @@ export const FastSweep: Story = {
   },
 };
 
+/** A six-row chart exercising the full palette. */
 export const Full: Story = {
   args: {
     data: [

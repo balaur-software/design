@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import { fn } from "@storybook/test";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 import type { MemoryNode } from "../../organisms/MemoryExplorer/memory-types";
 import { NodeSearchBox } from "./NodeSearchBox";
 
@@ -48,31 +48,40 @@ const results: MemoryNode[] = [
   },
 ];
 
-const meta: Meta<typeof NodeSearchBox> = {
+const meta = {
   title: "OCTANT/Molecules/NodeSearchBox",
   component: NodeSearchBox,
-  tags: ["autodocs"],
+  args: { style: { width: 360 } },
   argTypes: {
     value: { control: "text" },
     defaultValue: { control: "text" },
     results: { control: "object", description: "Search results from the caller's recall/search." },
-    onSelect: { action: "selected" },
-    onValueChange: { action: "value-changed" },
     placeholder: { control: "text" },
   },
-};
+} satisfies Meta<typeof NodeSearchBox>;
 export default meta;
 
-type Story = StoryObj<typeof NodeSearchBox>;
+type Story = StoryObj<typeof meta>;
 
+/** Typing opens the result dropdown; picking a row fires `onSelect` and closes it. */
 export const Default: Story = {
-  render: () => <NodeSearchBox results={results} onSelect={fn()} style={{ width: 360 }} />,
+  args: { results, onSelect: fn(), onValueChange: fn() },
+  play: async ({ canvas, userEvent, args }) => {
+    await userEvent.type(canvas.getByRole("combobox"), "ana");
+    await expect(args.onValueChange).toHaveBeenLastCalledWith("ana");
+    const row = await canvas.findByRole("option", { name: /ana — sister/i });
+    await userEvent.click(row);
+    await expect(args.onSelect).toHaveBeenCalledWith("r2");
+    await expect(canvas.queryByRole("option", { name: /ana — sister/i })).not.toBeInTheDocument();
+  },
 };
 
+/** Pre-seeded query; the dropdown opens once the input is focused. */
 export const WithResults: Story = {
-  render: () => <NodeSearchBox defaultValue="ana" results={results} onSelect={fn()} style={{ width: 360 }} />,
+  args: { defaultValue: "ana", results, onSelect: fn() },
 };
 
+/** No results — the dropdown never opens. */
 export const Empty: Story = {
-  render: () => <NodeSearchBox results={[]} style={{ width: 360 }} />,
+  args: { results: [] },
 };

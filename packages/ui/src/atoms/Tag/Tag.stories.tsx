@@ -1,24 +1,32 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
+import { expect, fn, waitFor } from "storybook/test";
 import { Tag } from "./Tag.tsx";
 
-const meta: Meta<typeof Tag> = {
+const meta = {
   title: "OCTANT/Atoms/Tag",
   component: Tag,
-  tags: ["autodocs"],
-  args: { label: "NODE-01" },
+  args: { label: "NODE-01", onRemove: fn() },
   argTypes: {
     label: { control: "text" },
     tone: { control: "select", options: ["default", "active", "degraded", "offline"] },
     removable: { control: "boolean" },
-    onRemove: { action: "removed" },
+  },
+} satisfies Meta<typeof Tag>;
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+/** Removable chip: `×` dissolves the label into dot-noise, collapses, then fires onRemove. */
+export const Default: Story = {
+  play: async ({ args, canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: /remove node-01/i }));
+    // Dissolve (~360ms) + collapse (~300ms) run before onRemove fires and the tag unmounts.
+    await waitFor(() => expect(args.onRemove).toHaveBeenCalledTimes(1), { timeout: 3000 });
+    await expect(canvas.queryByRole("button", { name: /remove node-01/i })).not.toBeInTheDocument();
   },
 };
-export default meta;
-type Story = StoryObj<typeof Tag>;
 
-export const Default: Story = {};
-
+/** No `×` button — a plain read-only chip. */
 export const NotRemovable: Story = {
   args: { label: "READ-ONLY", removable: false },
 };

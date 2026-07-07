@@ -1,13 +1,27 @@
 import type { CSSProperties } from "react";
+import { useReducedMotion } from "../../hooks/useReducedMotion";
 import type { BlockStatus } from "../../organisms/ChatPanel/chat-types";
 
 export type ToolPillStatus = BlockStatus | "idle";
 
-const STATUS: Record<ToolPillStatus, { glyph: string; color: string; spin?: boolean }> = {
-  idle: { glyph: "·", color: "var(--bx-text-6, #5b616e)" },
-  running: { glyph: "◐", color: "var(--bx-accent, #46c66d)", spin: true },
-  done: { glyph: "✓", color: "var(--bx-accent, #46c66d)" },
-  error: { glyph: "✕", color: "#ff6b6f" },
+const STATUS: Record<ToolPillStatus, { glyph: string; color: string; label: string; spin?: boolean }> = {
+  idle: { glyph: "·", color: "var(--bx-text-6, #5b616e)", label: "idle" },
+  running: { glyph: "◐", color: "var(--bx-accent, #46c66d)", label: "running", spin: true },
+  done: { glyph: "✓", color: "var(--bx-accent, #46c66d)", label: "done" },
+  error: { glyph: "✕", color: "#ff6b6f", label: "error" },
+};
+
+/** Keeps the status text out of view while staying readable to AT. */
+const VISUALLY_HIDDEN: CSSProperties = {
+  position: "absolute",
+  width: 1,
+  height: 1,
+  margin: -1,
+  padding: 0,
+  border: 0,
+  clipPath: "inset(50%)",
+  overflow: "hidden",
+  whiteSpace: "nowrap",
 };
 
 export interface ToolPillProps {
@@ -28,10 +42,12 @@ export interface ToolPillProps {
  */
 export function ToolPill({ name, status = "idle", onClick, expanded = false, style }: ToolPillProps) {
   const s = STATUS[status];
+  const reduced = useReducedMotion();
   return (
     <button
       type="button"
       onClick={onClick}
+      aria-expanded={onClick ? expanded : undefined}
       style={{
         display: "inline-flex",
         alignItems: "center",
@@ -63,11 +79,12 @@ export function ToolPill({ name, status = "idle", onClick, expanded = false, sty
         style={{
           color: s.color,
           display: "inline-block",
-          animation: s.spin ? "bx-spin 0.9s linear infinite" : undefined,
+          animation: s.spin && !reduced ? "bx-spin 0.9s linear infinite" : undefined,
         }}
       >
         {s.glyph}
       </span>
+      <span style={VISUALLY_HIDDEN}>{s.label}</span>
     </button>
   );
 }

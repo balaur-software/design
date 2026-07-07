@@ -1,10 +1,9 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { MessageBubble } from "./MessageBubble.tsx";
 
-const meta: Meta<typeof MessageBubble> = {
+const meta = {
   title: "OCTANT/Molecules/MessageBubble",
   component: MessageBubble,
-  tags: ["autodocs"],
   argTypes: {
     role: { control: "radio", options: ["user", "agent"] },
     name: { control: "text" },
@@ -12,11 +11,12 @@ const meta: Meta<typeof MessageBubble> = {
     avatar: { control: "text" },
     children: { control: "text" },
   },
-};
+} satisfies Meta<typeof MessageBubble>;
 export default meta;
 
-type Story = StoryObj<typeof MessageBubble>;
+type Story = StoryObj<typeof meta>;
 
+/** A user message — neutral tint, right-aligned. */
 export const Default: Story = {
   args: {
     role: "user",
@@ -25,6 +25,7 @@ export const Default: Story = {
   },
 };
 
+/** An agent message — accent tint, left-aligned. */
 export const Agent: Story = {
   args: {
     role: "agent",
@@ -33,6 +34,7 @@ export const Agent: Story = {
   },
 };
 
+/** A short alternating exchange, as it appears in the chat panel. */
 export const Conversation: Story = {
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 16, maxWidth: 520 }}>
@@ -49,6 +51,7 @@ export const Conversation: Story = {
   ),
 };
 
+/** A custom name + octant-mosaic avatar (e.g. a tool speaker). */
 export const CustomAvatar: Story = {
   args: {
     role: "agent",

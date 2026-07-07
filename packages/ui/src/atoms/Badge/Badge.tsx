@@ -67,6 +67,8 @@ export interface BadgeProps {
   tone?: BadgeTone;
   /** Optional trailing count/value, rendered brighter than the label. */
   count?: ReactNode;
+  className?: string;
+  style?: CSSProperties;
 }
 
 /**
@@ -74,10 +76,13 @@ export interface BadgeProps {
  * count — the annotation marker from the nav/markers section (e.g. `NEW 4`,
  * `ERR 2`, `QUEUE 128`). Pure static markup.
  */
-export function Badge({ children, tone = "accent", count }: BadgeProps) {
+export function Badge({ children, tone = "accent", count, className, style }: BadgeProps) {
   const t = TONES[tone];
   return (
-    <span style={{ ...base, border: `1px solid ${t.border}`, color: t.color }}>
+    <span
+      className={className}
+      style={{ ...base, border: `1px solid ${t.border}`, color: t.color, ...style }}
+    >
       {children}
       {count != null && <span style={{ color: t.count }}>{count}</span>}
     </span>

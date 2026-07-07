@@ -1,4 +1,4 @@
-import { type CSSProperties, useState } from "react";
+import { type CSSProperties, useRef, useState } from "react";
 import { useControllableState } from "../../hooks/useControllableState";
 
 /** Quadrant-block glyphs used when a row omits its own `glyph` (cycled by index). */
@@ -21,6 +21,9 @@ export interface ListProps {
   /** Initially selected index when uncontrolled. Defaults to the first row. */
   defaultSelected?: number;
   onSelect?: (index: number) => void;
+  /** Accessible name for the listbox. Default "List". */
+  ariaLabel?: string;
+  className?: string;
   style?: CSSProperties;
 }
 
@@ -30,13 +33,48 @@ export interface ListProps {
  * is via `useControllableState`; all styling is derived at render time so the list
  * is inert and deterministic on the server (no imperative fills or timers).
  */
-export function List({ items, selected, defaultSelected = 0, onSelect, style }: ListProps) {
+export function List({
+  items,
+  selected,
+  defaultSelected = 0,
+  onSelect,
+  ariaLabel = "List",
+  className,
+  style,
+}: ListProps) {
   const [sel, setSel] = useControllableState(selected, defaultSelected, onSelect);
   const [hovered, setHovered] = useState(-1);
+  const btnRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  // APG listbox keyboard support: one tab stop (the selected option), with
+  // arrows / Home / End moving both selection and focus.
+  const move = (i: number) => {
+    setSel(i);
+    btnRefs.current[i]?.focus();
+  };
+  const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (items.length === 0) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      move(Math.min(items.length - 1, sel + 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      move(Math.max(0, sel - 1));
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      move(0);
+    } else if (e.key === "End") {
+      e.preventDefault();
+      move(items.length - 1);
+    }
+  };
 
   return (
     <div
       role="listbox"
+      aria-label={ariaLabel}
+      className={className}
+      onKeyDown={onKeyDown}
       style={{
         display: "flex",
         flexDirection: "column",
@@ -51,11 +89,14 @@ export function List({ items, selected, defaultSelected = 0, onSelect, style }: 
         const bg = on ? "#15161e" : hovered === i ? "#0f1014" : "transparent";
         return (
           <button
-            // biome-ignore lint/suspicious/noArrayIndexKey: rows are positional and have no stable id
             key={i}
+            ref={(el) => {
+              btnRefs.current[i] = el;
+            }}
             type="button"
             role="option"
             aria-selected={on}
+            tabIndex={on ? 0 : -1}
             onClick={() => setSel(i)}
             onPointerEnter={() => setHovered(i)}
             onPointerLeave={() => setHovered((h) => (h === i ? -1 : h))}

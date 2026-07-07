@@ -3,6 +3,7 @@ import {
   type CSSProperties,
   type FocusEvent,
   type PointerEvent,
+  useEffect,
   useRef,
   useState,
 } from "react";
@@ -42,6 +43,9 @@ export function ScrambleButton({
   const [active, setActive] = useState(false);
 
   useScramble(labelRef, text, { dur: 560, delay: 0, active });
+
+  // Clear the pending lockout timer on unmount (mirrors HoverCard's hover timer).
+  useEffect(() => () => clearTimeout(timerRef.current), []);
 
   const trigger = () => {
     if (disabled || busyRef.current) return;

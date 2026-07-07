@@ -17,6 +17,7 @@ export interface SpecListProps {
   label?: string;
   /** Number of columns the rows flow across. Defaults to 2. */
   columns?: number;
+  style?: CSSProperties;
 }
 
 /** The reference spec sheet from §-glyph-block (source L842-849). */
@@ -49,6 +50,7 @@ export function SpecList({
   items = DEFAULT_ITEMS,
   label = "SPEC · key / value",
   columns = 2,
+  style,
 }: SpecListProps) {
   return (
     <div
@@ -57,6 +59,7 @@ export function SpecList({
         background: "var(--bx-surface-3, #0c0d11)",
         padding: 20,
         fontFamily: "var(--bx-font-mono, 'DepartureMono', ui-monospace, monospace)",
+        ...style,
       }}
     >
       <div style={{ color: "#5b616e", fontSize: 11, letterSpacing: "0.1em", marginBottom: 16 }}>{label}</div>

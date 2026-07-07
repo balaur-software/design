@@ -1,11 +1,13 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { GlyphReference } from "./GlyphReference.tsx";
 
-const meta: Meta<typeof GlyphReference> = {
+const meta = {
   title: "OCTANT/Atoms/GlyphReference",
   component: GlyphReference,
-  tags: ["autodocs"],
-};
+} satisfies Meta<typeof GlyphReference>;
 export default meta;
 
-export const Default: StoryObj<typeof GlyphReference> = {};
+type Story = StoryObj<typeof meta>;
+
+/** The full glyph reference table. */
+export const Default: Story = {};

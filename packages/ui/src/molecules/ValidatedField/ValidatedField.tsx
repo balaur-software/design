@@ -1,4 +1,4 @@
-import { type CSSProperties, useState } from "react";
+import { type CSSProperties, useId, useState } from "react";
 import { useControllableState } from "../../hooks/useControllableState";
 
 type Status = "empty" | "valid" | "invalid";
@@ -62,6 +62,8 @@ export function ValidatedField({
 }: ValidatedFieldProps) {
   const [value, setValue] = useControllableState(valueProp, defaultValue, onChange);
   const [focused, setFocused] = useState(false);
+  const inputId = useId();
+  const messageId = useId();
 
   const trimmed = value.trim();
   const status: Status = trimmed === "" ? "empty" : pattern.test(trimmed) ? "valid" : "invalid";
@@ -84,6 +86,7 @@ export function ValidatedField({
         FIELD &middot; live validation
       </div>
       <label
+        htmlFor={inputId}
         style={{
           display: "block",
           fontSize: 12,
@@ -106,7 +109,10 @@ export function ValidatedField({
         }}
       >
         <input
+          id={inputId}
           type="text"
+          aria-invalid={status === "invalid" || undefined}
+          aria-describedby={messageId}
           maxLength={maxLength}
           placeholder={placeholder}
           value={value}
@@ -130,7 +136,7 @@ export function ValidatedField({
           {GLYPH[status]}
         </span>
       </div>
-      <div role="status" style={{ fontSize: 11, color: MSG_COLOR[status], marginTop: 8 }}>
+      <div id={messageId} role="status" style={{ fontSize: 11, color: MSG_COLOR[status], marginTop: 8 }}>
         {message}
       </div>
     </div>

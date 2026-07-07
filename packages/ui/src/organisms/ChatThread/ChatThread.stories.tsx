@@ -1,19 +1,7 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 import type { Agent, ChatMessageData } from "../ChatPanel/chat-types";
 import { ChatThread } from "./ChatThread";
-
-const meta: Meta<typeof ChatThread> = {
-  title: "OCTANT/Organisms/ChatThread",
-  component: ChatThread,
-  tags: ["autodocs"],
-  argTypes: {
-    messages: { control: "object", description: "ChatMessageData[] (id, role, time?, agentId?, blocks)." },
-    agents: { control: "object", description: "Agent lookup indexed by id." },
-    streaming: { control: "boolean" },
-    onArtifactOpen: { action: "artifact-opened" },
-  },
-};
-export default meta;
 
 const agents: Record<string, Agent> = {
   router: { id: "router", name: "ROUTER" },
@@ -58,8 +46,40 @@ const messages: ChatMessageData[] = [
   },
 ];
 
-export const Default: StoryObj = {
-  args: { messages: messages.slice(0, 2), agents },
+const meta = {
+  title: "OCTANT/Organisms/ChatThread",
+  component: ChatThread,
+  args: { messages: messages.slice(0, 2), agents, onArtifactOpen: fn() },
+  argTypes: {
+    messages: { control: "object", description: "ChatMessageData[] (id, role, time?, agentId?, blocks)." },
+    agents: { control: "object", description: "Agent lookup indexed by id." },
+    streaming: { control: "boolean" },
+  },
+} satisfies Meta<typeof ChatThread>;
+export default meta;
+
+type Story = StoryObj<typeof meta>;
+
+/** A user turn and an agent reply with reasoning, a tool call, text and citations. */
+export const Default: Story = {
+  render: (args) => (
+    <div style={{ height: 420, border: "1px solid var(--bx-border, #1c1d24)" }}>
+      <ChatThread {...args} />
+    </div>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    // The finished tool call collapses to a pill; clicking expands args + result.
+    const pill = canvas.getByRole("button", { name: /render_frame/i });
+    await expect(canvas.queryByText("RESULT")).not.toBeInTheDocument();
+    await userEvent.click(pill);
+    await expect(canvas.getByText("ARGS")).toBeVisible();
+    await expect(canvas.getByText("RESULT")).toBeVisible();
+  },
+};
+
+/** Three turns across two different agents. */
+export const MultiTurn: Story = {
+  args: { messages },
   render: (args) => (
     <div style={{ height: 420, border: "1px solid var(--bx-border, #1c1d24)" }}>
       <ChatThread {...args} />
@@ -67,26 +87,22 @@ export const Default: StoryObj = {
   ),
 };
 
-export const MultiTurn: StoryObj = {
-  render: () => (
+/** The typing indicator shows while the agent is producing its first block. */
+export const Streaming: Story = {
+  args: { messages: messages.slice(0, 1), streaming: true },
+  render: (args) => (
     <div style={{ height: 420, border: "1px solid var(--bx-border, #1c1d24)" }}>
-      <ChatThread messages={messages} agents={agents} />
+      <ChatThread {...args} />
     </div>
   ),
 };
 
-export const Streaming: StoryObj = {
-  render: () => (
+/** An empty thread renders the EmptyState prompt. */
+export const Empty: Story = {
+  args: { messages: [] },
+  render: (args) => (
     <div style={{ height: 420, border: "1px solid var(--bx-border, #1c1d24)" }}>
-      <ChatThread messages={messages.slice(0, 1)} agents={agents} streaming />
-    </div>
-  ),
-};
-
-export const Empty: StoryObj = {
-  render: () => (
-    <div style={{ height: 420, border: "1px solid var(--bx-border, #1c1d24)" }}>
-      <ChatThread messages={[]} />
+      <ChatThread {...args} />
     </div>
   ),
 };

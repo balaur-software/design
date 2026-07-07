@@ -40,11 +40,15 @@ export function BlockRenderer({ block, onArtifactOpen, style }: BlockRendererPro
     case "tool_call":
       return <ToolCallBlock block={block} {...styleProp} />;
     case "code":
-      return <CodeBlock {...(block.language ? { lang: block.language } : {})}>{block.code}</CodeBlock>;
+      return (
+        <CodeBlock {...(block.language ? { lang: block.language } : {})} {...styleProp}>
+          {block.code}
+        </CodeBlock>
+      );
     case "artifact":
       return <ArtifactPanel block={block} {...openProp} {...styleProp} />;
-    case "citations":
-      return (
+    case "citations": {
+      const list = (
         <CitationList>
           {block.sources.map((s, i) => (
             <CitationSource key={i} label={s.label} {...(s.accent ? { accent: s.accent } : {})}>
@@ -53,6 +57,9 @@ export function BlockRenderer({ block, onArtifactOpen, style }: BlockRendererPro
           ))}
         </CitationList>
       );
+      // CitationList owns no style prop — wrap so the documented style prop still applies.
+      return style ? <div style={style}>{list}</div> : list;
+    }
     default:
       return (
         <div style={{ color: "var(--bx-text-6, #5b616e)", fontSize: 12, ...style }}>

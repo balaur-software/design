@@ -1,11 +1,11 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, waitFor } from "storybook/test";
 import { ToastProvider } from "../../primitives";
 import { ContextMenu, type ContextMenuItem } from "./ContextMenu.tsx";
 
-const meta: Meta<typeof ContextMenu> = {
+const meta = {
   title: "OCTANT/Organisms/ContextMenu",
   component: ContextMenu,
-  tags: ["autodocs"],
   decorators: [
     (Story) => (
       <ToastProvider>
@@ -17,12 +17,31 @@ const meta: Meta<typeof ContextMenu> = {
     items: { control: "object", description: "Menu rows: { label, glyph?, toast?, danger?, divider? }." },
     children: { control: "text", description: "Content of the right-click surface." },
   },
-};
+} satisfies Meta<typeof ContextMenu>;
 export default meta;
-type Story = StoryObj<typeof ContextMenu>;
+type Story = StoryObj<typeof meta>;
 
 /** The reference surface — right-click it to pop the cell-inspector menu. */
-export const Default: Story = {};
+export const Default: Story = {
+  play: async ({ canvas, userEvent }) => {
+    const surface = canvas.getByText(/right-click anywhere/i);
+    await userEvent.pointer({ keys: "[MouseRight]", target: surface });
+
+    await canvas.findByRole("menu");
+    const items = canvas.getAllByRole("menuitem");
+    await expect(items).toHaveLength(4);
+
+    // Focus lands on the first row once the menu is measured; arrows walk the rows.
+    await waitFor(() => expect(items[0]).toHaveFocus());
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(items[1]).toHaveFocus();
+
+    // Selecting a row closes the menu and fires its toast.
+    await userEvent.click(canvas.getByRole("menuitem", { name: /copy glyph/i }));
+    await expect(canvas.queryByRole("menu")).not.toBeInTheDocument();
+    await canvas.findByText("Copied glyph");
+  },
+};
 
 /** A custom action set, including a divider and a danger row. */
 export const CustomItems: Story = {

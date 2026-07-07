@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import { fn } from "@storybook/test";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 import { ToastProvider } from "../../primitives";
 import { Menubar, type MenubarMenu } from "./Menubar.tsx";
 
@@ -42,10 +42,9 @@ const MENUS: MenubarMenu[] = [
   },
 ];
 
-const meta: Meta<typeof Menubar> = {
+const meta = {
   title: "OCTANT/Organisms/Menubar",
   component: Menubar,
-  tags: ["autodocs"],
   args: { menus: MENUS },
   decorators: [
     (Story) => (
@@ -57,12 +56,33 @@ const meta: Meta<typeof Menubar> = {
   argTypes: {
     menus: { control: "object", description: "MenubarMenu[]: { label, items[] }." },
   },
-};
+} satisfies Meta<typeof Menubar>;
 export default meta;
-type Story = StoryObj<typeof Menubar>;
+type Story = StoryObj<typeof meta>;
 
 /** The reference app-shell menu bar — click a group, hover across to switch, pick an item to fire a toast. */
-export const Default: Story = {};
+export const Default: Story = {
+  play: async ({ canvas, userEvent }) => {
+    const file = canvas.getByRole("button", { name: "FILE" });
+    await userEvent.click(file);
+    await expect(file).toHaveAttribute("aria-expanded", "true");
+
+    // Picking an item closes the bar and fires its toast.
+    await userEvent.click(canvas.getByRole("menuitem", { name: /save/i }));
+    await expect(file).toHaveAttribute("aria-expanded", "false");
+    await canvas.findByText("Saved");
+
+    // While a menu is open, hovering a sibling trigger switches to it; Escape dismisses.
+    const edit = canvas.getByRole("button", { name: "EDIT" });
+    const view = canvas.getByRole("button", { name: "VIEW" });
+    await userEvent.click(edit);
+    await userEvent.hover(view);
+    await expect(view).toHaveAttribute("aria-expanded", "true");
+    await expect(edit).toHaveAttribute("aria-expanded", "false");
+    await userEvent.keyboard("{Escape}");
+    await expect(view).toHaveAttribute("aria-expanded", "false");
+  },
+};
 
 /** A trimmed bar with just two groups. */
 export const Compact: Story = {
@@ -108,6 +128,10 @@ export const NoShortcuts: Story = {
   },
 };
 
+const runBuild = fn();
+const runTest = fn();
+const runDeploy = fn();
+
 /** Custom `onSelect` handlers instead of the default toast. */
 export const CustomHandlers: Story = {
   args: {
@@ -115,12 +139,20 @@ export const CustomHandlers: Story = {
       {
         label: "RUN",
         items: [
-          { label: "Build", shortcut: "⌘B", onSelect: fn() },
-          { label: "Test", shortcut: "⌘T", onSelect: fn() },
+          { label: "Build", shortcut: "⌘B", onSelect: runBuild },
+          { label: "Test", shortcut: "⌘T", onSelect: runTest },
           { divider: true },
-          { label: "Deploy", onSelect: fn() },
+          { label: "Deploy", onSelect: runDeploy },
         ],
       },
     ],
+  },
+  play: async ({ canvas, userEvent }) => {
+    const trigger = canvas.getByRole("button", { name: "RUN" });
+    await userEvent.click(trigger);
+    await userEvent.click(canvas.getByRole("menuitem", { name: /build/i }));
+    await expect(runBuild).toHaveBeenCalled();
+    await expect(runDeploy).not.toHaveBeenCalled();
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
   },
 };

@@ -1,8 +1,13 @@
 import { type CSSProperties, Fragment } from "react";
 import { AgentGlyph } from "../../atoms/AgentGlyph/AgentGlyph";
 import { CellAvatar } from "../../atoms/CellAvatar/CellAvatar";
-import type { Agent, ChatBlockRenderer, ChatMessageData } from "../../organisms/ChatPanel/chat-types";
+import type { Agent, Block, ChatBlockRenderer, ChatMessageData } from "../../organisms/ChatPanel/chat-types";
 import { BlockRenderer } from "../BlockRenderer/BlockRenderer";
+
+/** Stable key: block ids when present (tool_call/artifact), type+index otherwise. */
+function blockKey(block: Block, i: number): string {
+  return "id" in block && block.id ? block.id : `${block.type}-${i}`;
+}
 
 export interface ChatMessageProps {
   message: ChatMessageData;
@@ -50,9 +55,15 @@ export function ChatMessage({ message, agent, onArtifactOpen, renderBlock, style
           ...style,
         }}
       >
-        {message.blocks.map((b, i) =>
-          b.type === "text" ? <div key={i}>{b.text}</div> : <BlockRenderer key={i} block={b} />,
-        )}
+        {message.blocks.map((b, i) => {
+          const custom = renderBlock?.(b);
+          if (custom != null) return <Fragment key={blockKey(b, i)}>{custom}</Fragment>;
+          return b.type === "text" ? (
+            <div key={blockKey(b, i)}>{b.text}</div>
+          ) : (
+            <BlockRenderer key={blockKey(b, i)} block={b} {...(onArtifactOpen ? { onArtifactOpen } : {})} />
+          );
+        })}
       </div>
     );
   }
@@ -98,7 +109,7 @@ export function ChatMessage({ message, agent, onArtifactOpen, renderBlock, style
         {message.blocks.map((block, i) => {
           const custom = renderBlock?.(block);
           return (
-            <Fragment key={i}>
+            <Fragment key={blockKey(block, i)}>
               {custom ?? <BlockRenderer block={block} {...(onArtifactOpen ? { onArtifactOpen } : {})} />}
             </Fragment>
           );

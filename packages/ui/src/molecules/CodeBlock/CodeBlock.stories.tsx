@@ -1,19 +1,18 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { CodeBlock } from "./CodeBlock.tsx";
 
-const meta: Meta<typeof CodeBlock> = {
+const meta = {
   title: "OCTANT/Molecules/CodeBlock",
   component: CodeBlock,
-  tags: ["autodocs"],
   argTypes: {
     lang: { control: "text" },
     filename: { control: "text" },
     children: { control: "text", description: "Code body: plain string or pre-highlighted nodes." },
   },
-};
+} satisfies Meta<typeof CodeBlock>;
 export default meta;
 
-type Story = StoryObj<typeof CodeBlock>;
+type Story = StoryObj<typeof meta>;
 
 const kw = { color: "#8a6dff" } as const;
 

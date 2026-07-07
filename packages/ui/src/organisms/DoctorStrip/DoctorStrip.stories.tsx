@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 import type { DoctorReportProps } from "./DoctorStrip";
-import { fn } from "@storybook/test";
 import { DoctorStrip } from "./DoctorStrip";
 
 const report: DoctorReportProps = {
@@ -15,31 +15,34 @@ const report: DoctorReportProps = {
   integrityOk: true,
 };
 
-const meta: Meta<typeof DoctorStrip> = {
+const meta = {
   title: "OCTANT/Organisms/DoctorStrip",
   component: DoctorStrip,
-  tags: ["autodocs"],
   args: { report, onMetricClick: fn(), style: { width: 720 } },
   argTypes: {
     report: { control: "object", description: "DoctorReportProps health snapshot." },
-    onMetricClick: { action: "metric-clicked" },
   },
-};
+} satisfies Meta<typeof DoctorStrip>;
 export default meta;
 
-type Story = StoryObj<typeof DoctorStrip>;
+type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
-
-export const Healthy: Story = {
-  render: () => <DoctorStrip report={report} onMetricClick={fn()} style={{ width: 720 }} />,
+/** The reference strip — clicking a metric fires `onMetricClick` with its key. */
+export const Default: Story = {
+  play: async ({ canvas, userEvent, args }) => {
+    await userEvent.click(canvas.getByRole("button", { name: /^active/i }));
+    await expect(args.onMetricClick).toHaveBeenCalledWith("active");
+    await userEvent.click(canvas.getByRole("button", { name: /^integrity/i }));
+    await expect(args.onMetricClick).toHaveBeenLastCalledWith("integrity");
+  },
 };
 
+/** An all-green snapshot: integrity OK, small queue. */
+export const Healthy: Story = {};
+
+/** Integrity failure plus a backed-up queue and no accept-rate data. */
 export const Degraded: Story = {
-  render: () => (
-    <DoctorStrip
-      report={{ ...report, integrityOk: false, pendingCount: 23, queueOldestDays: 41, acceptRate30d: null }}
-      style={{ width: 720 }}
-    />
-  ),
+  args: {
+    report: { ...report, integrityOk: false, pendingCount: 23, queueOldestDays: 41, acceptRate30d: null },
+  },
 };

@@ -25,6 +25,26 @@ const JUSTIFY: Record<NonNullable<ScrimOverlayProps["align"]>, CSSProperties["ju
 };
 
 /**
+ * Module-level scroll-lock counter: with stacked overlays closed out of order,
+ * per-instance save/restore would unlock the page while an overlay is still
+ * open. The first lock saves the inline overflow; the last unlock restores it.
+ */
+let scrollLocks = 0;
+let savedOverflow = "";
+
+function lockBodyScroll(): () => void {
+  if (scrollLocks === 0) {
+    savedOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+  }
+  scrollLocks += 1;
+  return () => {
+    scrollLocks -= 1;
+    if (scrollLocks === 0) document.body.style.overflow = savedOverflow;
+  };
+}
+
+/**
  * A portalled full-screen scrim + panel with Escape/outside-click dismissal,
  * body-scroll lock, and focus trapping. The shared shell behind Modal, Sheet, and
  * CommandPalette. Client-only (renders null on the server / when closed).
@@ -45,11 +65,7 @@ export function ScrimOverlay({
 
   useEffect(() => {
     if (!open) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = prev;
-    };
+    return lockBodyScroll();
   }, [open]);
 
   if (!open || typeof document === "undefined") return null;

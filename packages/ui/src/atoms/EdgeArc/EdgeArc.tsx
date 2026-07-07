@@ -1,3 +1,4 @@
+import type { KeyboardEvent } from "react";
 import { edgeStyle } from "../../organisms/MemoryExplorer/memory-types";
 
 export interface EdgeArcProps {
@@ -55,6 +56,7 @@ export function EdgeArc({
   }
 
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: SVG path acts as an APG button when onClick is set (role/tabIndex/keyboard applied below)
     <path
       d={d}
       fill="none"
@@ -64,6 +66,19 @@ export function EdgeArc({
       strokeDasharray={s.dash}
       strokeLinecap="round"
       onClick={onClick}
+      {...(onClick
+        ? {
+            role: "button",
+            tabIndex: 0,
+            "aria-label": `${edgeType} edge`,
+            onKeyDown: (e: KeyboardEvent<SVGPathElement>) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onClick();
+              }
+            },
+          }
+        : {})}
       style={{ cursor: onClick ? "pointer" : "default" }}
     />
   );

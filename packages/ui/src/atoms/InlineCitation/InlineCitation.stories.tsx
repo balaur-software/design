@@ -1,10 +1,9 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { CitationList, CitationSource, InlineCitation } from "./InlineCitation.tsx";
 
-const meta: Meta<typeof InlineCitation> = {
+const meta = {
   title: "OCTANT/Atoms/InlineCitation",
   component: InlineCitation,
-  tags: ["autodocs"],
   args: { label: "1" },
   argTypes: {
     label: { control: "text" },
@@ -12,10 +11,10 @@ const meta: Meta<typeof InlineCitation> = {
     accent: { control: "color" },
     border: { control: "color" },
   },
-};
+} satisfies Meta<typeof InlineCitation>;
 export default meta;
 
-type Story = StoryObj<typeof InlineCitation>;
+type Story = StoryObj<typeof meta>;
 
 /** A lone chip, rendered inline after a fragment of prose. */
 export const Default: Story = {

@@ -15,7 +15,9 @@ export interface StepperProps {
   step?: number;
   /** Caption shown above the bar. */
   label?: string;
-  /** Colour of the eighth-block fill and value readout. */
+  /** Colour of the eighth-block fill and value readout. Matches Slider's prop name. */
+  accentColor?: string;
+  /** @deprecated Use `accentColor` (kept as an alias for backwards compatibility). */
   fillColor?: string;
   disabled?: boolean;
   style?: CSSProperties;
@@ -49,10 +51,12 @@ export function Stepper({
   max = 16,
   step = 1,
   label = "STEPPER · brush radius",
+  accentColor,
   fillColor = "#f2c94c",
   disabled = false,
   style,
 }: StepperProps) {
+  const fill = accentColor ?? fillColor;
   const [val, setVal] = useControllableState(value, defaultValue, onChange);
   const barRef = useRef<HTMLPreElement>(null);
 
@@ -95,13 +99,23 @@ export function Stepper({
         }}
       >
         <span>{label}</span>
-        <span aria-live="polite" style={{ color: fillColor, fontSize: 15 }}>
+        <span aria-live="polite" style={{ color: fill, fontSize: 15 }}>
           {String(val).padStart(pad, "0")}
         </span>
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <button type="button" aria-label="Decrease" disabled={atMin} onClick={dec} style={btnStyle(atMin)}>
+        {/* aria-disabled (not native disabled) at the range bounds keeps focus on the
+            button when the limit is hit (APG spinbutton); dec/inc no-op there. Native
+            disabled only when the whole stepper is disabled. */}
+        <button
+          type="button"
+          aria-label="Decrease"
+          disabled={disabled}
+          aria-disabled={atMin}
+          onClick={dec}
+          style={btnStyle(atMin)}
+        >
           {"−"}
         </button>
         <pre
@@ -112,13 +126,20 @@ export function Stepper({
             flex: 1,
             fontSize: 16,
             lineHeight: 1,
-            color: fillColor,
+            color: fill,
             whiteSpace: "pre",
             overflow: "hidden",
             letterSpacing: 0,
           }}
         />
-        <button type="button" aria-label="Increase" disabled={atMax} onClick={inc} style={btnStyle(atMax)}>
+        <button
+          type="button"
+          aria-label="Increase"
+          disabled={disabled}
+          aria-disabled={atMax}
+          onClick={inc}
+          style={btnStyle(atMax)}
+        >
           +
         </button>
       </div>

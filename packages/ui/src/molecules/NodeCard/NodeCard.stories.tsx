@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import { fn } from "@storybook/test";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 import type { MemoryNode } from "../../organisms/MemoryExplorer/memory-types";
 import { NodeCard } from "./NodeCard";
 
@@ -19,36 +19,37 @@ const node: MemoryNode = {
   aliases: ["lake house", "cabin"],
 };
 
-const meta: Meta<typeof NodeCard> = {
+const meta = {
   title: "OCTANT/Molecules/NodeCard",
   component: NodeCard,
-  tags: ["autodocs"],
   args: { node, style: { width: 320 } },
   argTypes: {
     node: { control: "object", description: "MemoryNode descriptor." },
-    onClick: { action: "clicked" },
   },
-};
+} satisfies Meta<typeof NodeCard>;
 export default meta;
 
-type Story = StoryObj<typeof NodeCard>;
+type Story = StoryObj<typeof meta>;
 
-export const Default: Story = { args: { onClick: fn() } };
-
-export const Proposed: Story = {
-  render: () => (
-    <NodeCard
-      node={{ ...node, status: "proposed", importance: 2, origin: "turn:abc", author: "" }}
-      style={{ width: 320 }}
-    />
-  ),
+/** An active node with every field populated; clicking the card fires `onClick`. */
+export const Default: Story = {
+  args: { onClick: fn() },
+  play: async ({ canvas, userEvent, args }) => {
+    await userEvent.click(canvas.getByRole("button", { name: /lake house trip/i }));
+    await expect(args.onClick).toHaveBeenCalledOnce();
+  },
 };
 
+/** A freshly proposed node awaiting consent — no author, turn-scoped provenance. */
+export const Proposed: Story = {
+  args: {
+    node: { ...node, status: "proposed", importance: 2, origin: "turn:abc", author: "" },
+  },
+};
+
+/** A quarantined node — ask-before-surfacing, no scheduled moment. */
 export const Quarantined: Story = {
-  render: () => (
-    <NodeCard
-      node={{ ...node, status: "quarantined", surfacing: "ask", importance: 5, when: null }}
-      style={{ width: 320 }}
-    />
-  ),
+  args: {
+    node: { ...node, status: "quarantined", surfacing: "ask", importance: 5, when: null },
+  },
 };

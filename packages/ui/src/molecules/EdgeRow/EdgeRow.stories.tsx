@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import { fn } from "@storybook/test";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 import type { MemoryEdge } from "../../organisms/MemoryExplorer/memory-types";
 import { EdgeRow } from "./EdgeRow";
 
@@ -13,14 +13,14 @@ const base: MemoryEdge = {
   created: "2026-07-04T20:14:03.123Z",
 };
 
-const meta: Meta<typeof EdgeRow> = {
+const meta = {
   title: "OCTANT/Molecules/EdgeRow",
   component: EdgeRow,
-  tags: ["autodocs"],
   args: {
     edge: { ...base, type: "links", validFrom: "2026-07-01" },
     fromTitle: "lake house",
     toTitle: "Ana",
+    onClick: fn(),
   },
   argTypes: {
     edge: {
@@ -30,14 +30,19 @@ const meta: Meta<typeof EdgeRow> = {
     fromTitle: { control: "text" },
     toTitle: { control: "text" },
     outgoing: { control: "boolean" },
-    onClick: { action: "clicked" },
   },
-};
+} satisfies Meta<typeof EdgeRow>;
 export default meta;
 
-type Story = StoryObj<typeof EdgeRow>;
+type Story = StoryObj<typeof meta>;
 
-export const Default: Story = { args: { onClick: fn() } };
+/** An open outgoing "links" edge — clicking the row hands the far node's id (target) to onClick. */
+export const Default: Story = {
+  play: async ({ args, canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: /lake house → Ana/i }));
+    await expect(args.onClick).toHaveBeenCalledWith("b");
+  },
+};
 
 const edges: MemoryEdge[] = [
   { ...base, id: "1", type: "links", validFrom: "2026-07-01", validUntil: null },
@@ -48,6 +53,7 @@ const edges: MemoryEdge[] = [
   { ...base, id: "6", type: "no_match" },
 ];
 
+/** Every edge type's stroke style, including a closed (faded) validity window. */
 export const Types: Story = {
   render: () => (
     <div style={{ width: 460, border: "1px solid var(--bx-border, #1c1d24)" }}>
@@ -58,6 +64,7 @@ export const Types: Story = {
   ),
 };
 
+/** An incoming edge — the titles flip to `to → from`. */
 export const Incoming: Story = {
   render: () => (
     <div style={{ width: 460, border: "1px solid var(--bx-border, #1c1d24)" }}>

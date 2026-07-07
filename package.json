@@ -21,16 +21,25 @@
     "./package.json": "./package.json"
   },
   "files": [
-    "packages/*/src",
+    "packages/octant-core/src",
+    "packages/tokens/src",
     "packages/tokens/fonts",
-    "package.json",
+    "packages/ui/src",
+    "packages/ui/types",
+    "!**/*.stories.tsx",
+    "!**/*.test.ts",
+    "!**/*.test.tsx",
+    "!packages/ui/src/__ssr__",
+    "!packages/ui/src/screens",
     "README.md"
+  ],
+  "sideEffects": [
+    "**/*.css"
   ],
   "peerDependencies": {
     "react": "^19",
     "react-dom": "^19"
   },
-  "dependencies": {},
   "scripts": {
     "test": "bun test",
     "typecheck": "bun run --filter '*' typecheck",

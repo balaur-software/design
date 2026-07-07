@@ -1,0 +1,4 @@
+# Storybook + Vitest browser mode need a single hoisted copy of vitest;
+# bun's default isolated linker duplicates it via circular peer deps.
+[install]
+linker = "hoisted"

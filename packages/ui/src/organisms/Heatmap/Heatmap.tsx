@@ -135,10 +135,14 @@ export function Heatmap({
         }}
       >
         <span>{label}</span>
-        <span style={{ color: "var(--bx-text-4, #9aa0ad)" }}>{readout}</span>
+        <span aria-live="polite" style={{ color: "var(--bx-text-4, #9aa0ad)" }}>
+          {readout}
+        </span>
       </div>
       <pre
         ref={preRef}
+        role="img"
+        aria-label={`${label} — ${rows}×${cols} density grid`}
         onPointerMove={onPointerMove}
         onPointerLeave={() => setReadout("hover a cell")}
         style={{

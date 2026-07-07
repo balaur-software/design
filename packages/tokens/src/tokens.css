@@ -16,6 +16,11 @@
 }
 
 :root {
+  /* OCTANT is deliberately dark-only (terminal aesthetic); there is no light
+     theme. color-scheme keeps UA-rendered form controls, scrollbars and the
+     default canvas dark to match. */
+  color-scheme: dark;
+
   /* ---- Page background & surfaces (darkest -> lightest) ---- */
   --bx-bg: #08080a;
   --bx-surface-1: #0a0b0e;
@@ -47,7 +52,12 @@
   --bx-border-width: 1px;
   --bx-border-width-strong: 2px;
 
-  /* ---- Text ramp (brightest -> dimmest) ---- */
+  /* ---- Text ramp (brightest -> dimmest) ----
+     Contrast note: steps 1-5 meet WCAG AA (4.5:1) for body-size text on --bx-bg
+     (text-5 = 5.18:1; on the lightest surface, --bx-surface-7, prefer text-4+).
+     text-5 is the dimmest step for readable content (timestamps, meta).
+     text-6/text-7 (and --bx-text-dim-2..4) fall below 4.5:1 — use them only for
+     decorative/disabled/ghost content, never for information a user must read. */
   --bx-text-1: #f4f6fb;
   --bx-text-2: #dfe3ea;
   --bx-text-3: #c8cdd6;
@@ -81,6 +91,18 @@
   --bx-ansi-13: #d79bff; /* br.magenta */
   --bx-ansi-14: #6ff2f2; /* br.cyan */
   --bx-ansi-15: #f4f6fb; /* br.white */
+  /* Zero-padded aliases so `--bx-ansi-${PaletteColor.idx}` ("00".."15") always
+     resolves; indices 10-15 already match the unpadded names above. */
+  --bx-ansi-00: var(--bx-ansi-0);
+  --bx-ansi-01: var(--bx-ansi-1);
+  --bx-ansi-02: var(--bx-ansi-2);
+  --bx-ansi-03: var(--bx-ansi-3);
+  --bx-ansi-04: var(--bx-ansi-4);
+  --bx-ansi-05: var(--bx-ansi-5);
+  --bx-ansi-06: var(--bx-ansi-6);
+  --bx-ansi-07: var(--bx-ansi-7);
+  --bx-ansi-08: var(--bx-ansi-8);
+  --bx-ansi-09: var(--bx-ansi-9);
 
   /* ---- Accent (default: green). Override --bx-accent to reskin ---- */
   /*

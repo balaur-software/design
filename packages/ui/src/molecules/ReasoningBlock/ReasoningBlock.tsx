@@ -1,4 +1,5 @@
-import { type CSSProperties, useState } from "react";
+import { type CSSProperties, useId } from "react";
+import { useControllableState } from "../../hooks/useControllableState";
 import { TextBlock } from "../TextBlock/TextBlock";
 
 export interface ReasoningBlockProps {
@@ -14,7 +15,8 @@ export interface ReasoningBlockProps {
 /**
  * A collapsible "THINKING" trace. A `▸`/`▾` chevron toggles a dimmed body
  * rendered via `TextBlock`. Collapsed by default so the reasoning stays out of
- * the way unless the reader wants it. Pure local state via `useState`.
+ * the way unless the reader wants it. Collapsed state flows through
+ * `useControllableState`, so the `collapsed` prop stays authoritative when set.
  */
 export function ReasoningBlock({
   text,
@@ -23,11 +25,8 @@ export function ReasoningBlock({
   onCollapsedChange,
   style,
 }: ReasoningBlockProps) {
-  const [isCollapsed, setIsCollapsed] = useState(collapsed ?? defaultCollapsed);
-  const set = (v: boolean) => {
-    setIsCollapsed(v);
-    onCollapsedChange?.(v);
-  };
+  const [isCollapsed, set] = useControllableState(collapsed, defaultCollapsed, onCollapsedChange);
+  const bodyId = useId();
   return (
     <div
       style={{
@@ -39,6 +38,8 @@ export function ReasoningBlock({
     >
       <button
         type="button"
+        aria-expanded={!isCollapsed}
+        aria-controls={isCollapsed ? undefined : bodyId}
         onClick={() => set(!isCollapsed)}
         style={{
           display: "flex",
@@ -59,7 +60,7 @@ export function ReasoningBlock({
         THINKING
       </button>
       {!isCollapsed && (
-        <div style={{ marginTop: 8 }}>
+        <div id={bodyId} style={{ marginTop: 8 }}>
           <TextBlock text={text} style={{ color: "var(--bx-text-6, #5b616e)", fontSize: 12 }} />
         </div>
       )}

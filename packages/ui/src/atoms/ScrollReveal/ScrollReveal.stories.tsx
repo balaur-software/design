@@ -1,19 +1,18 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ScrollReveal } from "./ScrollReveal.tsx";
 
-const meta: Meta<typeof ScrollReveal> = {
+const meta = {
   title: "OCTANT/Atoms/ScrollReveal",
   component: ScrollReveal,
-  tags: ["autodocs"],
   argTypes: {
     scramble: { control: "text", description: "Text to glyph-scramble-decode on first view." },
     y: { control: { type: "number", min: 0, max: 80, step: 1 } },
     dur: { control: { type: "number", min: 100, max: 3000, step: 50 } },
     delay: { control: { type: "number", min: 0, max: 2000, step: 20 } },
   },
-};
+} satisfies Meta<typeof ScrollReveal>;
 export default meta;
-type Story = StoryObj<typeof ScrollReveal>;
+type Story = StoryObj<typeof meta>;
 
 const card = {
   border: "1px solid var(--bx-border, #1c1d24)",

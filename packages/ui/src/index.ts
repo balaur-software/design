@@ -15,6 +15,7 @@
  */
 
 export * from "./atoms";
+export * from "./ComponentCatalog/ComponentCatalog";
 export * from "./hooks";
 export * from "./molecules";
 export * from "./organisms";

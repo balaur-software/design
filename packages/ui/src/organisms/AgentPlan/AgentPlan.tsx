@@ -50,27 +50,23 @@ export function AgentPlan({ steps, onStepClick, style }: AgentPlanProps) {
       </div>
       {steps.map((step, i) => {
         const running = step.status === "running";
-        return (
-          <button
-            key={step.id}
-            type="button"
-            {...(onStepClick ? { onClick: () => onStepClick(step.id) } : {})}
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              gap: 10,
-              width: "100%",
-              textAlign: "left",
-              fontFamily: "inherit",
-              fontSize: 13,
-              padding: "8px 10px",
-              background: running ? "var(--bx-surface-2, #15161e)" : "transparent",
-              border: 0,
-              borderLeft: `2px solid ${running ? "var(--bx-accent, #46c66d)" : "transparent"}`,
-              color: step.status === "pending" ? "var(--bx-text-6, #5b616e)" : "var(--bx-text-2, #9aa0ad)",
-              cursor: onStepClick ? "pointer" : "default",
-            }}
-          >
+        const rowStyle: CSSProperties = {
+          display: "flex",
+          alignItems: "flex-start",
+          gap: 10,
+          width: "100%",
+          textAlign: "left",
+          fontFamily: "inherit",
+          fontSize: 13,
+          padding: "8px 10px",
+          background: running ? "var(--bx-surface-2, #15161e)" : "transparent",
+          border: 0,
+          borderLeft: `2px solid ${running ? "var(--bx-accent, #46c66d)" : "transparent"}`,
+          color: step.status === "pending" ? "var(--bx-text-6, #5b616e)" : "var(--bx-text-2, #9aa0ad)",
+          cursor: onStepClick ? "pointer" : "default",
+        };
+        const content = (
+          <>
             <span
               style={{
                 color: STATUS_COLOR[step.status],
@@ -90,12 +86,25 @@ export function AgentPlan({ steps, onStepClick, style }: AgentPlanProps) {
               </span>
               {step.label}
               {step.detail && (
-                <div style={{ color: "var(--bx-text-6, #5b616e)", fontSize: 11, marginTop: 3 }}>
+                <span
+                  style={{ display: "block", color: "var(--bx-text-6, #5b616e)", fontSize: 11, marginTop: 3 }}
+                >
                   {step.detail}
-                </div>
+                </span>
               )}
             </span>
+          </>
+        );
+        // Steps are buttons only when they actually do something; otherwise a
+        // plain row, so keyboard users get no dead tab stops.
+        return onStepClick ? (
+          <button key={step.id} type="button" onClick={() => onStepClick(step.id)} style={rowStyle}>
+            {content}
           </button>
+        ) : (
+          <div key={step.id} style={rowStyle}>
+            {content}
+          </div>
         );
       })}
     </div>

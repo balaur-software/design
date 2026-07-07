@@ -1,4 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, waitFor } from "storybook/test";
 import { NavMenu, type NavMenuItem } from "./NavMenu.tsx";
 
 const ITEMS: NavMenuItem[] = [
@@ -23,20 +24,38 @@ const ITEMS: NavMenuItem[] = [
   { label: "PRICING", href: "#pricing" },
 ];
 
-const meta: Meta<typeof NavMenu> = {
+const meta = {
   title: "OCTANT/Organisms/NavMenu",
   component: NavMenu,
-  tags: ["autodocs"],
   args: { items: ITEMS },
   argTypes: {
     items: { control: "object", description: "NavMenuItem[]: { label, cards?[], links?[], href? }." },
   },
-};
+} satisfies Meta<typeof NavMenu>;
 export default meta;
-type Story = StoryObj<typeof NavMenu>;
+type Story = StoryObj<typeof meta>;
 
 /** The reference bar — hover PRODUCT for the mega grid, RESOURCES for a link list; PRICING is a bare link. */
-export const Default: Story = {};
+export const Default: Story = {
+  play: async ({ canvas, userEvent }) => {
+    // Hovering a trigger opens its panel (clicking then toggles it).
+    const product = canvas.getByRole("button", { name: /product/i });
+    await userEvent.hover(product);
+    await expect(product).toHaveAttribute("aria-expanded", "true");
+    const renderer = canvas.getByRole("link", { name: /renderer/i });
+    await waitFor(() => expect(renderer).toBeVisible());
+
+    // Only one panel opens at a time.
+    const resources = canvas.getByRole("button", { name: /resources/i });
+    await userEvent.hover(resources);
+    await expect(resources).toHaveAttribute("aria-expanded", "true");
+    await expect(product).toHaveAttribute("aria-expanded", "false");
+
+    // Escape dismisses the open panel.
+    await userEvent.keyboard("{Escape}");
+    await expect(resources).toHaveAttribute("aria-expanded", "false");
+  },
+};
 
 /** A single mega panel with a three-column card grid. */
 export const WideMega: Story = {

@@ -1,10 +1,11 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 import { Slider } from "./Slider.tsx";
 
-const meta: Meta<typeof Slider> = {
+const meta = {
   title: "OCTANT/Molecules/Slider",
   component: Slider,
-  tags: ["autodocs"],
+  args: { onChange: fn() },
   argTypes: {
     min: { control: { type: "number", min: -1000, max: 1000, step: 1 } },
     max: { control: { type: "number", min: -1000, max: 100000, step: 1 } },
@@ -17,16 +18,27 @@ const meta: Meta<typeof Slider> = {
     label: { control: "text" },
     accentColor: { control: "color" },
     disabled: { control: "boolean" },
-    onChange: { action: "changed" },
   },
-};
+} satisfies Meta<typeof Slider>;
 export default meta;
-type Story = StoryObj<typeof Slider>;
+type Story = StoryObj<typeof meta>;
 
+/** Uncontrolled slider; arrow keys nudge the value and fire `onChange`. */
 export const Default: Story = {
   args: { defaultValue: 62 },
+  play: async ({ canvas, userEvent, args }) => {
+    const slider = canvas.getByRole("slider");
+    await expect(slider).toHaveAttribute("aria-valuenow", "62");
+    slider.focus();
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(slider).toHaveAttribute("aria-valuenow", "63");
+    await expect(args.onChange).toHaveBeenLastCalledWith(63);
+    await userEvent.keyboard("{Home}");
+    await expect(slider).toHaveAttribute("aria-valuenow", "0");
+  },
 };
 
+/** Snaps to the nearest multiple of `step`. */
 export const Stepped: Story = {
   args: {
     label: "GAIN · step 10",
@@ -37,6 +49,7 @@ export const Stepped: Story = {
   },
 };
 
+/** Custom bounds with a formatted readout and cyan accent. */
 export const CustomRange: Story = {
   args: {
     label: "FREQ · 20 → 20k Hz",
@@ -48,6 +61,7 @@ export const CustomRange: Story = {
   },
 };
 
+/** Disabled: dimmed, unfocusable, ignores input. */
 export const Disabled: Story = {
   args: { label: "LOCKED", defaultValue: 30, disabled: true },
 };

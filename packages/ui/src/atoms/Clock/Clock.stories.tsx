@@ -1,22 +1,27 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, waitFor } from "storybook/test";
 import { Clock } from "./Clock.tsx";
 
-const meta: Meta<typeof Clock> = {
+const meta = {
   title: "OCTANT/Atoms/Clock",
   component: Clock,
-  tags: ["autodocs"],
   argTypes: {
     showTime: { control: "boolean" },
     showUptime: { control: "boolean" },
     uptimeLabel: { control: "text" },
     interval: { control: { type: "number", min: 100, max: 5000, step: 100 } },
   },
-};
+} satisfies Meta<typeof Clock>;
 export default meta;
-type Story = StoryObj<typeof Clock>;
+type Story = StoryObj<typeof meta>;
 
 /** Live wall-clock time, `HH:MM:SS`. */
-export const Default: Story = {};
+export const Default: Story = {
+  play: async ({ canvas }) => {
+    // The static `--:--:--` placeholder is replaced by a real time after mount.
+    await waitFor(() => expect(canvas.getByText(/^\d{2}:\d{2}:\d{2}$/)).toBeInTheDocument());
+  },
+};
 
 /** Uptime counter only, ticking up from mount. */
 export const UptimeOnly: Story = {

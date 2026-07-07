@@ -1,11 +1,13 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, waitFor } from "storybook/test";
 import { Tabs } from "./Tabs.tsx";
 
-const meta: Meta<typeof Tabs> = {
+const meta = {
   title: "OCTANT/Organisms/Tabs",
   component: Tabs,
   args: {
     "aria-label": "System sections",
+    onChange: fn(),
     tabs: [
       {
         label: "OVERVIEW",
@@ -29,16 +31,36 @@ const meta: Meta<typeof Tabs> = {
       },
     ],
   },
-};
+} satisfies Meta<typeof Tabs>;
 export default meta;
-type Story = StoryObj<typeof Tabs>;
+type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
+/** The reference four-tab strip — click or arrow between tabs to decode each panel. */
+export const Default: Story = {
+  play: async ({ canvas, userEvent, args }) => {
+    // Clicking a tab selects it and swaps (scramble-decodes) the panel.
+    const signal = canvas.getByRole("tab", { name: "SIGNAL" });
+    await userEvent.click(signal);
+    await expect(signal).toHaveAttribute("aria-selected", "true");
+    await expect(args.onChange).toHaveBeenCalledWith(1);
+    await waitFor(() => expect(canvas.getByRole("tabpanel")).toHaveTextContent(/cursor x drives frequency/i));
 
+    // Arrow keys move selection with roving focus.
+    await userEvent.keyboard("{ArrowRight}");
+    const render = canvas.getByRole("tab", { name: "RENDER" });
+    await expect(render).toHaveAttribute("aria-selected", "true");
+    await expect(render).toHaveFocus();
+    await userEvent.keyboard("{ArrowLeft}");
+    await expect(signal).toHaveAttribute("aria-selected", "true");
+  },
+};
+
+/** Starts with the second tab (SIGNAL) selected via `defaultIndex`. */
 export const StartOnSignal: Story = {
   args: { defaultIndex: 1 },
 };
 
+/** A minimal two-tab strip. */
 export const TwoTabs: Story = {
   args: {
     "aria-label": "Transport modes",
@@ -57,16 +79,21 @@ export const TwoTabs: Story = {
   },
 };
 
+/** Controlled mode — `index` pins the selection; clicks only fire `onChange`. */
 export const Controlled: Story = {
-  render: (args) => {
-    const items = args.tabs;
-    return (
-      <div style={{ maxWidth: 680 }}>
-        <Tabs {...args} tabs={items} index={2} onChange={() => {}} />
-        <p style={{ marginTop: 12, color: "#5b616e", fontSize: 12 }}>
-          index is pinned to RENDER (controlled); clicks fire onChange only.
-        </p>
-      </div>
-    );
+  args: { index: 2 },
+  render: (args) => (
+    <div style={{ maxWidth: 680 }}>
+      <Tabs {...args} />
+      <p style={{ marginTop: 12, color: "#5b616e", fontSize: 12 }}>
+        index is pinned to RENDER (controlled); clicks fire onChange only.
+      </p>
+    </div>
+  ),
+  play: async ({ canvas, userEvent, args }) => {
+    await userEvent.click(canvas.getByRole("tab", { name: "OVERVIEW" }));
+    await expect(args.onChange).toHaveBeenCalledWith(0);
+    // Selection stays pinned to the controlled index.
+    await expect(canvas.getByRole("tab", { name: "RENDER" })).toHaveAttribute("aria-selected", "true");
   },
 };

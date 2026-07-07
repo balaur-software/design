@@ -53,6 +53,9 @@ export function DecodeScramble({
   color = "var(--bx-ansi-5, #c061ff)",
   fontSize = 30,
   style,
+  onClick,
+  onMouseEnter,
+  onKeyDown,
   ...rest
 }: DecodeScrambleProps) {
   const [runKey, setRunKey] = useState(0);
@@ -63,15 +66,22 @@ export function DecodeScramble({
       role="button"
       tabIndex={0}
       aria-label={text}
-      onClick={trigger === "click" ? replay : undefined}
-      onMouseEnter={trigger === "hover" ? replay : undefined}
+      {...rest}
+      onClick={(e) => {
+        onClick?.(e);
+        if (trigger === "click") replay();
+      }}
+      onMouseEnter={(e) => {
+        onMouseEnter?.(e);
+        if (trigger === "hover") replay();
+      }}
       onKeyDown={(e) => {
+        onKeyDown?.(e);
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           replay();
         }
       }}
-      {...rest}
       style={{
         display: "inline-block",
         cursor: "pointer",

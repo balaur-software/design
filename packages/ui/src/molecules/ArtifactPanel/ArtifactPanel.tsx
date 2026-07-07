@@ -58,7 +58,19 @@ export function ArtifactPanel({ block, onOpen, previewMaxHeight = 240, style }: 
           </button>
         )}
       </div>
-      <div style={{ maxHeight: previewMaxHeight, overflow: "auto", padding: 8 }}>
+      {/* Focusable so keyboard users can scroll a clipped preview (WCAG 2.1.1). */}
+      <div
+        role="region"
+        aria-label={block.title}
+        // biome-ignore lint/a11y/noNoninteractiveTabindex: WCAG 2.1.1 — a clipped scrollable region must be keyboard-focusable (axe: scrollable-region-focusable)
+        tabIndex={0}
+        style={{
+          // `Infinity` (= "unclipped") is not a valid CSS length — omit maxHeight instead.
+          ...(Number.isFinite(previewMaxHeight) ? { maxHeight: previewMaxHeight } : {}),
+          overflow: "auto",
+          padding: 8,
+        }}
+      >
         {block.kind === "code" ? (
           <CodeBlock {...(block.language ? { lang: block.language } : {})}>{block.content}</CodeBlock>
         ) : block.kind === "document" ? (

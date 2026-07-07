@@ -10,12 +10,7 @@
       "correctness": { "useExhaustiveDependencies": "off" },
       "a11y": {
         "useSemanticElements": "off",
-        "useValidAriaRole": "off",
-        "noStaticElementInteractions": "off",
-        "useFocusableInteractive": "off",
-        "useAriaPropsSupportedByRole": "off",
-        "noNoninteractiveTabindex": "off",
-        "noLabelWithoutControl": "off"
+        "useValidAriaRole": { "level": "error", "options": { "ignoreNonDom": true } }
       }
     }
   },

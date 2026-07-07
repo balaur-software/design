@@ -1,4 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 import { List, type ListItem } from "./List.tsx";
 
 const FILES: ListItem[] = [
@@ -9,38 +10,51 @@ const FILES: ListItem[] = [
   { glyph: "▚", label: "render.cfg", meta: "340b" },
 ];
 
-const meta: Meta<typeof List> = {
+const meta = {
   title: "OCTANT/Organisms/List",
   component: List,
-  tags: ["autodocs"],
-  args: { items: FILES },
+  args: { items: FILES, onSelect: fn() },
   argTypes: {
     items: { control: "object", description: "Rows: { glyph?, label, meta? }." },
-    selected: { control: { type: "number", min: 0, max: 50, step: 1 }, description: "Controlled selected index." },
+    selected: {
+      control: { type: "number", min: 0, max: 50, step: 1 },
+      description: "Controlled selected index.",
+    },
     defaultSelected: { control: { type: "number", min: 0, max: 50, step: 1 } },
-    onSelect: { action: "selected" },
+  },
+} satisfies Meta<typeof List>;
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+/** The reference file list — clicking a row moves the selection and fires `onSelect`. */
+export const Default: Story = {
+  play: async ({ canvas, userEvent, args }) => {
+    const row = canvas.getByRole("option", { name: /dither\.bayer/i });
+    await expect(row).toHaveAttribute("aria-selected", "false");
+    await userEvent.click(row);
+    await expect(args.onSelect).toHaveBeenCalledWith(2);
+    await expect(row).toHaveAttribute("aria-selected", "true");
   },
 };
-export default meta;
-type Story = StoryObj<typeof List>;
 
-export const Default: Story = {};
-
+/** Uncontrolled initial selection via `defaultSelected`. */
 export const ThirdSelected: Story = {
   args: { items: FILES, defaultSelected: 2 },
 };
 
+/** Rows without `meta` collapse to glyph + label. */
 export const NoMeta: Story = {
   args: {
     items: [{ label: "SYSTEM" }, { label: "GLYPHS" }, { label: "RENDER" }, { label: "PALETTE" }],
   },
 };
 
+/** Two fully controlled lists pinned to different indices. */
 export const Controlled: Story = {
-  render: () => (
+  render: (args) => (
     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-      <List items={FILES} selected={0} />
-      <List items={FILES} selected={3} />
+      <List {...args} selected={0} />
+      <List {...args} selected={3} />
     </div>
   ),
 };

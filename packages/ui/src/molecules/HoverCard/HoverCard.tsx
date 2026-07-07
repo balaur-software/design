@@ -76,7 +76,7 @@ export function HoverCard({
   };
 
   return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: hover-preview affordance mirrors the reference; the handle stays keyboard-inert (a decorative preview, not a control).
+    // Hover-preview affordance mirrors the reference; focus/blur on the inner handle give keyboard users the same reveal.
     <span
       onPointerEnter={() => schedule(true, openDelay)}
       onPointerLeave={() => schedule(false, closeDelay)}
@@ -98,7 +98,12 @@ export function HoverCard({
           padding: 14,
         }}
         trigger={
+          // biome-ignore lint/a11y/noStaticElementInteractions: tooltip-style trigger — focus/hover reveal the card, no activation behavior
           <span
+            // biome-ignore lint/a11y/noNoninteractiveTabindex: trigger must be focusable so keyboard users can open the card via focus
+            tabIndex={0}
+            onFocus={() => schedule(true, openDelay)}
+            onBlur={() => schedule(false, closeDelay)}
             style={{
               position: "relative",
               color: "var(--bx-accent, #46c66d)",

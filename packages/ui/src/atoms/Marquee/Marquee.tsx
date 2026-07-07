@@ -119,7 +119,6 @@ export function Marquee({
   const body: ReactNode =
     children ??
     items.map((item, i) => (
-      // biome-ignore lint/suspicious/noArrayIndexKey: static ticker copy, order is stable
       <span key={i}>
         {item}
         <span aria-hidden="true" style={{ color: "var(--bx-accent, #46c66d)", margin: "0 14px" }}>

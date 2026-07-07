@@ -52,11 +52,13 @@ export function FloatingPanel({
   return (
     <div ref={rootRef} style={{ position: "relative", display: "inline-block" }}>
       {trigger}
+      {/* biome-ignore lint/a11y/useAriaPropsSupportedByRole: role and aria-label/labelledby are caller-supplied together; the generic case passes no labels */}
       <div
         id={panelId}
         role={role === "none" ? undefined : role}
         aria-label={ariaLabel}
         aria-labelledby={ariaLabelledBy}
+        inert={!open}
         style={{
           position: "absolute",
           top: "100%",
@@ -67,8 +69,11 @@ export function FloatingPanel({
           opacity: open ? 1 : 0,
           transform: open ? "translateY(0)" : "translateY(-5px)",
           pointerEvents: open ? "auto" : "none",
-          transition:
-            "opacity .12s var(--bx-ease, cubic-bezier(.5,0,.2,1)), transform .12s var(--bx-ease, cubic-bezier(.5,0,.2,1))",
+          // Closed panels must leave the tab order / a11y tree. `visibility` is
+          // discretely animatable: flip it instantly on open, but delay the flip to
+          // hidden by the fade duration on close so the exit transition still plays.
+          visibility: open ? "visible" : "hidden",
+          transition: `opacity .12s var(--bx-ease, cubic-bezier(.5,0,.2,1)), transform .12s var(--bx-ease, cubic-bezier(.5,0,.2,1)), visibility 0s linear ${open ? "0s" : ".12s"}`,
           ...panelStyle,
         }}
       >

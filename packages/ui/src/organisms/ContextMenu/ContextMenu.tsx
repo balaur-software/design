@@ -57,6 +57,7 @@ export function ContextMenu({ items = DEFAULT_ITEMS, children, style }: ContextM
   const [focused, setFocused] = useState(-1);
   const menuRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const triggerRef = useRef<HTMLDivElement>(null);
   const toast = useToast();
 
   const actionable = items.map((it, i) => (it.divider ? -1 : i)).filter((i) => i >= 0);
@@ -81,11 +82,31 @@ export function ContextMenu({ items = DEFAULT_ITEMS, children, style }: ContextM
   const close = () => setOpen(false);
   useDismissable(menuRef, { onDismiss: close, active: open });
 
-  // Focus the first actionable item once the menu opens + is positioned.
+  const openAt = (x: number, y: number) => {
+    setRawPos({ x, y });
+    setReady(false);
+    setHovered(-1);
+    setOpen(true);
+  };
+
+  /** Keyboard path: pop the menu anchored inside the trigger surface. */
+  const openAtTrigger = () => {
+    const rect = triggerRef.current?.getBoundingClientRect();
+    if (rect) openAt(rect.left + Math.min(rect.width / 2, 60), rect.top + Math.min(rect.height / 2, 40));
+  };
+
+  // Focus the first actionable item once the menu opens + is positioned; when
+  // the menu closes, return focus to the trigger surface (APG menu pattern —
+  // the menu unmounts, so focus would otherwise fall to <body>).
+  const wasOpen = useRef(false);
   useEffect(() => {
-    if (open && ready) focusItem(firstIdx);
-    else setFocused(-1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (open && ready) {
+      focusItem(firstIdx);
+    } else if (!open) {
+      setFocused(-1);
+      if (wasOpen.current) triggerRef.current?.focus();
+    }
+    wasOpen.current = open;
   }, [open, ready]);
 
   const onMenuKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -137,12 +158,28 @@ export function ContextMenu({ items = DEFAULT_ITEMS, children, style }: ContextM
   return (
     <>
       <div
+        ref={triggerRef}
+        tabIndex={0}
+        role="button"
+        aria-haspopup="menu"
+        aria-expanded={open}
         onContextMenu={(e) => {
           e.preventDefault();
-          setRawPos({ x: e.clientX, y: e.clientY });
-          setReady(false);
-          setHovered(-1);
-          setOpen(true);
+          // Keyboard-initiated contextmenu events (Shift+F10 / the menu key)
+          // report 0,0 in some browsers — anchor those to the surface instead.
+          if (e.clientX === 0 && e.clientY === 0) openAtTrigger();
+          else openAt(e.clientX, e.clientY);
+        }}
+        onKeyDown={(e) => {
+          if (
+            e.key === "ContextMenu" ||
+            (e.shiftKey && e.key === "F10") ||
+            e.key === "Enter" ||
+            e.key === " "
+          ) {
+            e.preventDefault();
+            openAtTrigger();
+          }
         }}
         style={{
           border: "1px dashed var(--bx-border-mid, #2a2c34)",
@@ -180,7 +217,6 @@ export function ContextMenu({ items = DEFAULT_ITEMS, children, style }: ContextM
         >
           {items.map((item, i) => {
             if (item.divider) {
-              // eslint-disable-next-line react/no-array-index-key
               return (
                 <div
                   key={i}
@@ -193,7 +229,6 @@ export function ContextMenu({ items = DEFAULT_ITEMS, children, style }: ContextM
             const isFocused = focused === i;
             return (
               <button
-                // eslint-disable-next-line react/no-array-index-key
                 key={i}
                 ref={(el) => {
                   itemRefs.current[i] = el;

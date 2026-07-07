@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, KeyboardEvent } from "react";
 import { ImportanceMeter } from "../../atoms/ImportanceMeter/ImportanceMeter";
 import { NodeTypeTag } from "../../atoms/NodeTypeTag/NodeTypeTag";
 import { StatusGlyph } from "../../atoms/StatusGlyph/StatusGlyph";
@@ -35,8 +35,12 @@ export function NodeCard({ node, onClick, style }: NodeCardProps) {
             role: "button",
             tabIndex: 0,
             onClick,
-            onKeyDown: (e: { key: string }) => {
-              if (e.key === "Enter" || e.key === " ") onClick();
+            onKeyDown: (e: KeyboardEvent<HTMLDivElement>) => {
+              if (e.key === "Enter" || e.key === " ") {
+                // Prevent Space from scrolling the page (native button semantics).
+                e.preventDefault();
+                onClick();
+              }
             },
           }
         : {})}

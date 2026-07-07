@@ -89,8 +89,17 @@ function Bar({ datum, active, delay }: { datum: BarChartDatum; active: boolean; 
   useBar8Fill(fillRef, target, { rows: 1 });
   usePercentReadout(valRef, target);
 
+  const pct = Math.round(value * 100);
+
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+    <div
+      role="meter"
+      aria-label={datum.label}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={pct}
+      style={{ display: "flex", alignItems: "center", gap: 12 }}
+    >
       <span style={{ width: 56, flex: "none", color: "var(--bx-text-4, #9aa0ad)", fontSize: 12 }}>
         {datum.label}
       </span>
@@ -109,11 +118,13 @@ function Bar({ datum, active, delay }: { datum: BarChartDatum; active: boolean; 
           minWidth: 0,
         }}
       />
+      {/* SSR / pre-scroll markup carries the true value; the rAF readout
+          animates it from 0 in step with the bar once the chart is visible. */}
       <span
         ref={valRef}
         style={{ width: 36, flex: "none", textAlign: "right", color: "#5b616e", fontSize: 12 }}
       >
-        0%
+        {pct}%
       </span>
     </div>
   );

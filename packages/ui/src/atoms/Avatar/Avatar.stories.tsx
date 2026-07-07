@@ -1,10 +1,9 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Avatar } from "./Avatar.tsx";
 
-const meta: Meta<typeof Avatar> = {
+const meta = {
   title: "OCTANT/Atoms/Avatar",
   component: Avatar,
-  tags: ["autodocs"],
   args: { seed: "OCTANT" },
   argTypes: {
     seed: { control: "text", description: "Name/id hashed into the identicon." },
@@ -12,11 +11,12 @@ const meta: Meta<typeof Avatar> = {
     color: { control: "color" },
     fontSize: { control: { type: "number", min: 4, max: 40, step: 1 } },
   },
-};
+} satisfies Meta<typeof Avatar>;
 export default meta;
 
-type Story = StoryObj<typeof Avatar>;
+type Story = StoryObj<typeof meta>;
 
+/** Deterministic identicon hashed from the seed. */
 export const Default: Story = {};
 
 /** The four seeded avatars from the reference, each in its own accent colour. */

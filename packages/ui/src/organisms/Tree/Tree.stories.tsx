@@ -1,4 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, waitFor } from "storybook/test";
 import { Tree, type TreeNode } from "./Tree.tsx";
 
 const SYSTEM: TreeNode[] = [
@@ -25,16 +26,36 @@ const SYSTEM: TreeNode[] = [
   },
 ];
 
-const meta: Meta<typeof Tree> = {
+const meta = {
   title: "OCTANT/Organisms/Tree",
   component: Tree,
-  args: { nodes: SYSTEM },
-};
+  args: { nodes: SYSTEM, "aria-label": "System files" },
+  argTypes: {
+    nodes: { control: "object", description: "TreeNode[]: { label, glyph?, children?, defaultCollapsed? }." },
+  },
+} satisfies Meta<typeof Tree>;
 export default meta;
-type Story = StoryObj<typeof Tree>;
+type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
+/** The reference SYSTEM tree — click a folder (or use arrow keys) to toggle its subtree. */
+export const Default: Story = {
+  play: async ({ canvas, userEvent }) => {
+    // Clicking an open folder collapses its subtree.
+    const glyphs = canvas.getByRole("treeitem", { name: "glyphs" });
+    await expect(glyphs).toHaveAttribute("aria-expanded", "true");
+    await expect(canvas.getByText("octant.map")).toBeVisible();
+    await userEvent.click(glyphs);
+    await expect(glyphs).toHaveAttribute("aria-expanded", "false");
+    await waitFor(() => expect(canvas.queryByText("octant.map")).toBeNull());
 
+    // ArrowRight on the focused closed folder expands it again.
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(glyphs).toHaveAttribute("aria-expanded", "true");
+    await waitFor(() => expect(canvas.getByText("octant.map")).toBeVisible());
+  },
+};
+
+/** The `glyphs` and `render` folders start collapsed via `defaultCollapsed`. */
 export const CollapsedFolders: Story = {
   args: {
     nodes: [
@@ -64,6 +85,7 @@ export const CollapsedFolders: Story = {
   },
 };
 
+/** Four levels of nesting — depth drives the indent. */
 export const DeepNesting: Story = {
   args: {
     nodes: [
@@ -90,6 +112,7 @@ export const DeepNesting: Story = {
   },
 };
 
+/** The tree framed inside a bordered panel, as it would sit in an app rail. */
 export const InPanel: Story = {
   render: (args) => (
     <div

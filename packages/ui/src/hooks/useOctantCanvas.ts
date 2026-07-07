@@ -42,7 +42,6 @@ export function useOctantCanvas(
   optsRef.current = opts;
   const reduced = useReducedMotion();
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: canvas ref is stable; loop is set up once, fresh props read via optsRef each frame.
   useEffect(() => {
     const c = ref.current;
     if (!c) return;
@@ -59,7 +58,7 @@ export function useOctantCanvas(
     let visible = true;
     const t0 = performance.now();
 
-    const fit = (): boolean => {
+    const fitCanvas = (): boolean => {
       const r = c.getBoundingClientRect();
       if (r.width < 2 || r.height < 2) return dw > 0;
       const ndw = Math.max(1, Math.floor(r.width / dotPx));
@@ -75,34 +74,43 @@ export function useOctantCanvas(
     };
 
     const frame = () => {
-      if (fit() && (!gated || visible)) {
+      if (fitCanvas() && (!gated || visible)) {
         optsRef.current.draw({ canvas: c, ctx, dw, dh, t: (performance.now() - t0) / 1000 });
       }
     };
 
+    const loop = () => {
+      frame();
+      raf = requestAnimationFrame(loop);
+    };
+
     let io: IntersectionObserver | undefined;
     if (gated) {
+      // Actually pause the loop while offscreen — cancel the rAF instead of
+      // spinning a per-frame no-op (which would still hit getBoundingClientRect
+      // via fitCanvas() at 60fps for every offscreen canvas).
       io = new IntersectionObserver(([e]) => {
-        visible = e?.isIntersecting ?? true;
+        const next = e?.isIntersecting ?? true;
+        if (next === visible) return;
+        visible = next;
+        if (!animate) {
+          if (visible) frame();
+          return;
+        }
+        cancelAnimationFrame(raf);
+        if (visible) raf = requestAnimationFrame(loop);
       });
       io.observe(c);
     }
 
     const onResize = () => {
-      fit();
+      fitCanvas();
       if (!animate) frame();
     };
     window.addEventListener("resize", onResize);
 
-    if (animate) {
-      const loop = () => {
-        frame();
-        raf = requestAnimationFrame(loop);
-      };
-      loop();
-    } else {
-      frame();
-    }
+    if (animate) loop();
+    else frame();
 
     return () => {
       cancelAnimationFrame(raf);

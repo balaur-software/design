@@ -1,8 +1,8 @@
 import type { CSSProperties } from "react";
 
 const card: CSSProperties = {
-  border: "1px solid #1c1d24",
-  background: "#0c0d11",
+  border: "1px solid var(--bx-border, #1c1d24)",
+  background: "var(--bx-surface-3, #0c0d11)",
   padding: 18,
 };
 const cardLabel: CSSProperties = { color: "#5b616e", fontSize: 12, marginBottom: 14 };

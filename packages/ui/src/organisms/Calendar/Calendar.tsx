@@ -61,7 +61,15 @@ export function Calendar({ value, defaultValue = null, onSelect, defaultMonth, s
     defaultValue,
     onSelect ? (d) => d && onSelect(d) : undefined,
   );
-  const [view, setView] = useState<Date>(() => startOfMonth(defaultMonth ?? selected ?? new Date()));
+  // Deterministic on the server: the view month comes only from props. When
+  // neither `defaultMonth` nor a selected day is given, the current month is
+  // resolved in a mount effect (like "today" below) so server and client never
+  // disagree across timezones or a month boundary.
+  const seedMonth = defaultMonth ?? selected;
+  const [view, setView] = useState<Date | null>(() => (seedMonth ? startOfMonth(seedMonth) : null));
+  useEffect(() => {
+    setView((v) => v ?? startOfMonth(new Date()));
+  }, []);
 
   // Resolve "today" only on the client so SSR markup carries no date-specific
   // highlight and there is no hydration mismatch.
@@ -71,6 +79,7 @@ export function Calendar({ value, defaultValue = null, onSelect, defaultMonth, s
   }, []);
 
   const cells = useMemo<(Date | null)[]>(() => {
+    if (!view) return [];
     const year = view.getFullYear();
     const month = view.getMonth();
     const startDow = new Date(year, month, 1).getDay();
@@ -82,7 +91,10 @@ export function Calendar({ value, defaultValue = null, onSelect, defaultMonth, s
   }, [view]);
 
   const shiftMonth = (delta: number) => {
-    setView((v) => new Date(v.getFullYear(), v.getMonth() + delta, 1));
+    setView((v) => {
+      const base = v ?? startOfMonth(new Date());
+      return new Date(base.getFullYear(), base.getMonth() + delta, 1);
+    });
   };
 
   const navBtn: CSSProperties = {
@@ -113,7 +125,7 @@ export function Calendar({ value, defaultValue = null, onSelect, defaultMonth, s
           {"‹"}
         </button>
         <div style={{ color: "var(--bx-text-1, #f4f6fb)", fontSize: 13, letterSpacing: "0.05em" }}>
-          {MONTHS[view.getMonth()]!} {view.getFullYear()}
+          {view ? `${MONTHS[view.getMonth()]!} ${view.getFullYear()}` : " "}
         </div>
         <button type="button" aria-label="Next month" style={navBtn} onClick={() => shiftMonth(1)}>
           {"›"}
@@ -137,6 +149,7 @@ export function Calendar({ value, defaultValue = null, onSelect, defaultMonth, s
             <button
               key={date.getTime()}
               type="button"
+              aria-label={`${date.getDate()} ${MONTHS[date.getMonth()]!} ${date.getFullYear()}`}
               aria-pressed={isSel}
               aria-current={isToday ? "date" : undefined}
               onClick={() => setSelected(date)}

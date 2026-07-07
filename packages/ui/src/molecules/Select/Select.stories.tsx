@@ -1,4 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 import { Select } from "./Select.tsx";
 
 const ENCODERS = [
@@ -8,11 +9,10 @@ const ENCODERS = [
   { value: "shade", label: "SHADE · 1×1" },
 ];
 
-const meta: Meta<typeof Select> = {
+const meta = {
   title: "OCTANT/Molecules/Select",
   component: Select,
-  tags: ["autodocs"],
-  args: { options: ENCODERS },
+  args: { options: ENCODERS, onChange: fn() },
   argTypes: {
     options: { control: "object", description: "Options: { value, label }." },
     value: { control: "text", description: "Controlled selected value." },
@@ -21,22 +21,36 @@ const meta: Meta<typeof Select> = {
     disabled: { control: "boolean" },
     width: { control: { type: "number", min: 120, max: 480, step: 8 } },
     ariaLabel: { control: "text" },
-    onChange: { action: "changed" },
+  },
+} satisfies Meta<typeof Select>;
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+/** Click to unroll the option list; choosing an option updates the trigger and closes. */
+export const Default: Story = {
+  args: { defaultValue: "octant" },
+  play: async ({ canvas, userEvent, args }) => {
+    const trigger = canvas.getByRole("combobox", { name: /octant · 2×4/i });
+    await userEvent.click(trigger);
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+    await userEvent.click(canvas.getByRole("option", { name: /braille/i }));
+    await expect(args.onChange).toHaveBeenCalledWith("braille");
+    await expect(trigger).toHaveTextContent("BRAILLE · 2×4");
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
   },
 };
-export default meta;
-type Story = StoryObj<typeof Select>;
 
-export const Default: Story = { args: { defaultValue: "octant" } };
-
+/** Nothing selected — the trigger shows the placeholder text. */
 export const Placeholder: Story = {
   args: { placeholder: "CHOOSE ENCODER" },
 };
 
+/** Disabled trigger — the menu never opens. */
 export const Disabled: Story = {
   args: { defaultValue: "octant", disabled: true },
 };
 
+/** A wider select with region options. */
 export const Regions: Story = {
   args: {
     options: [

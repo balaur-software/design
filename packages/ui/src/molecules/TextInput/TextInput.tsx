@@ -17,6 +17,12 @@ export interface TextInputProps
  * a dim placeholder). A fake eighth-cell block caret sits at the end of the
  * mirror text, blinking via the global `bx-blink` keyframe while focused, and an
  * accent underline slides in on focus. Value flows through `useControllableState`.
+ *
+ * Known limitation (accepted for the terminal-caret aesthetic): because the real
+ * input's text and native caret are transparent, text selection has no visible
+ * highlight and the fake caret always sits at the end of the mirror text rather
+ * than at the true editing position. Focus remains clearly visible via the
+ * blinking block caret and the accent underline.
  */
 export function TextInput({
   value: valueProp,

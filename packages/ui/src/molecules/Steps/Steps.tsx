@@ -59,7 +59,6 @@ export function Steps({ steps, step, defaultStep = 0, onStepChange, style }: Ste
             ? "var(--bx-text-1, #f4f6fb)"
             : "#5b616e";
         return (
-          // biome-ignore lint/suspicious/noArrayIndexKey: stages are a fixed positional list
           <Fragment key={i}>
             {i > 0 && (
               <div

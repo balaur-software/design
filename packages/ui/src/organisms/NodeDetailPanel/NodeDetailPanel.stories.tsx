@@ -1,21 +1,7 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, within } from "storybook/test";
 import type { MemoryEdge, MemoryHistorySnapshot, MemoryNode } from "../MemoryExplorer/memory-types";
-import { fn } from "@storybook/test";
 import { NodeDetailPanel } from "./NodeDetailPanel";
-
-const meta: Meta<typeof NodeDetailPanel> = {
-  title: "OCTANT/Organisms/NodeDetailPanel",
-  component: NodeDetailPanel,
-  tags: ["autodocs"],
-  argTypes: {
-    node: { control: "object", description: "MemoryNode descriptor." },
-    edges: { control: "object", description: "All edges touching the node (in + out)." },
-    neighbours: { control: "object", description: "Lookup Map<id, MemoryNode> for neighbour titles." },
-    history: { control: "object", description: "Pre-mutation history snapshots." },
-    onNavigate: { action: "navigated" },
-  },
-};
-export default meta;
 
 const node: MemoryNode = {
   id: "n1",
@@ -99,15 +85,45 @@ const history: MemoryHistorySnapshot[] = [
   },
 ];
 
-export const Default: StoryObj = {
-  render: () => (
-    <NodeDetailPanel
-      node={node}
-      edges={edges}
-      neighbours={neighbours}
-      history={history}
-      onNavigate={fn()}
-      style={{ height: 520, width: 360 }}
-    />
-  ),
+const meta = {
+  title: "OCTANT/Organisms/NodeDetailPanel",
+  component: NodeDetailPanel,
+  args: {
+    node,
+    edges,
+    neighbours,
+    history,
+    onNavigate: fn(),
+  },
+  argTypes: {
+    node: { control: "object", description: "MemoryNode descriptor." },
+    edges: { control: "object", description: "All edges touching the node (in + out)." },
+    neighbours: { control: "object", description: "Lookup Map<id, MemoryNode> for neighbour titles." },
+    history: { control: "object", description: "Pre-mutation history snapshots." },
+  },
+} satisfies Meta<typeof NodeDetailPanel>;
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+/** The reference panel — Edges / Provenance / History tabs over a NodeCard header. */
+export const Default: Story = {
+  args: { style: { height: 520, width: 360 } },
+  play: async ({ canvas, userEvent, args }) => {
+    // Edges tab is active by default; clicking an edge navigates to the neighbour.
+    await expect(canvas.getByText(/outgoing · 2/i)).toBeVisible();
+    await userEvent.click(canvas.getByRole("button", { name: /the cabin/i }));
+    await expect(args.onNavigate).toHaveBeenCalledWith("n3");
+
+    // Provenance tab shows origin + aliases (scoped to the tabpanel — the
+    // NodeCard header also prints the origin).
+    await userEvent.click(canvas.getByRole("tab", { name: /provenance/i }));
+    const panel = canvas.getByRole("tabpanel");
+    await expect(within(panel).getByText("telegram:fwd:123")).toBeVisible();
+    await expect(within(panel).getByText("lake house")).toBeVisible();
+
+    // History tab lists pre-mutation snapshots.
+    await userEvent.click(canvas.getByRole("tab", { name: /history/i }));
+    await expect(canvas.getByText("CREATE")).toBeVisible();
+    await expect(canvas.getByText("UPDATE")).toBeVisible();
+  },
 };

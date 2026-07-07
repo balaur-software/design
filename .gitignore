@@ -13,3 +13,6 @@ storybook-static/
 
 # Browser-driver scratch
 .playwright-mcp/
+
+# Storybook CLI debug output
+debug-storybook.log

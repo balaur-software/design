@@ -138,7 +138,6 @@ export function LogStream({
       const lv = LV[(Math.random() * 2) | 0]!;
       pushRef.current(lv[0], lv[1], pick(messagesRef.current), false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Auto-append a scrambled row every `interval` ms.
@@ -181,6 +180,9 @@ export function LogStream({
           <span style={{ color: "#3f424d", fontSize: 11 }}>tail -f</span>
         </div>
         <div
+          role="log"
+          aria-label={title}
+          aria-atomic="false"
           style={{
             height: 152,
             overflow: "hidden",
@@ -215,6 +217,7 @@ export function LogStream({
         >
           <input
             type="text"
+            aria-label="Command"
             maxLength={40}
             value={cmd}
             placeholder={placeholder}

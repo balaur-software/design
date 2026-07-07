@@ -1,6 +1,5 @@
 import { type CSSProperties, useEffect, useRef, useState } from "react";
 import { useControllableState } from "../../hooks/useControllableState";
-import { useToast } from "../../primitives";
 
 const AC = "var(--bx-accent, #46c66d)";
 
@@ -34,7 +33,8 @@ const cellStyle: CSSProperties = {
  * Six-cell one-time-passcode field (§ INPUT-OTP). Each cell accepts a single
  * digit, auto-advances on entry, walks back on Backspace, and accepts a pasted
  * code across all cells. The value is held in `useControllableState`; when every
- * cell is filled the assembled code is announced once via `useToast` + `onComplete`.
+ * cell is filled the assembled code fires `onComplete` once — verification (and
+ * any success announcement) is the caller's job, so the code is never echoed.
  * Border/glow paint reacts to focus + filled state, mirroring the reference `paint`.
  */
 export function OTPInput({
@@ -50,7 +50,6 @@ export function OTPInput({
   const [active, setActive] = useState<number | null>(null);
   const cellRefs = useRef<(HTMLInputElement | null)[]>([]);
   const doneRef = useRef(false);
-  const toast = useToast();
 
   const chars = Array.from({ length }, (_, i) => value[i] ?? "");
   const full = chars.every((c) => c !== "");
@@ -59,11 +58,10 @@ export function OTPInput({
   useEffect(() => {
     if (full && !doneRef.current) {
       doneRef.current = true;
-      toast({ kind: "ok", message: `OTP verified — ${code}` });
       onComplete?.(code);
     }
     if (!full) doneRef.current = false;
-  }, [full, code, toast, onComplete]);
+  }, [full, code, onComplete]);
 
   const focusCell = (i: number) => {
     if (i >= 0 && i < length) cellRefs.current[i]?.focus();
@@ -88,7 +86,7 @@ export function OTPInput({
               : "var(--bx-border, #1c1d24)";
           return (
             <input
-              // biome-ignore lint/suspicious/noArrayIndexKey: fixed positional cells
+              // Fixed positional cells — the index is the stable identity.
               key={i}
               ref={(el) => {
                 cellRefs.current[i] = el;
@@ -131,6 +129,7 @@ export function OTPInput({
         })}
       </div>
       <div
+        role="status"
         style={{
           fontSize: 11,
           marginTop: 14,

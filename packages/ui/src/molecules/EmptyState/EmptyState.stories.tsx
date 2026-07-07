@@ -1,28 +1,35 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 import { EmptyState } from "./EmptyState.tsx";
 
-const meta: Meta<typeof EmptyState> = {
+const meta = {
   title: "OCTANT/Molecules/EmptyState",
   component: EmptyState,
-  tags: ["autodocs"],
   args: {
     title: "NO CELLS LIT",
     description: "The octant buffer is empty. Seed it with random cells or start drawing to begin.",
     cta: "SEED RANDOM ▸",
+    onCtaClick: fn(),
   },
   argTypes: {
     title: { control: "text" },
     description: { control: "text" },
     art: { control: "text", description: "ASCII art above the title." },
     cta: { control: "text" },
-    onCtaClick: { action: "cta-clicked" },
+  },
+} satisfies Meta<typeof EmptyState>;
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+/** The §17 empty card — clicking the CTA fires onCtaClick. */
+export const Default: Story = {
+  play: async ({ args, canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: /seed random/i }));
+    await expect(args.onCtaClick).toHaveBeenCalledTimes(1);
   },
 };
-export default meta;
-type Story = StoryObj<typeof EmptyState>;
 
-export const Default: Story = {};
-
+/** No CTA — just art, title, and copy. */
 export const NoCta: Story = {
   args: {
     title: "NOTHING TO SHOW",
@@ -31,15 +38,17 @@ export const NoCta: Story = {
   },
 };
 
+/** Custom ASCII art above the title. */
 export const CustomArt: Story = {
   args: {
     title: "SIGNAL LOST",
     description: "The relay dropped its carrier. Retry the handshake to reconnect.",
-    art: "░▒▓█▓▒░\n ✗   ✗ \n░▒▓█▓▒░",
+    art: "░▒▓█▓▒░\n ✗   ✗ \n░▒▓█▓▒░",
     cta: "RETRY ↻",
   },
 };
 
+/** A fully custom action node in place of the built-in CTA. */
 export const CustomAction: Story = {
   args: {
     title: "QUEUE DRAINED",

@@ -1,10 +1,9 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Sparkline } from "./Sparkline.tsx";
 
-const meta: Meta<typeof Sparkline> = {
+const meta = {
   title: "OCTANT/Atoms/Sparkline",
   component: Sparkline,
-  tags: ["autodocs"],
   args: { label: "throughput", unit: "MB/s" },
   argTypes: {
     label: { control: "text" },
@@ -13,20 +12,24 @@ const meta: Meta<typeof Sparkline> = {
     color: { control: "color" },
     spanLabel: { control: "text" },
   },
-};
+} satisfies Meta<typeof Sparkline>;
 export default meta;
-type Story = StoryObj<typeof Sparkline>;
+type Story = StoryObj<typeof meta>;
 
+/** The default throughput readout with the accent trace. */
 export const Default: Story = {};
 
+/** A latency trace in the warning-yellow ramp with a custom span label. */
 export const Latency: Story = {
   args: { label: "latency", unit: "ms", color: "#f2c94c", spanLabel: "-30s" },
 };
 
+/** More samples packed into the same width. */
 export const Dense: Story = {
   args: { label: "packets", unit: "pkt/s", color: "#46c66d", samples: 64 },
 };
 
+/** Several sparklines in a responsive dashboard grid. */
 export const Grid: Story = {
   render: () => (
     <div

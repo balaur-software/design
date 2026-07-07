@@ -1,24 +1,45 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, within } from "storybook/test";
 import { Table, type TableColumn } from "./Table.tsx";
 
-const meta: Meta<typeof Table> = {
+const meta = {
   title: "OCTANT/Organisms/Table",
   component: Table,
-  tags: ["autodocs"],
   argTypes: {
-    columns: { control: "object", description: "TableColumn[]: { key, label, color?, align?, sortValue?, render? }." },
+    columns: {
+      control: "object",
+      description: "TableColumn[]: { key, label, color?, align?, sortValue?, render? }.",
+    },
     rows: { control: "object", description: "Row objects keyed by column key." },
     defaultSortKey: { control: "text" },
     defaultAsc: { control: "boolean" },
     label: { control: "text" },
   },
-};
+} satisfies Meta<typeof Table>;
 export default meta;
 
-type Story = StoryObj<typeof Table>;
+type Story = StoryObj<typeof meta>;
 
 /** The reference node/status/load/cells table — click any header to sort. */
-export const Default: Story = {};
+export const Default: Story = {
+  play: async ({ canvas, userEvent }) => {
+    // Initial sort: first column (NODE), ascending.
+    const node = canvas.getByRole("columnheader", { name: /node/i });
+    await expect(node).toHaveAttribute("aria-sort", "ascending");
+
+    // Clicking another header sorts by it, ascending first.
+    const cells = canvas.getByRole("columnheader", { name: /cells/i });
+    await userEvent.click(within(cells).getByRole("button"));
+    await expect(cells).toHaveAttribute("aria-sort", "ascending");
+    await expect(node).toHaveAttribute("aria-sort", "none");
+    await expect(canvas.getAllByRole("row")[1]).toHaveTextContent("SINK-03");
+
+    // Clicking the active header flips the direction.
+    await userEvent.click(within(cells).getByRole("button"));
+    await expect(cells).toHaveAttribute("aria-sort", "descending");
+    await expect(canvas.getAllByRole("row")[1]).toHaveTextContent("CACHE-9");
+  },
+};
 
 /** Pre-sorted by the `load` meter, descending (heaviest node first). */
 export const SortedByLoad: Story = {
@@ -60,7 +81,7 @@ const PROC_ROWS: ProcRow[] = [
 ];
 
 /** A custom dataset with its own columns, proving the generic column API. */
-export const CustomColumns: StoryObj = {
+export const CustomColumns: Story = {
   render: () => (
     <Table<ProcRow>
       label="PROCESSES · click a header to sort"

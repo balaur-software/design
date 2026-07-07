@@ -1,21 +1,7 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import { fn } from "@storybook/test";
-import type { MemoryNode, NodeFilter } from "../../organisms/MemoryExplorer/memory-types";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
+import type { MemoryNode } from "../../organisms/MemoryExplorer/memory-types";
 import { GraphFilterBar } from "./GraphFilterBar";
-
-const meta: Meta<typeof GraphFilterBar> = {
-  title: "OCTANT/Molecules/GraphFilterBar",
-  component: GraphFilterBar,
-  tags: ["autodocs"],
-  argTypes: {
-    filter: { control: "object", description: "NodeFilter: { types, statuses, minImportance }." },
-    onFilterChange: { action: "filter-changed" },
-    types: { control: "object", description: "Node types available in the vault." },
-    searchResults: { control: "object", description: "Search results from the caller's recall/search." },
-    onSearchSelect: { action: "search-selected" },
-  },
-};
-export default meta;
 
 const results: MemoryNode[] = [
   {
@@ -34,22 +20,45 @@ const results: MemoryNode[] = [
   },
 ];
 
-export const Default: StoryObj = {
-  render: () => {
-    const filter: NodeFilter = {
+const meta = {
+  title: "OCTANT/Molecules/GraphFilterBar",
+  component: GraphFilterBar,
+  args: {
+    filter: {
       types: ["memory", "person"],
       statuses: ["active", "proposed"],
       minImportance: 2,
-    };
-    return (
-      <GraphFilterBar
-        filter={filter}
-        onFilterChange={fn()}
-        types={["memory", "person", "skill", "note", "event"]}
-        searchResults={results}
-        onSearchSelect={fn()}
-        style={{ width: 460 }}
-      />
-    );
+    },
+    onFilterChange: fn(),
+    types: ["memory", "person", "skill", "note", "event"],
+    searchResults: results,
+    onSearchSelect: fn(),
+    style: { width: 460 },
+  },
+  argTypes: {
+    filter: { control: "object", description: "NodeFilter: { types, statuses, minImportance }." },
+    types: { control: "object", description: "Node types available in the vault." },
+    searchResults: { control: "object", description: "Search results from the caller's recall/search." },
+  },
+} satisfies Meta<typeof GraphFilterBar>;
+export default meta;
+
+type Story = StoryObj<typeof meta>;
+
+/** The full scope bar — toggling a type composes a new NodeFilter, and picking a search result fires onSearchSelect. */
+export const Default: Story = {
+  play: async ({ args, canvas, userEvent }) => {
+    const skill = canvas.getByRole("button", { name: "skill" });
+    await expect(skill).toHaveAttribute("aria-pressed", "false");
+    await userEvent.click(skill);
+    await expect(args.onFilterChange).toHaveBeenCalledWith({
+      types: ["memory", "person", "skill"],
+      statuses: ["active", "proposed"],
+      minImportance: 2,
+    });
+
+    await userEvent.click(canvas.getByRole("combobox"));
+    await userEvent.click(canvas.getByRole("option", { name: /lake house trip/i }));
+    await expect(args.onSearchSelect).toHaveBeenCalledWith("r1");
   },
 };

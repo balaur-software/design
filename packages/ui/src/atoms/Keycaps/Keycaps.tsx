@@ -12,11 +12,14 @@ const cap: CSSProperties = {
   // the thicker bottom border gives the chip its physical, pressable keycap look
   borderBottomWidth: 2,
   color: "var(--bx-text-3, #c8cdd6)",
+  // <kbd> defaults to the UA monospace; inherit the surrounding OCTANT mono stack.
+  fontFamily: "inherit",
+  fontSize: "inherit",
 };
 
 /** A single pressable keycap chip (section §17). Pure static markup. */
 export function Keycap({ children }: { children: ReactNode }) {
-  return <span style={cap}>{children}</span>;
+  return <kbd style={cap}>{children}</kbd>;
 }
 
 /** One keyboard shortcut: a set of keys plus what they do. */
@@ -43,6 +46,8 @@ const DEFAULT_SHORTCUTS: Shortcut[] = [
 export interface KeycapsProps {
   /** The shortcut rows to render (defaults to a small demo set). */
   shortcuts?: Shortcut[];
+  className?: string;
+  style?: CSSProperties;
 }
 
 /**
@@ -50,9 +55,10 @@ export interface KeycapsProps {
  * each row pairs a chord (or cluster) of {@link Keycap}s with a description.
  * Pure static markup — no effects.
  */
-export function Keycaps({ shortcuts = DEFAULT_SHORTCUTS }: KeycapsProps) {
+export function Keycaps({ shortcuts = DEFAULT_SHORTCUTS, className, style }: KeycapsProps) {
   return (
     <div
+      className={className}
       style={{
         display: "flex",
         flexDirection: "column",
@@ -60,6 +66,7 @@ export function Keycaps({ shortcuts = DEFAULT_SHORTCUTS }: KeycapsProps) {
         fontSize: 12,
         color: "var(--bx-text-5, #7b8290)",
         fontFamily: "var(--bx-font-mono, 'DepartureMono', ui-monospace, monospace)",
+        ...style,
       }}
     >
       {shortcuts.map((s, i) => {

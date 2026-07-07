@@ -76,11 +76,11 @@ export const fg = {
   body: text[2],
   /** Muted text. `--bx-text-4` (text[3]) */
   muted: text[3],
-  /** Dim / secondary text. `--bx-text-5` (text[4]) */
+  /** Dim / secondary text (timestamps, meta) — the dimmest AA-readable step. `--bx-text-5` (text[4]) */
   dim: text[4],
-  /** Faint text (timestamps, meta). `--bx-text-6` (text[5]) */
+  /** Faint text — below 4.5:1 contrast; decorative/disabled only, not readable content. `--bx-text-6` (text[5]) */
   faint: text[5],
-  /** Ghost text (placeholders, disabled). `--bx-text-7` (text[6]) */
+  /** Ghost text (placeholders, disabled) — below 4.5:1 contrast; decorative only. `--bx-text-7` (text[6]) */
   ghost: text[6],
 } as const;
 

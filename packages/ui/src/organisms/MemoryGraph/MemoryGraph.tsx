@@ -1,7 +1,7 @@
 import {
   type CSSProperties,
+  type KeyboardEvent as ReactKeyboardEvent,
   type PointerEvent as ReactPointerEvent,
-  type WheelEvent as ReactWheelEvent,
   useEffect,
   useMemo,
   useRef,
@@ -78,6 +78,7 @@ export function MemoryGraph({
   // Viewport pan/zoom.
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
+  const [panning, setPanning] = useState(false);
   const panRef = useRef<{ x: number; y: number; startX: number; startY: number; panning: boolean }>({
     x: 0,
     y: 0,
@@ -95,7 +96,6 @@ export function MemoryGraph({
       if (pinnedIds.has(n.id) && !n.pinned) pin(n.id, { x: n.x, y: n.y });
       if (!pinnedIds.has(n.id) && n.pinned) release(n.id);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pinnedIds]);
 
   const toGraph = (clientX: number, clientY: number): { x: number; y: number } => {
@@ -107,8 +107,11 @@ export function MemoryGraph({
     return { x: (sx - pan.x) / zoom, y: (sy - pan.y) / zoom };
   };
 
-  const onWheel = (e: ReactWheelEvent<SVGSVGElement>) => {
-    e.preventDefault();
+  // React attaches `wheel` passively at the root (since v17), so a JSX `onWheel`
+  // can't preventDefault page scroll. Keep the latest handler in a ref and attach
+  // a native non-passive listener once.
+  const wheelRef = useRef<(e: WheelEvent) => void>(() => {});
+  wheelRef.current = (e: WheelEvent) => {
     const factor = e.deltaY < 0 ? 1.1 : 1 / 1.1;
     const next = Math.max(0.2, Math.min(3, zoom * factor));
     // Zoom around the cursor: keep the graph point under the pointer fixed.
@@ -123,8 +126,20 @@ export function MemoryGraph({
     setZoom(next);
   };
 
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      wheelRef.current(e);
+    };
+    svg.addEventListener("wheel", onWheel, { passive: false });
+    return () => svg.removeEventListener("wheel", onWheel);
+  }, []);
+
   const onBackgroundDown = (e: ReactPointerEvent<SVGGElement>) => {
     panRef.current = { x: pan.x, y: pan.y, startX: e.clientX, startY: e.clientY, panning: true };
+    setPanning(true);
     (e.currentTarget as SVGGElement).setPointerCapture(e.pointerId);
   };
 
@@ -144,6 +159,7 @@ export function MemoryGraph({
 
   const onBackgroundUp = (e: ReactPointerEvent<SVGGElement>) => {
     panRef.current.panning = false;
+    setPanning(false);
     (e.currentTarget as SVGGElement).releasePointerCapture(e.pointerId);
   };
 
@@ -166,7 +182,18 @@ export function MemoryGraph({
         lay.vx = 0;
         lay.vy = 0;
         pin(d.id, { x: g.x, y: g.y });
+        // The sim may already be converged (its rAF re-render loop stopped), so
+        // force a render to redraw the dragged node at its new position.
+        tickFrame.current++;
+        setTick((t) => (t + 1) % 1_000_000);
       }
+    }
+  };
+
+  const onNodeKeyDown = (e: ReactKeyboardEvent<SVGGElement>, id: string) => {
+    if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+      e.preventDefault();
+      onSelect?.(id);
     }
   };
 
@@ -226,11 +253,10 @@ export function MemoryGraph({
       width="100%"
       height="100%"
       preserveAspectRatio="xMidYMid meet"
-      onWheel={onWheel}
       style={{
         display: "block",
         background: "var(--bx-bg, #0a0b0e)",
-        cursor: panRef.current.panning ? "grabbing" : "default",
+        cursor: panning ? "grabbing" : "default",
         touchAction: "none",
         ...style,
       }}
@@ -272,12 +298,20 @@ export function MemoryGraph({
               <g
                 key={n.id}
                 transform={`translate(${p.x} ${p.y})`}
+                role="button"
+                tabIndex={0}
+                aria-label={n.title}
+                aria-pressed={selectedId === n.id}
                 onPointerDown={(e) => onNodeDown(e, n.id)}
                 onPointerMove={onNodeMove}
                 onPointerUp={(e) => onNodeUp(e, n.id)}
                 onPointerEnter={() => onHover?.(n.id)}
                 onPointerLeave={() => onHover?.(null)}
+                onFocus={() => onHover?.(n.id)}
+                onBlur={() => onHover?.(null)}
+                onKeyDown={(e) => onNodeKeyDown(e, n.id)}
                 onDoubleClick={() => onNodeDouble(n.id)}
+                style={{ outline: "none", cursor: "pointer" }}
               >
                 <NodeGlyph
                   node={n}

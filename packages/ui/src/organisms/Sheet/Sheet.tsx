@@ -19,6 +19,8 @@ export interface SheetProps {
   width?: number;
   /** Trap focus within the panel while open (default true). */
   trapFocus?: boolean;
+  /** Accessible name for the dialog when `title` is omitted (or to override it). */
+  "aria-label"?: string;
   panelStyle?: CSSProperties;
 }
 
@@ -39,6 +41,7 @@ export function Sheet({
   footer,
   width = 360,
   trapFocus = true,
+  "aria-label": ariaLabel,
   panelStyle,
 }: SheetProps) {
   const reduced = useReducedMotion();
@@ -68,6 +71,7 @@ export function Sheet({
       align={side === "right" ? "end" : "start"}
       trapFocus={trapFocus}
       ariaLabelledBy={title != null ? titleId : undefined}
+      ariaLabel={ariaLabel ?? (title == null ? "Panel" : undefined)}
       panelStyle={{
         display: "flex",
         flexDirection: "column",

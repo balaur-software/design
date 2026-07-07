@@ -51,6 +51,7 @@ export function DropdownMenu({
   const [hovered, setHovered] = useState(-1);
   const [focused, setFocused] = useState(-1);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const toast = useToast();
 
   const actionable = items.map((it, i) => (it.divider ? -1 : i)).filter((i) => i >= 0);
@@ -72,11 +73,17 @@ export function DropdownMenu({
     itemRefs.current[i]?.focus();
   };
 
-  // On open, move focus to the first actionable item; on close, reset.
+  // On open, move focus to the first actionable item; on close, reset and —
+  // if focus is stranded on a (now hidden) item — return it to the trigger.
   useEffect(() => {
-    if (open) focusItem(firstIdx);
-    else setFocused(-1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (open) {
+      focusItem(firstIdx);
+    } else {
+      setFocused(-1);
+      if (itemRefs.current.some((el) => el !== null && el === document.activeElement)) {
+        triggerRef.current?.focus();
+      }
+    }
   }, [open]);
 
   const onMenuKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -111,6 +118,7 @@ export function DropdownMenu({
       }}
       trigger={
         <button
+          ref={triggerRef}
           type="button"
           aria-haspopup="menu"
           aria-expanded={open}
@@ -147,10 +155,10 @@ export function DropdownMenu({
         </button>
       }
     >
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: APG menu pattern — ArrowUp/Down/Home/End are handled on the items container */}
       <div onKeyDown={onMenuKey}>
         {items.map((item, i) => {
           if (item.divider) {
-            // eslint-disable-next-line react/no-array-index-key
             return (
               <div key={i} style={{ height: 1, background: "var(--bx-border, #1c1d24)", margin: "4px 0" }} />
             );
@@ -160,7 +168,6 @@ export function DropdownMenu({
           const isFocused = focused === i;
           return (
             <button
-              // eslint-disable-next-line react/no-array-index-key
               key={i}
               ref={(el) => {
                 itemRefs.current[i] = el;

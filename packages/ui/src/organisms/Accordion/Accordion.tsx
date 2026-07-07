@@ -1,4 +1,4 @@
-import { type CSSProperties, type ReactNode, useRef } from "react";
+import { type CSSProperties, type ReactNode, useId, useRef } from "react";
 import { useCollapse } from "../../hooks/useCollapse";
 import { useControllableState } from "../../hooks/useControllableState";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
@@ -35,6 +35,13 @@ interface RowProps {
 function AccordionRow({ item, open, last, reduced, onToggle }: RowProps) {
   const bodyRef = useRef<HTMLDivElement>(null);
   useCollapse(bodyRef, open);
+  const baseId = useId();
+  const headerId = `${baseId}-header`;
+  const panelId = `${baseId}-panel`;
+  // Server markup reflects the initial open state (no max-height clamp), so
+  // `defaultOpen` items are visible in SSR HTML / without JS; after mount
+  // `useCollapse` owns the pixel value and drives the transition.
+  const initialOpen = useRef(open).current;
 
   return (
     <div
@@ -45,7 +52,9 @@ function AccordionRow({ item, open, last, reduced, onToggle }: RowProps) {
     >
       <button
         type="button"
+        id={headerId}
         aria-expanded={open}
+        aria-controls={panelId}
         onClick={onToggle}
         style={{
           width: "100%",
@@ -79,8 +88,12 @@ function AccordionRow({ item, open, last, reduced, onToggle }: RowProps) {
       </button>
       <div
         ref={bodyRef}
+        id={panelId}
+        role="region"
+        aria-labelledby={headerId}
+        inert={!open}
         style={{
-          maxHeight: 0,
+          maxHeight: initialOpen ? undefined : 0,
           overflow: "hidden",
           transition: reduced ? "none" : `max-height .28s ${EASE}`,
         }}
@@ -110,7 +123,7 @@ function AccordionRow({ item, open, last, reduced, onToggle }: RowProps) {
  * server and the bodies size themselves after mount.
  */
 export function Accordion({ items, single = false, openIndices, onOpenChange, style }: AccordionProps) {
-  const initial = items.reduce<number[]>((acc, item, i) => (item.defaultOpen ? [...acc, i] : acc), []);
+  const initial = items.flatMap((item, i) => (item.defaultOpen ? [i] : []));
   const [open, setOpen] = useControllableState<number[]>(openIndices, initial, onOpenChange);
   const reduced = useReducedMotion();
 
@@ -127,7 +140,6 @@ export function Accordion({ items, single = false, openIndices, onOpenChange, st
     <div style={style}>
       {items.map((item, i) => (
         <AccordionRow
-          // biome-ignore lint/suspicious/noArrayIndexKey: items are a stable, ordered list
           key={i}
           item={item}
           open={open.includes(i)}

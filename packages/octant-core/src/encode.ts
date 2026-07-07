@@ -36,37 +36,48 @@ const Q: Readonly<Record<number, string>> = {
 };
 
 /**
- * 3 special masks whose glyph lives outside the contiguous octant block; encoded
- * as explicit code points.
+ * 10 special masks whose glyph lives outside the contiguous octant block;
+ * encoded as explicit code points. Unicode 16 unified these octant patterns
+ * with pre-existing (or separately allocated) characters, so they are absent
+ * from the U+1CD00.. BLOCK OCTANT run (verified against UnicodeData 16.0).
  */
 const S: Readonly<Record<number, number>> = {
-  1: 0x1cea8,
-  2: 0x1ceab,
-  3: 0x1fb82,
+  1: 0x1cea8, // LEFT HALF UPPER ONE QUARTER BLOCK (octant cell 1)
+  2: 0x1ceab, // RIGHT HALF UPPER ONE QUARTER BLOCK (cell 2)
+  3: 0x1fb82, // UPPER ONE QUARTER BLOCK (cells 1-2)
+  20: 0x1fbe6, // MIDDLE LEFT ONE QUARTER BLOCK (cells 3,5)
+  40: 0x1fbe7, // MIDDLE RIGHT ONE QUARTER BLOCK (cells 4,6)
+  63: 0x1fb85, // UPPER THREE QUARTERS BLOCK (cells 1-6)
+  64: 0x1cea3, // LEFT HALF LOWER ONE QUARTER BLOCK (cell 7)
+  128: 0x1cea0, // RIGHT HALF LOWER ONE QUARTER BLOCK (cell 8)
+  192: 0x2582, // LOWER ONE QUARTER BLOCK (cells 7-8)
+  252: 0x2586, // LOWER THREE QUARTERS BLOCK (cells 3-8)
 };
 
 /**
- * The set of masks already handled by Q or S. Used to compress the remaining
- * masks into the contiguous octant code-point range: for a non-Q/S mask we count
- * how many lower masks are NOT skipped and add that offset to OCTANT_BASE.
+ * Precomputed mask -> glyph table. The 26 masks covered by Q or S map to their
+ * unified characters; the remaining 230 masks are compressed into the
+ * contiguous BLOCK OCTANT run (U+1CD00..U+1CDE5), whose code points ascend in
+ * mask order.
  */
-const _octSkip: ReadonlySet<number> = new Set([
-  0, 5, 10, 15, 80, 85, 90, 95, 160, 165, 170, 175, 240, 245, 250, 255, 1, 2, 3,
-]);
+const _glyph: readonly string[] = (() => {
+  const t: string[] = [];
+  let next = OCTANT_BASE;
+  for (let mask = 0; mask <= 255; mask++) {
+    const q = Q[mask];
+    const s = S[mask];
+    if (q !== undefined) t.push(q);
+    else if (s !== undefined) t.push(String.fromCodePoint(s));
+    else t.push(String.fromCodePoint(next++));
+  }
+  return t;
+})();
 
 /**
  * Encode an 8-bit octant sub-pixel mask (0..255) to its single-code-point glyph.
  */
 export function octChar(mask: number): string {
-  const q = Q[mask];
-  if (q !== undefined) return q;
-  const s = S[mask];
-  if (s !== undefined) return String.fromCodePoint(s);
-  let idx = 0;
-  for (let i = 0; i < mask; i++) {
-    if (!_octSkip.has(i)) idx++;
-  }
-  return String.fromCodePoint(OCTANT_BASE + idx);
+  return _glyph[mask] ?? " ";
 }
 
 /**
@@ -85,15 +96,17 @@ export function sext(mask: number): string {
 }
 
 /**
- * DOM/canvas-dependent glyph-availability probe. Renders a sparse octant and a
- * dense octant to an offscreen canvas and compares lit-pixel counts: a real font
- * shows a large density ratio, whereas tofu ".notdef" boxes (which draw the hex
- * code point) have near-identical counts.
+ * DOM/canvas-dependent glyph-availability probe. Renders the sparsest octant
+ * (`octChar(1)`) and `ch` — a **dense** glyph, defaulting to `octChar(254)` —
+ * to an offscreen canvas and compares lit-pixel counts: a real font shows a
+ * large density ratio between the two, whereas tofu ".notdef" boxes (which
+ * draw the hex code point) have near-identical counts. Pass a dense glyph
+ * (e.g. a mostly-lit octant or `"█"`) for a meaningful answer; the default
+ * probes support for the octant block itself.
  *
  * NOTE: requires a DOM (`document`, canvas 2D + getImageData). Not unit-tested.
  */
-export function glyphSupported(ch: string): boolean {
-  void ch;
+export function glyphSupported(ch: string = octChar(254)): boolean {
   try {
     const s = 24;
     const cv = document.createElement("canvas");
@@ -117,7 +130,7 @@ export function glyphSupported(ch: string): boolean {
       return n;
     };
     const lo = count(octChar(1));
-    const hi = count(octChar(254));
+    const hi = count(ch);
     return lo > 0 && hi > lo * 2.5;
   } catch {
     return false;

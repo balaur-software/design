@@ -1,10 +1,9 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Breadcrumb } from "./Breadcrumb.tsx";
 
-const meta: Meta<typeof Breadcrumb> = {
+const meta = {
   title: "OCTANT/Molecules/Breadcrumb",
   component: Breadcrumb,
-  tags: ["autodocs"],
   args: {
     items: [{ label: "ROOT" }, { label: "SYSTEM" }, { label: "GLYPHS" }, { label: "OCTANT.MAP" }],
   },
@@ -12,10 +11,10 @@ const meta: Meta<typeof Breadcrumb> = {
     items: { control: "object", description: "Path segments: { label, href? }." },
     separator: { control: "text" },
   },
-};
+} satisfies Meta<typeof Breadcrumb>;
 export default meta;
 
-type Story = StoryObj<typeof Breadcrumb>;
+type Story = StoryObj<typeof meta>;
 
 /** The canonical §16 trail: ROOT ▸ SYSTEM ▸ GLYPHS ▸ OCTANT.MAP. */
 export const Default: Story = {};

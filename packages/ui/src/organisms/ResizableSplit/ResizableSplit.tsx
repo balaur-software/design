@@ -106,8 +106,7 @@ export function ResizableSplit({
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", up);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dragging, min, max]);
+  }, [dragging, min, max, setPct]);
 
   const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     setDragging(true);

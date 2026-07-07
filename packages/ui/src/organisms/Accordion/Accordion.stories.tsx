@@ -1,4 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 import { Accordion } from "./Accordion.tsx";
 
 const items = [
@@ -20,31 +21,55 @@ const items = [
   },
 ];
 
-const meta: Meta<typeof Accordion> = {
+const meta = {
   title: "OCTANT/Organisms/Accordion",
   component: Accordion,
-  tags: ["autodocs"],
-  args: { items, style: { maxWidth: 560 } },
+  args: { items, style: { maxWidth: 560 }, onOpenChange: fn() },
   argTypes: {
     items: { control: "object", description: "Rows: { title, content, defaultOpen? }." },
     single: { control: "boolean" },
     openIndices: { control: "object", description: "Controlled set of open indices." },
-    onOpenChange: { action: "open-changed" },
+  },
+} satisfies Meta<typeof Accordion>;
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+/** Multi-open accordion; the first item starts expanded via `defaultOpen`. */
+export const Default: Story = {
+  play: async ({ canvas, userEvent, args }) => {
+    const first = canvas.getByRole("button", { name: /what is an octant cell/i });
+    const second = canvas.getByRole("button", { name: /how is density/i });
+    await expect(first).toHaveAttribute("aria-expanded", "true");
+    await expect(second).toHaveAttribute("aria-expanded", "false");
+
+    await userEvent.click(second);
+    await expect(second).toHaveAttribute("aria-expanded", "true");
+    // Multi-open: the first item stays expanded.
+    await expect(first).toHaveAttribute("aria-expanded", "true");
+    await expect(args.onOpenChange).toHaveBeenLastCalledWith([0, 1]);
   },
 };
-export default meta;
-type Story = StoryObj<typeof Accordion>;
 
-export const Default: Story = {};
-
+/** Every row starts collapsed. */
 export const AllClosed: Story = {
   args: { items: items.map((it) => ({ ...it, defaultOpen: false })) },
 };
 
+/** Radio-style behaviour: opening one row closes the others. */
 export const SingleOpen: Story = {
   args: { single: true, items: items.map((it) => ({ ...it, defaultOpen: false })) },
+  play: async ({ canvas, userEvent }) => {
+    const first = canvas.getByRole("button", { name: /what is an octant cell/i });
+    const second = canvas.getByRole("button", { name: /how is density/i });
+    await userEvent.click(first);
+    await expect(first).toHaveAttribute("aria-expanded", "true");
+    await userEvent.click(second);
+    await expect(second).toHaveAttribute("aria-expanded", "true");
+    await expect(first).toHaveAttribute("aria-expanded", "false");
+  },
 };
 
+/** A short two-row status readout. */
 export const Compact: Story = {
   args: {
     items: [

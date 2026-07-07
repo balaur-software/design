@@ -1,10 +1,9 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Badge } from "./Badge.tsx";
 
-const meta: Meta<typeof Badge> = {
+const meta = {
   title: "OCTANT/Atoms/Badge",
   component: Badge,
-  tags: ["autodocs"],
   args: { children: "NEW", tone: "accent", count: 4 },
   argTypes: {
     tone: {
@@ -15,11 +14,12 @@ const meta: Meta<typeof Badge> = {
     children: { control: "text", description: "The label content." },
     count: { control: "text", description: "Optional trailing count/value." },
   },
-};
+} satisfies Meta<typeof Badge>;
 export default meta;
 
-type Story = StoryObj<typeof Badge>;
+type Story = StoryObj<typeof meta>;
 
+/** Label plus trailing count in the accent tone. */
 export const Default: Story = {};
 
 /** The reference row from the nav/markers section. */

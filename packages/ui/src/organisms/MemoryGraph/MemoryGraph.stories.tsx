@@ -1,12 +1,35 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import { useState } from "react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { type ComponentProps, useState } from "react";
 import { mockEdges, mockNodes } from "../MemoryExplorer/mock-vault";
 import { MemoryGraph } from "./MemoryGraph";
 
-const meta: Meta<typeof MemoryGraph> = {
+/** Wires the controlled selection/hover props to local state while forwarding the arg spies. */
+function GraphDemo(props: ComponentProps<typeof MemoryGraph>) {
+  const [selected, setSelected] = useState<string | null>(null);
+  const [hovered, setHovered] = useState<string | null>(null);
+  return (
+    <div style={{ height: 520, border: "1px solid var(--bx-border, #1c1d24)" }}>
+      <MemoryGraph
+        {...props}
+        {...(selected ? { selectedId: selected } : {})}
+        {...(hovered ? { hoveredId: hovered } : {})}
+        onSelect={(id) => {
+          setSelected(id);
+          props.onSelect?.(id);
+        }}
+        onHover={(id) => {
+          setHovered(id);
+          props.onHover?.(id);
+        }}
+      />
+    </div>
+  );
+}
+
+const meta = {
   title: "OCTANT/Organisms/MemoryGraph",
   component: MemoryGraph,
-  tags: ["autodocs"],
+  args: { nodes: mockNodes, edges: mockEdges },
   argTypes: {
     nodes: { control: "object", description: "MemoryNode[] to lay out." },
     edges: { control: "object", description: "MemoryEdge[] between nodes." },
@@ -16,52 +39,23 @@ const meta: Meta<typeof MemoryGraph> = {
     width: { control: { type: "number", min: 200, max: 2000, step: 10 } },
     height: { control: { type: "number", min: 200, max: 2000, step: 10 } },
     showGrid: { control: "boolean" },
-    onSelect: { action: "selected" },
-    onHover: { action: "hovered" },
-    onPinChange: { action: "pin-changed" },
   },
-};
+} satisfies Meta<typeof MemoryGraph>;
 export default meta;
+type Story = StoryObj<typeof meta>;
 
-export const Default: StoryObj = {
-  render: () => {
-    const [selected, setSelected] = useState<string | null>(null);
-    const [hovered, setHovered] = useState<string | null>(null);
-    return (
-      <div style={{ height: 520, border: "1px solid var(--bx-border, #1c1d24)" }}>
-        <MemoryGraph
-          nodes={mockNodes}
-          edges={mockEdges}
-          {...(selected ? { selectedId: selected } : {})}
-          {...(hovered ? { hoveredId: hovered } : {})}
-          onSelect={setSelected}
-          onHover={setHovered}
-        />
-      </div>
-    );
-  },
+/** The force-directed vault graph — click a node to select, drag to pin, scroll to zoom. */
+export const Default: Story = {
+  render: (args) => <GraphDemo {...args} />,
 };
 
-export const Full: StoryObj = {
-  render: () => {
-    const [selected, setSelected] = useState<string | null>(null);
-    const [hovered, setHovered] = useState<string | null>(null);
-    return (
-      <div style={{ height: 520, border: "1px solid var(--bx-border, #1c1d24)" }}>
-        <MemoryGraph
-          nodes={mockNodes}
-          edges={mockEdges}
-          {...(selected ? { selectedId: selected } : {})}
-          {...(hovered ? { hoveredId: hovered } : {})}
-          onSelect={setSelected}
-          onHover={setHovered}
-        />
-      </div>
-    );
-  },
+/** The same graph with the full mock vault (~30 nodes, ~50 typed edges). */
+export const Full: Story = {
+  render: (args) => <GraphDemo {...args} />,
 };
 
-export const Empty: StoryObj = {
+/** No nodes: the canvas renders just the crosshair grid. */
+export const Empty: Story = {
   render: () => (
     <div style={{ height: 320, border: "1px solid var(--bx-border, #1c1d24)" }}>
       <MemoryGraph nodes={[]} edges={[]} />

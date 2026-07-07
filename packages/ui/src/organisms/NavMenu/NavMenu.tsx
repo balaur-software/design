@@ -1,4 +1,4 @@
-import { type CSSProperties, useEffect, useRef, useState } from "react";
+import { type CSSProperties, useEffect, useId, useRef, useState } from "react";
 import { FloatingPanel } from "../../primitives";
 
 /** A rich mega-panel card: an accent glyph over a title + one-line description. */
@@ -63,6 +63,7 @@ export function NavMenu({ items, style }: NavMenuProps) {
   const [openIdx, setOpenIdx] = useState(-1);
   const [hovered, setHovered] = useState<string | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const baseId = useId();
 
   useEffect(
     () => () => {
@@ -134,11 +135,14 @@ export function NavMenu({ items, style }: NavMenuProps) {
               onOpenChange={(o) => setOpenIdx(o ? i : -1)}
               width={width}
               panelStyle={panelStyle}
+              role="group"
+              panelId={`${baseId}-panel-${i}`}
+              ariaLabel={item.label}
               trigger={
                 <button
                   type="button"
-                  aria-haspopup="menu"
                   aria-expanded={on}
+                  aria-controls={`${baseId}-panel-${i}`}
                   onClick={() => setOpenIdx(on ? -1 : i)}
                   style={{
                     display: "flex",
@@ -177,7 +181,6 @@ export function NavMenu({ items, style }: NavMenuProps) {
                     return (
                       <a
                         key={key}
-                        role="menuitem"
                         href={card.href ?? "#"}
                         onPointerEnter={() => setHovered(key)}
                         onPointerLeave={() => setHovered((h) => (h === key ? null : h))}
@@ -212,7 +215,6 @@ export function NavMenu({ items, style }: NavMenuProps) {
                     return (
                       <a
                         key={key}
-                        role="menuitem"
                         href={link.href ?? "#"}
                         onPointerEnter={() => setHovered(key)}
                         onPointerLeave={() => setHovered((h) => (h === key ? null : h))}

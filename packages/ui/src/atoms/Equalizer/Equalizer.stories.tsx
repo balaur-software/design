@@ -1,10 +1,9 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Equalizer } from "./Equalizer.tsx";
 
-const meta: Meta<typeof Equalizer> = {
+const meta = {
   title: "OCTANT/Atoms/Equalizer",
   component: Equalizer,
-  tags: ["autodocs"],
   argTypes: {
     bands: { control: { type: "number", min: 2, max: 64, step: 1 } },
     motion: { control: { type: "range", min: 0, max: 1, step: 0.05 } },
@@ -13,10 +12,11 @@ const meta: Meta<typeof Equalizer> = {
     fontSize: { control: { type: "number", min: 12, max: 96, step: 1 } },
     label: { control: "text" },
   },
-};
+} satisfies Meta<typeof Equalizer>;
 export default meta;
-type Story = StoryObj<typeof Equalizer>;
+type Story = StoryObj<typeof meta>;
 
+/** The default animated spectrum. */
 export const Default: Story = {};
 
 export const FewBands: Story = {

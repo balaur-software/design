@@ -214,7 +214,14 @@ export function useForceLayout(
     seed,
   });
 
-  const positions = useRef<LayoutNode[]>(initLayout(ids, initOpts()));
+  // Lazy init: a plain `useRef(initLayout(...))` would run the seeded hash for
+  // every node on every render only to discard the result after the first.
+  const positions = useRef<LayoutNode[]>([]);
+  const seeded = useRef(false);
+  if (!seeded.current) {
+    seeded.current = true;
+    positions.current = initLayout(ids, initOpts());
+  }
   const [, forceTick] = useState(0);
   const [converged, setConverged] = useState(false);
 
@@ -223,9 +230,7 @@ export function useForceLayout(
   useEffect(() => {
     positions.current = initLayout(ids, initOpts());
     setConverged(false);
-    // biome-ignore lint/suspicious/noAssignInExpressions: forceTick is a state setter wrapper
     forceTick((t) => (t + 1) % 1_000_000);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key, opts.width, opts.height, seed]);
 
   const adj: AdjPair[] = useMemo(() => {
@@ -255,6 +260,7 @@ export function useForceLayout(
 
   const pin = (id: string, xy?: { x: number; y: number }) => {
     pinById(positions.current, id, xy);
+    wake();
   };
   const release = (id: string) => {
     releaseById(positions.current, id);

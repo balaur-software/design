@@ -14,20 +14,21 @@ export interface BreadcrumbProps {
   items: readonly BreadcrumbItem[];
   /** Glyph rendered between segments. Defaults to ▸ (U+25B8). */
   separator?: ReactNode;
+  style?: CSSProperties;
 }
 
 /** ▸ BLACK RIGHT-POINTING SMALL TRIANGLE — the default wayfinding separator. */
 const SEP = "▸";
 
 const linkStyle: CSSProperties = {
-  color: "#7b8290",
+  color: "var(--bx-text-5, #7b8290)",
   cursor: "pointer",
   textDecoration: "none",
 };
 
 const currentStyle: CSSProperties = { color: "var(--bx-accent, #46c66d)" };
 
-const sepStyle: CSSProperties = { color: "#3f424d" };
+const sepStyle: CSSProperties = { color: "var(--bx-text-dim, #3f424d)" };
 
 /**
  * Breadcrumb trail (section §16 — NAV & MARKERS): a horizontal path of segments
@@ -35,7 +36,7 @@ const sepStyle: CSSProperties = { color: "#3f424d" };
  * is highlighted with the accent color; the rest are clickable links. Pure
  * static markup — no client-side effects.
  */
-export function Breadcrumb({ items, separator = SEP }: BreadcrumbProps) {
+export function Breadcrumb({ items, separator = SEP, style }: BreadcrumbProps) {
   const last = items.length - 1;
   return (
     <nav
@@ -47,6 +48,7 @@ export function Breadcrumb({ items, separator = SEP }: BreadcrumbProps) {
         fontSize: 13,
         flexWrap: "wrap",
         fontFamily: "var(--bx-font-mono, 'DepartureMono', ui-monospace, monospace)",
+        ...style,
       }}
     >
       {items.map((item, i) => {

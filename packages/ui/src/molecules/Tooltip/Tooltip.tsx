@@ -1,4 +1,4 @@
-import { type CSSProperties, type ReactNode, useRef, useState } from "react";
+import { type CSSProperties, type ReactNode, useId, useRef, useState } from "react";
 import { useScramble } from "../../hooks/useScramble";
 
 export interface TooltipProps {
@@ -16,9 +16,10 @@ export interface TooltipProps {
 /**
  * A hover/focus tooltip whose text resolves out of static via the shared
  * `useScramble` hook. The trigger carries a dotted underline; the CSS-positioned
- * bubble floats above it, centred, fading and rising in on reveal. SSR emits an
- * empty bubble — the scramble only runs client-side once `active` flips true, so
- * there is no hydration mismatch.
+ * bubble floats above it, centred, fading and rising in on reveal. The tip text
+ * is rendered statically (SSR-safe, and reachable via `aria-describedby`); the
+ * scramble only repaints it visually on the client once `active` flips true.
+ * Escape dismisses the open tip (WCAG 1.4.13).
  */
 export function Tooltip({
   children,
@@ -28,16 +29,23 @@ export function Tooltip({
   style,
 }: TooltipProps) {
   const boxRef = useRef<HTMLSpanElement>(null);
+  const tipId = useId();
   const [open, setOpen] = useState(false);
   useScramble(boxRef, tip, { dur: 440, active: open });
 
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: APG tooltip pattern — focus/hover show the tip, Escape dismisses
     <span
+      // biome-ignore lint/a11y/noNoninteractiveTabindex: tooltip trigger must be focusable for keyboard users (WCAG 1.4.13)
       tabIndex={0}
+      aria-describedby={tipId}
       onPointerEnter={() => setOpen(true)}
       onPointerLeave={() => setOpen(false)}
       onFocus={() => setOpen(true)}
       onBlur={() => setOpen(false)}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") setOpen(false);
+      }}
       style={{
         position: "relative",
         fontSize: 13,
@@ -52,8 +60,8 @@ export function Tooltip({
       {children}
       <span
         ref={boxRef}
+        id={tipId}
         role="tooltip"
-        aria-hidden="true"
         style={{
           position: "absolute",
           left: "50%",
@@ -68,7 +76,9 @@ export function Tooltip({
           pointerEvents: "none",
           transition: "opacity .18s ease, transform .18s ease",
         }}
-      />
+      >
+        {tip}
+      </span>
     </span>
   );
 }

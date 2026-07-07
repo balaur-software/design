@@ -147,6 +147,11 @@ function TreeFolder({
   const bodyRef = useRef<HTMLDivElement>(null);
   useCollapse(bodyRef, open);
 
+  // SSR-correct height: open folders render expanded on the server. The value is
+  // frozen at mount so `useCollapse`/`toggle` own max-height imperatively after
+  // hydration without React re-writing it on re-renders.
+  const [initialOpen] = useState(open);
+
   // While closed/open, `useCollapse` pins max-height to a pixel value. Once an
   // open panel finishes animating we release it to `none` so nested folders can
   // grow/shrink without being clipped by an ancestor's stale measured height.
@@ -155,6 +160,13 @@ function TreeFolder({
     if (!el) return;
     if (reduced) el.style.maxHeight = open ? "none" : "0px";
   }, [open, reduced]);
+
+  // `useCollapse` pins an open body to a px height on mount, but no transition
+  // fires there to release it — do it ourselves so nested toggles aren't clipped.
+  useEffect(() => {
+    const el = bodyRef.current;
+    if (el && initialOpen) el.style.maxHeight = "none";
+  }, []);
 
   const toggle = () => {
     const el = bodyRef.current;
@@ -222,7 +234,7 @@ function TreeFolder({
           if (open && bodyRef.current) bodyRef.current.style.maxHeight = "none";
         }}
         style={{
-          maxHeight: 0,
+          maxHeight: initialOpen ? "none" : 0,
           overflow: "hidden",
           transition: reduced ? "none" : `max-height .26s ${EASE}`,
         }}
@@ -259,6 +271,11 @@ export function Tree({ nodes, "aria-label": ariaLabel, style }: TreeProps) {
     return out;
   }, [nodes, collapsed, baseId]);
 
+  // Roving tabindex: before any interaction the first visible row is the tab
+  // stop, so the tree is reachable by keyboard (APG: exactly one treeitem with
+  // tabindex=0 at all times).
+  const effectiveFocusId = focusId ?? flat[0]?.id ?? null;
+
   const register = useCallback((id: string, el: HTMLDivElement | null) => {
     if (el) itemMap.current.set(id, el);
     else itemMap.current.delete(id);
@@ -281,7 +298,7 @@ export function Tree({ nodes, "aria-label": ariaLabel, style }: TreeProps) {
 
   const onTreeKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (flat.length === 0) return;
-    const currentIdx = focusId ? flat.findIndex((n) => n.id === focusId) : -1;
+    const currentIdx = effectiveFocusId ? flat.findIndex((n) => n.id === effectiveFocusId) : -1;
     const cur = currentIdx >= 0 ? flat[currentIdx] : null;
     const clamp = (i: number) => Math.max(0, Math.min(flat.length - 1, i));
 
@@ -337,9 +354,6 @@ export function Tree({ nodes, "aria-label": ariaLabel, style }: TreeProps) {
       const node = flat[i]!;
       if (node.parentId !== parentId) break;
       if (node.folder) {
-        // Find the end of this folder's visible descendants.
-        let end = i + 1;
-        while (end < flat.length && flat[end]!.depth > node.depth) end++;
         const child = renderRange(i + 1, node.id);
         out.push(
           <TreeFolder
@@ -348,7 +362,7 @@ export function Tree({ nodes, "aria-label": ariaLabel, style }: TreeProps) {
             depth={node.depth}
             open={node.open}
             onToggle={() => toggle(node.id)}
-            focused={focusId === node.id}
+            focused={effectiveFocusId === node.id}
             onFocus={focus}
             register={register}
             reduced={reduced}
@@ -364,7 +378,7 @@ export function Tree({ nodes, "aria-label": ariaLabel, style }: TreeProps) {
             node={node}
             depth={node.depth}
             id={node.id}
-            focused={focusId === node.id}
+            focused={effectiveFocusId === node.id}
             onFocus={focus}
             register={register}
           />,

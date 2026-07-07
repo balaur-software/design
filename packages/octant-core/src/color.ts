@@ -15,7 +15,8 @@ export function hexRGB(h: string): RGB {
       .map((x) => x + x)
       .join("");
   }
-  const n = parseInt(h || "46c66d", 16);
+  if (!/^[0-9a-f]{6}$/i.test(h)) h = "46c66d";
+  const n = parseInt(h, 16);
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
 

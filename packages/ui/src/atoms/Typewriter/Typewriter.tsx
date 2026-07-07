@@ -56,12 +56,14 @@ export function Typewriter({
   useTypewriter(outRef, current, { speed, caret: false });
 
   // Advance to the next phrase once the current one has finished typing + held.
+  // Keyed on `index` (not the phrase string) so identical adjacent phrases
+  // still reschedule the timeout instead of stalling the loop.
   useEffect(() => {
     if (!loop || reduced || phrases.length < 2) return;
     const total = current.length * speed + hold;
     const t = setTimeout(() => setIndex((i) => i + 1), total);
     return () => clearTimeout(t);
-  }, [current, speed, hold, loop, reduced, phrases.length]);
+  }, [index, current, speed, hold, loop, reduced, phrases.length]);
 
   return (
     <div
@@ -87,7 +89,7 @@ export function Typewriter({
             background: accent,
             display: "inline-block",
             marginLeft: 2,
-            animation: "bx-blink 1s steps(1) infinite",
+            animation: reduced ? undefined : "bx-blink 1s steps(1) infinite",
           }}
         />
       )}

@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
+import { useReducedMotion } from "../../hooks/useReducedMotion";
 
 /** One of the built-in presence tones, each with its own dot colour and label wash. */
 export type PresenceState = "online" | "thinking" | "idle";
@@ -69,11 +70,12 @@ const DEFAULT_ITEMS: readonly PresenceItem[] = [
 /**
  * A stack of presence rows — a coloured status dot, a label, and a right-aligned
  * meta readout (section: CELL AVATARS · PRESENCE). The ONLINE dot uses the global
- * `bx-blink` cursor keyframe for a live heartbeat; the rest are steady. Pure static
- * markup — the blink is a declarative CSS animation, so it renders identically on
- * the server and after hydration.
+ * `bx-blink` cursor keyframe for a live heartbeat; the rest are steady. The blink
+ * is a declarative CSS animation, so it renders identically on the server and
+ * after hydration; `prefers-reduced-motion` pins the dot steady.
  */
 export function PresenceStatus({ items = DEFAULT_ITEMS, style }: PresenceStatusProps) {
+  const reduced = useReducedMotion();
   return (
     <div
       style={{
@@ -95,7 +97,7 @@ export function PresenceStatus({ items = DEFAULT_ITEMS, style }: PresenceStatusP
           flex: "none",
           display: "inline-block",
           background: item.color ?? preset.color,
-          ...(preset.blink ? { animation: "bx-blink 1.4s steps(1) infinite" } : {}),
+          ...(preset.blink && !reduced ? { animation: "bx-blink 1.4s steps(1) infinite" } : {}),
         };
         const metaStyle: CSSProperties = {
           marginLeft: "auto",

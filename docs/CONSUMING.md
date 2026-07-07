@@ -21,6 +21,30 @@ directly via the root `exports` map. No bundler, no `dist/`. `react` /
 what makes cross-repo consumption work (see
 [Cross-repo consumption](#cross-repo-consumption) below).
 
+### Consumer TypeScript requirements
+
+Because the package ships `.ts` sources (not `.d.ts` + JS), the consumer's
+`tsconfig.json` type-checks them directly — `skipLibCheck` does not apply. The
+sources use `.ts`-extension import specifiers and this repo's strict flags, so
+a consuming tsconfig needs:
+
+```jsonc
+{
+  "compilerOptions": {
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true, // sources import "./x.ts"
+    "noEmit": true,                     // required by allowImportingTsExtensions
+    "jsx": "react-jsx"
+  }
+}
+```
+
+Bun runs the code natively regardless — these flags only matter for `tsc`
+type-checking. Strictness flags are one-way-compatible: the library type-checks
+under `exactOptionalPropertyTypes` / `noUncheckedIndexedAccess`, so consumers
+may enable or omit those freely. Bundler-based hosts (Vite, Bun.build) need no
+extra wiring; a Next.js host must add `transpilePackages: ["@balaur/octant"]`.
+
 ## App-root wiring
 
 Three things, once, at the root of your app:
@@ -246,8 +270,10 @@ Interactive components are built on two shared primitives:
 | `Tree` | `role="tree/treeitem/group"`, `aria-expanded`, roving `tabindex`, ↑/↓/←/→/Home/End, Enter/Space to toggle. |
 | `ResizableSplit` | `role="separator"`, `aria-orientation`, `aria-valuenow/min/max`, ←/→ nudge, `tabindex`. |
 
-Storybook's a11y addon is **not** installed (deliberate — no extra deps).
-Verify interactions via the per-component keyboard stories and manual testing.
+Storybook's a11y addon (`@storybook/addon-a11y`) **is** installed and
+registered in [packages/ui/.storybook/main.ts](../packages/ui/.storybook/main.ts):
+use its Accessibility panel on any story, alongside the per-component keyboard
+stories and manual testing.
 
 ## Known token-hygiene issues (non-blocking)
 
@@ -260,8 +286,11 @@ Verify interactions via the per-component keyboard stories and manual testing.
 
 ## Versioning / linking
 
-`web/` pins the three packages via `link:@balaur/*` in
-[../../web/package.json](../../web/package.json) (dev). For a tagged release
-runbook see [RELEASE.md](RELEASE.md). Per workspace `AGENTS.md`: if you change
-an API surface in `design/`, run `bun run check` in `web/` to confirm it still
-compiles.
+`web/` pins the single `@balaur/octant` package: the committed state is a
+tagged release (`"@balaur/octant": "github:balaur-software/design#vX.Y.Z"`);
+active design iteration uses `"@balaur/octant": "file:../design"` plus a
+`bun install` after each edit. `bun link` is never used (see
+[Cross-repo consumption](#cross-repo-consumption) above). For the tagged
+release runbook see [RELEASE.md](RELEASE.md). Per workspace `AGENTS.md`: if you
+change an API surface in `design/`, run `bun run check` in `web/` to confirm it
+still compiles.

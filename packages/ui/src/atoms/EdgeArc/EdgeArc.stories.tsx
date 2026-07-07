@@ -1,13 +1,21 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 import { EdgeArc } from "./EdgeArc";
 
 const EDGE_TYPES = ["links", "supersedes", "merged_into", "derived_from", "on_day", "no_match"];
 
-const meta: Meta<typeof EdgeArc> = {
+const meta = {
   title: "OCTANT/Atoms/EdgeArc",
   component: EdgeArc,
-  tags: ["autodocs"],
-  args: { x1: 20, y1: 30, x2: 400, y2: 30, edgeType: "links", highlighted: true },
+  args: {
+    x1: 20,
+    y1: 30,
+    x2: 400,
+    y2: 30,
+    edgeType: "links",
+    highlighted: true,
+    onClick: fn(),
+  },
   argTypes: {
     edgeType: { control: "select", options: EDGE_TYPES },
     x1: { control: { type: "number", min: 0, max: 400, step: 1 } },
@@ -18,7 +26,6 @@ const meta: Meta<typeof EdgeArc> = {
     strokeWidth: { control: { type: "number", min: 0.5, max: 6, step: 0.5 } },
     closed: { control: "boolean" },
     highlighted: { control: "boolean" },
-    onClick: { action: "clicked" },
   },
   render: (args) => (
     <svg width={420} height={120} style={{ background: "var(--bx-bg, #0a0b0e)" }}>
@@ -26,15 +33,24 @@ const meta: Meta<typeof EdgeArc> = {
       <EdgeArc {...args} />
     </svg>
   ),
-};
+} satisfies Meta<typeof EdgeArc>;
 export default meta;
 
-type Story = StoryObj<typeof EdgeArc>;
+type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
+/** A single highlighted `links` edge; the stroke itself is the click target. */
+export const Default: Story = {
+  play: async ({ canvasElement, userEvent, args }) => {
+    const path = canvasElement.querySelector("path");
+    await expect(path).not.toBeNull();
+    if (path) await userEvent.click(path);
+    await expect(args.onClick).toHaveBeenCalledOnce();
+  },
+};
 
 const TYPES = EDGE_TYPES;
 
+/** One row per edge type, each with its own dash/colour from `EDGE_STYLE`. */
 export const Types: Story = {
   render: () => (
     <svg width={420} height={240} style={{ background: "var(--bx-bg, #0a0b0e)" }}>
@@ -46,6 +62,7 @@ export const Types: Story = {
   ),
 };
 
+/** Base, highlighted, closed (faded) and curved edges. */
 export const States: Story = {
   render: () => (
     <svg width={420} height={180} style={{ background: "var(--bx-bg, #0a0b0e)" }}>

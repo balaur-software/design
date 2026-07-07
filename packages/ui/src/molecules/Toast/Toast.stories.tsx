@@ -1,11 +1,11 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect } from "storybook/test";
 import { ToastProvider, useToast } from "../../primitives";
 import { Toast } from "./Toast.tsx";
 
-const meta: Meta<typeof Toast> = {
+const meta = {
   title: "OCTANT/Molecules/Toast",
   component: Toast,
-  tags: ["autodocs"],
   decorators: [
     (Story) => (
       <ToastProvider>
@@ -13,11 +13,22 @@ const meta: Meta<typeof Toast> = {
       </ToastProvider>
     ),
   ],
-};
+} satisfies Meta<typeof Toast>;
 export default meta;
-type Story = StoryObj<typeof Toast>;
+type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
+/** Trigger panel; each button spawns a toast in the provider's stack. */
+export const Default: Story = {
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: /ok/i }));
+    const toast = await canvas.findByRole("status");
+    await expect(toast).toHaveTextContent("Buffer committed");
+    await userEvent.click(canvas.getByRole("button", { name: /error/i }));
+    const toasts = await canvas.findAllByRole("status");
+    await expect(toasts).toHaveLength(2);
+    await expect(toasts[1]).toHaveTextContent("Glyph out of range");
+  },
+};
 
 /** Two demo panels side by side share the single provider stack. */
 export const SharedStack: Story = {
@@ -54,5 +65,10 @@ export const CustomTrigger: Story = {
       );
     }
     return <Panel />;
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: /flush buffer/i }));
+    const toast = await canvas.findByRole("status");
+    await expect(toast).toHaveTextContent("Rendered 256 cells");
   },
 };

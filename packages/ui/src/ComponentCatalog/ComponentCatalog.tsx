@@ -202,10 +202,10 @@ export function ComponentCatalog({
           COMPONENT INDEX
         </h2>
         <span style={{ flex: 1, borderTop: "1px solid var(--bx-border, #1c1d24)", alignSelf: "center" }} />
-        <span style={{ color: "#3f424d", fontSize: 13 }}>{count}</span>
+        <span style={{ color: "var(--bx-text-7, #3f424d)", fontSize: 13 }}>{count}</span>
       </div>
 
-      <p style={{ margin: "0 0 18px", color: "#7b8290", maxWidth: 620, fontSize: 14 }}>
+      <p style={{ margin: "0 0 18px", color: "var(--bx-text-5, #7b8290)", maxWidth: 620, fontSize: 14 }}>
         Every primitive in the system, catalogued. Filter by name, or click any entry to jump to its live demo
         — the whole library on one surface, drawn in cells.
       </p>
@@ -219,7 +219,7 @@ export function ComponentCatalog({
           aria-label="Filter components"
           style={{
             width: "100%",
-            background: "#0a0b0e",
+            background: "var(--bx-surface-1, #0a0b0e)",
             border: "1px solid var(--bx-border, #1c1d24)",
             outline: 0,
             fontFamily: "inherit",
@@ -236,7 +236,7 @@ export function ComponentCatalog({
             left: 11,
             top: "50%",
             transform: "translateY(-50%)",
-            color: "#3f424d",
+            color: "var(--bx-text-7, #3f424d)",
             fontSize: 13,
             pointerEvents: "none",
           }}
@@ -251,9 +251,11 @@ export function ComponentCatalog({
           return (
             <div key={group.cat} style={{ marginBottom: 22 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
-                <span style={{ color: "#5b616e", fontSize: 11, letterSpacing: "0.12em" }}>{group.cat}</span>
-                <span style={{ flex: 1, borderTop: "1px solid #15161e" }} />
-                <span style={{ color: "#3f424d", fontSize: 11 }}>{items.length}</span>
+                <span style={{ color: "var(--bx-text-6, #5b616e)", fontSize: 11, letterSpacing: "0.12em" }}>
+                  {group.cat}
+                </span>
+                <span style={{ flex: 1, borderTop: "1px solid var(--bx-surface-6, #15161e)" }} />
+                <span style={{ color: "var(--bx-text-7, #3f424d)", fontSize: 11 }}>{items.length}</span>
               </div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                 {items.map((it) => {

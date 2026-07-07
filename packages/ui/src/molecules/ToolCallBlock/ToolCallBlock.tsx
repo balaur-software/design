@@ -44,7 +44,10 @@ function fmtDuration(block: ToolCallBlockData): string | null {
  * `error`. Local state via `useState`.
  */
 export function ToolCallBlock({ block, style }: ToolCallBlockProps) {
-  const [expanded, setExpanded] = useState(block.status !== "done");
+  // The user's explicit toggle wins; otherwise derive from status each render
+  // so the block auto-collapses once the call resolves to "done".
+  const [userExpanded, setUserExpanded] = useState<boolean | null>(null);
+  const expanded = userExpanded ?? block.status !== "done";
   const dur = fmtDuration(block);
   const errColor = block.status === "error" ? "#ff6b6f" : "var(--bx-text-6, #5b616e)";
   return (
@@ -53,7 +56,7 @@ export function ToolCallBlock({ block, style }: ToolCallBlockProps) {
         name={block.name}
         status={block.status}
         expanded={expanded}
-        onClick={() => setExpanded((e) => !e)}
+        onClick={() => setUserExpanded(!expanded)}
       />
       {expanded && (
         <div style={{ display: "flex", flexDirection: "column", gap: 6, paddingLeft: 4 }}>

@@ -1,4 +1,5 @@
-import { type CSSProperties, useEffect, useRef, useState } from "react";
+import { type CSSProperties, type KeyboardEvent, useEffect, useId, useRef, useState } from "react";
+import { useControllableState } from "../../hooks/useControllableState";
 import type { MemoryNode } from "../../organisms/MemoryExplorer/memory-types";
 import { NodeListItem } from "../NodeListItem/NodeListItem";
 
@@ -10,6 +11,8 @@ export interface NodeSearchBoxProps {
   results?: readonly MemoryNode[];
   onSelect?: (id: string) => void;
   placeholder?: string;
+  /** Accessible name for the search combobox. */
+  ariaLabel?: string;
   style?: CSSProperties;
 }
 
@@ -17,7 +20,9 @@ export interface NodeSearchBoxProps {
  * A node-search input with a dropdown of `NodeListItem` results. Purely
  * presentational: the caller owns the query → `Store.recall`/`search` mapping
  * and passes results back. The dropdown opens while focused and there are
- * results; selecting one fires `onSelect` and closes.
+ * results; selecting one fires `onSelect` and closes. The input is an APG
+ * combobox: ArrowUp/ArrowDown move the active option (aria-activedescendant),
+ * Enter picks it, Escape closes the list.
  */
 export function NodeSearchBox({
   value,
@@ -26,16 +31,18 @@ export function NodeSearchBox({
   results = [],
   onSelect,
   placeholder = "search memory…",
+  ariaLabel = "Search memory",
   style,
 }: NodeSearchBoxProps) {
-  const [inner, setInner] = useState(value ?? defaultValue);
+  const [inner, setInner] = useControllableState(value, defaultValue, onValueChange);
   const [open, setOpen] = useState(false);
+  const [active, setActive] = useState(-1);
   const [hovered, setHovered] = useState<string | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
+  const baseId = useId();
+  const listboxId = `${baseId}-listbox`;
 
-  useEffect(() => {
-    if (value !== undefined) setInner(value);
-  }, [value]);
+  const expanded = open && results.length > 0;
 
   useEffect(() => {
     const onDoc = (e: MouseEvent) => {
@@ -47,23 +54,51 @@ export function NodeSearchBox({
 
   const commit = (v: string) => {
     setInner(v);
-    onValueChange?.(v);
+    setActive(-1);
     setOpen(true);
   };
 
   const choose = (id: string) => {
     onSelect?.(id);
     setOpen(false);
+    setActive(-1);
+  };
+
+  const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (!open) setOpen(true);
+      setActive((a) => Math.min(results.length - 1, a + 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActive((a) => Math.max(0, a - 1));
+    } else if (e.key === "Enter") {
+      const target = expanded ? results[active] : undefined;
+      if (target) {
+        e.preventDefault();
+        choose(target.id);
+      }
+    } else if (e.key === "Escape") {
+      setOpen(false);
+      setActive(-1);
+    }
   };
 
   return (
     <div ref={rootRef} style={{ position: "relative", ...style }}>
       <input
         type="text"
+        role="combobox"
+        aria-label={ariaLabel}
+        aria-expanded={expanded}
+        aria-controls={expanded ? listboxId : undefined}
+        aria-autocomplete="list"
+        aria-activedescendant={expanded && active >= 0 ? `${baseId}-opt-${active}` : undefined}
         value={inner}
         placeholder={placeholder}
         onChange={(e) => commit(e.target.value)}
         onFocus={() => setOpen(true)}
+        onKeyDown={onKeyDown}
         style={{
           width: "100%",
           fontFamily: "var(--bx-font-mono, 'DepartureMono', ui-monospace, monospace)",
@@ -76,8 +111,11 @@ export function NodeSearchBox({
           caretColor: "var(--bx-accent, #46c66d)",
         }}
       />
-      {open && results.length > 0 && (
+      {expanded && (
         <div
+          id={listboxId}
+          role="listbox"
+          aria-label={ariaLabel}
           style={{
             position: "absolute",
             top: "100%",
@@ -91,11 +129,15 @@ export function NodeSearchBox({
             overflowY: "auto",
           }}
         >
-          {results.map((n) => (
+          {results.map((n, i) => (
             <NodeListItem
               key={n.id}
+              id={`${baseId}-opt-${i}`}
+              role="option"
+              tabIndex={-1}
+              aria-selected={i === active}
               node={n}
-              hovered={hovered === n.id}
+              hovered={hovered === n.id || i === active}
               onHover={setHovered}
               onSelect={choose}
             />

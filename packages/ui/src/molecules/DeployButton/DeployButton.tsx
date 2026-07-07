@@ -5,6 +5,19 @@ import { useReducedMotion } from "../../hooks/useReducedMotion";
 /** Number of comet cells swept during the deploy progress animation. */
 const CELLS = 11;
 
+/** Keeps the live status announcement out of view while staying readable to AT. */
+const VISUALLY_HIDDEN: CSSProperties = {
+  position: "absolute",
+  width: 1,
+  height: 1,
+  margin: -1,
+  padding: 0,
+  border: 0,
+  clipPath: "inset(50%)",
+  overflow: "hidden",
+  whiteSpace: "nowrap",
+};
+
 export interface DeployButtonProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "style" | "onClick" | "children"> {
   /** Idle label. Shown on the server and restored after the deploy cycle ends. */
@@ -39,6 +52,7 @@ export function DeployButton({
 }: DeployButtonProps) {
   const btnRef = useRef<HTMLButtonElement>(null);
   const labelRef = useRef<HTMLSpanElement>(null);
+  const statusRef = useRef<HTMLSpanElement>(null);
   const busyRef = useRef(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -60,10 +74,13 @@ export function DeployButton({
     if (btn) {
       btn.style.color = accentBright;
       btn.style.cursor = "pointer";
+      btn.removeAttribute("aria-busy");
     }
+    if (statusRef.current) statusRef.current.textContent = "deployed";
     onDeploy?.();
     timeoutRef.current = setTimeout(() => {
       if (lab) lab.textContent = label;
+      if (statusRef.current) statusRef.current.textContent = label;
       if (btn) btn.style.color = accent;
       busyRef.current = false;
       timeoutRef.current = null;
@@ -76,7 +93,11 @@ export function DeployButton({
     if (!lab) return;
     busyRef.current = true;
     const btn = btnRef.current;
-    if (btn) btn.style.cursor = "progress";
+    if (btn) {
+      btn.style.cursor = "progress";
+      btn.setAttribute("aria-busy", "true");
+    }
+    if (statusRef.current) statusRef.current.textContent = "deploying…";
 
     if (reduced) {
       finish();
@@ -126,7 +147,11 @@ export function DeployButton({
         ...style,
       }}
     >
-      <span ref={labelRef} style={{ whiteSpace: "pre" }}>
+      {/* Decorative frames (comet glyphs) — the live region below carries the accessible name. */}
+      <span ref={labelRef} aria-hidden="true" style={{ whiteSpace: "pre" }}>
+        {label}
+      </span>
+      <span ref={statusRef} aria-live="polite" style={VISUALLY_HIDDEN}>
         {label}
       </span>
     </button>

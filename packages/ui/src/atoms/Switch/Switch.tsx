@@ -1,4 +1,4 @@
-import { type CSSProperties, useEffect, useRef } from "react";
+import { type CSSProperties, useEffect, useRef, useState } from "react";
 import { useControllableState } from "../../hooks/useControllableState";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 
@@ -69,6 +69,10 @@ export function Switch({ checked, defaultChecked = false, onChange, label, disab
     if (!disabled) setOn(!on);
   };
 
+  // Visible keyboard-focus affordance: inline styles can't express
+  // :focus-visible, so track focus and draw an accent ring ourselves.
+  const [focused, setFocused] = useState(false);
+
   return (
     <div
       role="switch"
@@ -77,6 +81,8 @@ export function Switch({ checked, defaultChecked = false, onChange, label, disab
       aria-disabled={disabled}
       tabIndex={disabled ? -1 : 0}
       onClick={toggle}
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
       onKeyDown={(e) => {
         if (e.key === " " || e.key === "Enter") {
           e.preventDefault();
@@ -90,7 +96,8 @@ export function Switch({ checked, defaultChecked = false, onChange, label, disab
         alignItems: "center",
         gap: 14,
         userSelect: "none",
-        outline: "none",
+        outline: focused ? "1px solid var(--bx-accent, #46c66d)" : "none",
+        outlineOffset: 3,
         ...style,
       }}
     >

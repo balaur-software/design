@@ -23,6 +23,8 @@ export interface DoctorStripProps {
 export type DoctorMetricKey =
   | "active"
   | "pending"
+  | "queueOldest"
+  | "acceptRate"
   | "due"
   | "deadWeight"
   | "stale"
@@ -36,28 +38,35 @@ export function DoctorStrip({ report, onMetricClick, style }: DoctorStripProps) 
 
   const cell = (key: DoctorMetricKey, label: string, value: ReactNode, tone?: string): ReactNode => {
     const color = tone ?? "var(--bx-text-2, #dfe3ea)";
-    return (
-      <button
-        key={key}
-        type="button"
-        onClick={onMetricClick ? () => onMetricClick(key) : undefined}
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-          padding: "6px 12px",
-          background: "transparent",
-          border: 0,
-          borderRight: "1px solid var(--bx-border, #1c1d24)",
-          color,
-          cursor: onMetricClick ? "pointer" : "default",
-          fontFamily: "var(--bx-font-mono, 'DepartureMono', ui-monospace, monospace)",
-          textAlign: "left",
-        }}
-      >
+    const cellStyle: CSSProperties = {
+      display: "flex",
+      flexDirection: "column",
+      gap: 2,
+      padding: "6px 12px",
+      background: "transparent",
+      border: 0,
+      borderRight: "1px solid var(--bx-border, #1c1d24)",
+      color,
+      cursor: onMetricClick ? "pointer" : "default",
+      fontFamily: "var(--bx-font-mono, 'DepartureMono', ui-monospace, monospace)",
+      textAlign: "left",
+    };
+    const inner = (
+      <>
         <span style={{ fontSize: 9, letterSpacing: "0.08em", color: "#5b616e" }}>{label}</span>
         <span style={{ fontSize: 14 }}>{value}</span>
+      </>
+    );
+    // Read-only strips render plain cells — no dead tab stops when there is
+    // no drill-down to invoke.
+    return onMetricClick ? (
+      <button key={key} type="button" onClick={() => onMetricClick(key)} style={cellStyle}>
+        {inner}
       </button>
+    ) : (
+      <div key={key} style={cellStyle}>
+        {inner}
+      </div>
     );
   };
 
@@ -75,8 +84,8 @@ export function DoctorStrip({ report, onMetricClick, style }: DoctorStripProps) 
     >
       {cell("active", "ACTIVE", report.activeCount, "var(--bx-accent, #46c66d)")}
       {cell("pending", "PENDING", report.pendingCount, "#f2c94c")}
-      {cell("pending", "QUEUE OLDEST", queueOldest)}
-      {cell("pending", "ACCEPT 30D", pct)}
+      {cell("queueOldest", "QUEUE OLDEST", queueOldest)}
+      {cell("acceptRate", "ACCEPT 30D", pct)}
       {cell("due", "DUE", report.dueCandidates, "#f2c94c")}
       {cell("deadWeight", "DEAD WEIGHT", report.deadWeightCandidates)}
       {cell("stale", "STALE", report.staleCandidates)}

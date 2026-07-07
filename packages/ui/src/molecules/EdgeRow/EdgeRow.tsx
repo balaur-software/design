@@ -34,27 +34,25 @@ export function EdgeRow({ edge, fromTitle, toTitle, outgoing = true, onClick, st
       ? "undated · still true"
       : `${fmtDate(edge.validFrom)} → ${closed ? fmtDate(edge.validUntil) : "now"}`;
 
-  return (
-    <button
-      type="button"
-      onClick={onClick ? () => onClick(outgoing ? edge.target : edge.source) : undefined}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 10,
-        width: "100%",
-        textAlign: "left",
-        fontFamily: "var(--bx-font-mono, 'DepartureMono', ui-monospace, monospace)",
-        fontSize: 12,
-        padding: "7px 10px",
-        background: "transparent",
-        border: 0,
-        borderBottom: "1px solid var(--bx-border, #1c1d24)",
-        color: closed ? "#3f424d" : "var(--bx-text-4, #9aa0ad)",
-        cursor: onClick ? "pointer" : "default",
-        ...style,
-      }}
-    >
+  const rowStyle: CSSProperties = {
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+    width: "100%",
+    textAlign: "left",
+    fontFamily: "var(--bx-font-mono, 'DepartureMono', ui-monospace, monospace)",
+    fontSize: 12,
+    padding: "7px 10px",
+    background: "transparent",
+    border: 0,
+    borderBottom: "1px solid var(--bx-border, #1c1d24)",
+    color: closed ? "#3f424d" : "var(--bx-text-4, #9aa0ad)",
+    cursor: onClick ? "pointer" : "default",
+    ...style,
+  };
+
+  const body = (
+    <>
       <svg width={26} height={10} aria-hidden="true" style={{ flex: "none" }}>
         <line
           x1={1}
@@ -76,6 +74,16 @@ export function EdgeRow({ edge, fromTitle, toTitle, outgoing = true, onClick, st
         {outgoing ? `${fromTitle} → ${toTitle}` : `${toTitle} → ${fromTitle}`}
       </span>
       <span style={{ color: "#3f424d", fontSize: 10, flex: "none" }}>{validity}</span>
+    </>
+  );
+
+  // Only render a focusable button when the row is actually interactive.
+  if (!onClick) {
+    return <div style={rowStyle}>{body}</div>;
+  }
+  return (
+    <button type="button" onClick={() => onClick(outgoing ? edge.target : edge.source)} style={rowStyle}>
+      {body}
     </button>
   );
 }

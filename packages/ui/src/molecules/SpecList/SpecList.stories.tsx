@@ -1,19 +1,18 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { SpecList } from "./SpecList.tsx";
 
-const meta: Meta<typeof SpecList> = {
+const meta = {
   title: "OCTANT/Molecules/SpecList",
   component: SpecList,
-  tags: ["autodocs"],
   argTypes: {
     items: { control: "object", description: "Key/value rows: { key, value, accent? }." },
     label: { control: "text" },
     columns: { control: { type: "number", min: 1, max: 6, step: 1 } },
   },
-};
+} satisfies Meta<typeof SpecList>;
 export default meta;
 
-type Story = StoryObj<typeof SpecList>;
+type Story = StoryObj<typeof meta>;
 
 /** The reference glyph-block spec sheet, two columns. */
 export const Default: Story = {};

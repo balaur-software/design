@@ -1,10 +1,9 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Marquee } from "./Marquee.tsx";
 
-const meta: Meta<typeof Marquee> = {
+const meta = {
   title: "OCTANT/Atoms/Marquee",
   component: Marquee,
-  tags: ["autodocs"],
   argTypes: {
     items: { control: "object", description: "Inline items separated by the separator." },
     separator: { control: "text" },
@@ -12,16 +11,19 @@ const meta: Meta<typeof Marquee> = {
     ambient: { control: { type: "range", min: 0, max: 1, step: 0.05 } },
     pauseOnHover: { control: "boolean" },
   },
-};
+} satisfies Meta<typeof Marquee>;
 export default meta;
-type Story = StoryObj<typeof Marquee>;
+type Story = StoryObj<typeof meta>;
 
+/** The default scrolling ticker with built-in items. */
 export const Default: Story = {};
 
+/** Slower scroll at reduced ambient intensity. */
 export const Slow: Story = {
   args: { speed: 26, ambient: 0.4 },
 };
 
+/** Fast, full-intensity ticker with status-line items. */
 export const HighEnergy: Story = {
   args: {
     speed: 92,
@@ -30,6 +32,7 @@ export const HighEnergy: Story = {
   },
 };
 
+/** Arbitrary children instead of the items prop. */
 export const CustomContent: Story = {
   render: () => (
     <Marquee separator="◆">
@@ -45,6 +48,7 @@ export const CustomContent: Story = {
   ),
 };
 
+/** Two marquees stacked with different content and speed. */
 export const Stack: Story = {
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>

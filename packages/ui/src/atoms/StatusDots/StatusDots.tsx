@@ -19,6 +19,8 @@ export interface StatusDotsProps {
   dots?: readonly StatusDot[];
   /** Gap between entries, in px. */
   gap?: number;
+  className?: string;
+  style?: CSSProperties;
 }
 
 /** The reference marker set from the nav section (§ markers). */
@@ -41,14 +43,16 @@ const rowStyle: CSSProperties = {
  * A row of colored status dots with labels — the terminal-legend used to key
  * ONLINE / IDLE / BUSY / OFFLINE (or any custom set) states. Pure static markup.
  */
-export function StatusDots({ dots = DEFAULT_DOTS, gap = 18 }: StatusDotsProps) {
+export function StatusDots({ dots = DEFAULT_DOTS, gap = 18, className, style }: StatusDotsProps) {
   return (
     <div
+      className={className}
       style={{
         display: "flex",
         flexWrap: "wrap",
         gap,
         fontFamily: "var(--bx-font-mono, 'DepartureMono', ui-monospace, monospace)",
+        ...style,
       }}
     >
       {dots.map((d) => (

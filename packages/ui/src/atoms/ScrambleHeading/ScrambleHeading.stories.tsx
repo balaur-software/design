@@ -1,10 +1,9 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ScrambleHeading } from "./ScrambleHeading.tsx";
 
-const meta: Meta<typeof ScrambleHeading> = {
+const meta = {
   title: "OCTANT/Atoms/ScrambleHeading",
   component: ScrambleHeading,
-  tags: ["autodocs"],
   args: { text: "COMPONENT INDEX" },
   argTypes: {
     text: { control: "text" },
@@ -13,16 +12,19 @@ const meta: Meta<typeof ScrambleHeading> = {
     dur: { control: { type: "number", min: 100, max: 4000, step: 100 } },
     delay: { control: { type: "number", min: 0, max: 2000, step: 20 } },
   },
-};
+} satisfies Meta<typeof ScrambleHeading>;
 export default meta;
-type Story = StoryObj<typeof ScrambleHeading>;
+type Story = StoryObj<typeof meta>;
 
+/** A heading that decodes itself from glyph noise on mount. */
 export const Default: Story = {};
 
+/** Accent-coloured variant. */
 export const Accent: Story = {
   args: { text: "SIGNAL / SCOPE", accent: true },
 };
 
+/** Two oversized hero lines decoding with a stagger. */
 export const Hero: Story = {
   args: { text: "OCTANT" },
   render: () => (
@@ -45,6 +47,7 @@ export const Hero: Story = {
   ),
 };
 
+/** A stack of headings decoding in sequence. */
 export const Stack: Story = {
   render: () => (
     <div style={{ display: "grid", gap: 28 }}>

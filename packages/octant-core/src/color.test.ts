@@ -16,6 +16,13 @@ describe("hexRGB", () => {
     expect(hexRGB("")).toEqual([70, 198, 109]);
   });
 
+  test("falls back to accent green on invalid input", () => {
+    expect(hexRGB("#zzz")).toEqual([70, 198, 109]);
+    expect(hexRGB("4fzzzz")).toEqual([70, 198, 109]);
+    expect(hexRGB("#46c66d0")).toEqual([70, 198, 109]);
+    expect(hexRGB("not a color")).toEqual([70, 198, 109]);
+  });
+
   test("black and white extremes", () => {
     expect(hexRGB("#000000")).toEqual([0, 0, 0]);
     expect(hexRGB("#ffffff")).toEqual([255, 255, 255]);

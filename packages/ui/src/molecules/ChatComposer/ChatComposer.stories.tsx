@@ -1,12 +1,11 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import { fn } from "@storybook/test";
-import { useState } from "react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 import { ChatComposer } from "./ChatComposer";
 
-const meta: Meta<typeof ChatComposer> = {
+const meta = {
   title: "OCTANT/Molecules/ChatComposer",
   component: ChatComposer,
-  tags: ["autodocs"],
+  args: { onSend: fn(), onValueChange: fn(), onStop: fn() },
   argTypes: {
     value: { control: "text", description: "Controlled value." },
     defaultValue: { control: "text" },
@@ -14,27 +13,38 @@ const meta: Meta<typeof ChatComposer> = {
     attachHint: { control: "text" },
     slashHint: { control: "boolean" },
     placeholder: { control: "text" },
-    onValueChange: { action: "value-changed" },
-    onSend: { action: "sent" },
-    onStop: { action: "stopped" },
   },
-};
+} satisfies Meta<typeof ChatComposer>;
 export default meta;
 
-export const Idle: StoryObj = {
-  render: () => {
-    const [v, setV] = useState("");
-    return <ChatComposer value={v} onValueChange={setV} onSend={fn()} attachHint="drop a file" />;
+type Story = StoryObj<typeof meta>;
+
+/** The resting composer — Enter sends the trimmed text and clears the textarea. */
+export const Idle: Story = {
+  args: { attachHint: "drop a file" },
+  play: async ({ args, canvas, userEvent }) => {
+    const textarea = canvas.getByRole("textbox");
+    await userEvent.type(textarea, "rasterise the field{Enter}");
+    await expect(args.onSend).toHaveBeenCalledWith("rasterise the field");
+    await expect(textarea).toHaveValue("");
   },
 };
 
-export const Streaming: StoryObj = {
-  render: () => <ChatComposer streaming onSend={fn()} onStop={fn()} />,
+/** While the agent streams, the textarea is disabled and Stop replaces Send. */
+export const Streaming: Story = {
+  args: { streaming: true },
+  play: async ({ args, canvas, userEvent }) => {
+    await expect(canvas.getByRole("textbox")).toBeDisabled();
+    await userEvent.click(canvas.getByRole("button", { name: /stop generation/i }));
+    await expect(args.onStop).toHaveBeenCalledTimes(1);
+  },
 };
 
-export const WithText: StoryObj = {
-  render: () => {
-    const [v, setV] = useState("rasterise the field");
-    return <ChatComposer value={v} onValueChange={setV} onSend={fn()} />;
+/** Pre-filled text — the send button is enabled and fires onSend on click. */
+export const WithText: Story = {
+  args: { defaultValue: "rasterise the field" },
+  play: async ({ args, canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: /send/i }));
+    await expect(args.onSend).toHaveBeenCalledWith("rasterise the field");
   },
 };

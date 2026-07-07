@@ -30,6 +30,9 @@ export function StatusGlyph({ status, size = 14, showLabel = false, style }: Sta
   const s = STATUS_STYLE[status];
   return (
     <span
+      // Without the visible label the aria-hidden glyph is the only content;
+      // expose the status text to AT via role="img" + aria-label.
+      {...(showLabel ? {} : { role: "img", "aria-label": s.label })}
       style={{
         display: "inline-flex",
         alignItems: "center",

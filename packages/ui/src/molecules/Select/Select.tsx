@@ -106,6 +106,9 @@ export function Select({
         <button
           type="button"
           disabled={disabled}
+          role="combobox"
+          aria-label={ariaLabel}
+          aria-labelledby={ariaLabel ? undefined : `${baseId}-value`}
           aria-haspopup="listbox"
           aria-expanded={open && !disabled}
           aria-controls={open ? listboxId : undefined}
@@ -131,7 +134,7 @@ export function Select({
             ...style,
           }}
         >
-          <span>{current ? current.label : placeholder}</span>
+          <span id={`${baseId}-value`}>{current ? current.label : placeholder}</span>
           <span aria-hidden="true" style={{ color: "var(--bx-accent, #46c66d)" }}>
             {open && !disabled ? "▴" : "▾"}
           </span>

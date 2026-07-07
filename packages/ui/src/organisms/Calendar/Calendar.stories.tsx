@@ -1,27 +1,39 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
+import { expect, fn } from "storybook/test";
 import { Calendar } from "./Calendar.tsx";
 
-const meta: Meta<typeof Calendar> = {
+const meta = {
   title: "OCTANT/Organisms/Calendar",
   component: Calendar,
-  tags: ["autodocs"],
+  args: { onSelect: fn() },
   argTypes: {
     value: { control: "date", description: "Controlled selected day." },
     defaultValue: { control: "date" },
     defaultMonth: { control: "date" },
-    onSelect: { action: "selected" },
+  },
+} satisfies Meta<typeof Calendar>;
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+/** The current month; clicking a day selects it and fires `onSelect`. */
+export const Default: Story = {
+  play: async ({ canvas, userEvent, args }) => {
+    const day = canvas.getByRole("button", { name: /^15 / });
+    await expect(day).toHaveAttribute("aria-pressed", "false");
+    await userEvent.click(day);
+    await expect(day).toHaveAttribute("aria-pressed", "true");
+    await expect(args.onSelect).toHaveBeenCalledTimes(1);
+    await expect(args.onSelect).toHaveBeenCalledWith(expect.any(Date));
   },
 };
-export default meta;
-type Story = StoryObj<typeof Calendar>;
 
-export const Default: Story = {};
-
+/** Opens with the 15th of the current month pre-selected. */
 export const WithSelection: Story = {
   args: { defaultValue: new Date(new Date().getFullYear(), new Date().getMonth(), 15) },
 };
 
+/** The calendar composed inside a bordered card surface. */
 export const InCard: Story = {
   render: (args) => (
     <div
@@ -37,6 +49,7 @@ export const InCard: Story = {
   ),
 };
 
+/** Fully controlled selection — the caption mirrors the chosen day. */
 export const Controlled: Story = {
   render: () => {
     const [date, setDate] = useState<Date | null>(null);
@@ -48,5 +61,10 @@ export const Controlled: Story = {
         </div>
       </div>
     );
+  },
+  play: async ({ canvas, userEvent }) => {
+    await expect(canvas.getByText("no date selected")).toBeVisible();
+    await userEvent.click(canvas.getByRole("button", { name: /^10 / }));
+    await expect(canvas.getByText(/^SELECTED:/)).toBeVisible();
   },
 };
