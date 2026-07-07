@@ -1,5 +1,5 @@
-import { bar8 } from "@balaur/octant-core";
 import { type CSSProperties, type ReactNode, useMemo, useState } from "react";
+import { bar8 } from "../../../../octant-core/src/index.ts";
 
 /** Number of eighth-block cells the `load` bar is rendered across. */
 const LOAD_CELLS = 12;

@@ -1,4 +1,3 @@
-import { G, noise } from "@balaur/octant-core";
 import {
   type CSSProperties,
   type PointerEvent,
@@ -8,6 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { G, noise } from "../../../../octant-core/src/index.ts";
 import { useCellMetrics } from "../../hooks/useCellMetrics";
 import { useOnVisible } from "../../hooks/useInView";
 import { useReducedMotion } from "../../hooks/useReducedMotion";

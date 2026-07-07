@@ -1,5 +1,5 @@
-import { bar8 } from "@balaur/octant-core";
 import { type CSSProperties, useCallback, useEffect, useRef, useState } from "react";
+import { bar8 } from "../../../../octant-core/src/index.ts";
 import { useControllableState, useReducedMotion, useScramble } from "../../hooks";
 
 const DEFAULT_LINES = [

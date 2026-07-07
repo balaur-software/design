@@ -1,6 +1,6 @@
-import { seededRandom } from "@balaur/octant-core";
-import { PALETTE } from "@balaur/tokens";
 import type { CSSProperties } from "react";
+import { seededRandom } from "../../../../octant-core/src/index.ts";
+import { PALETTE } from "../../../../tokens/src/index.ts";
 
 /** Deterministic accent color for a node type, hashed from its name. */
 export function typeAccent(type: string): string {

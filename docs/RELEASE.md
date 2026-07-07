@@ -1,119 +1,106 @@
-# RELEASE.md — publishing `balaur-design`
+# RELEASE.md — publishing `@balaur/octant`
 
-The OCTANT design system is published as **Git tag-pinned GitHub
-dependencies**, not to the npm registry. The repo is a Bun-workspace
-monorepo with three packages (`@balaur/octant-core`, `@balaur/tokens`,
-`@balaur/ui`); each release tags the whole repo at a shared version.
+The OCTANT design system is published as a **single package**, `@balaur/octant`,
+via **Git tag-pinned GitHub dependencies** — not to the npm registry. One repo,
+one package, one tag per release.
 
-> **Multi-package caveat.** Bun's `github:user/repo#tag` spec installs
-> the package named in the repo's *root* `package.json` — which here is
-> `balaur-design` (private, not publishable). To consume the individual
-> subpackages from a fresh checkout, the supported path today is
-> `bun link` against a local clone (see below). A future release may
-> add a single meta-package `@balaur/design` that re-exports the three
-> subpackages, so hosts can pin via one `github:balaur-software/design#vX`
-> line. Until then, `bun link` is the canonical consumption path.
+The repo is a Bun workspace internally (`packages/{ui,octant-core,tokens}` — for
+Storybook, per-package `typecheck`, and tests), but the **published unit is the
+root package** `@balaur/octant`. Its `exports` map points at the three
+sub-packages' `src/index.ts` entry points:
+
+| Subpath | Resolves to |
+|---|---|
+| `@balaur/octant` | `packages/ui/src/index.ts` (all React components/hooks/primitives/providers) |
+| `@balaur/octant/core` | `packages/octant-core/src/index.ts` (pure encoder) |
+| `@balaur/octant/tokens` | `packages/tokens/src/index.ts` (typed tokens) |
+| `@balaur/octant/tokens/tokens.css` | `packages/tokens/src/tokens.css` (CSS custom properties + `@font-face`) |
+| `@balaur/octant/tokens/fonts/*` | `packages/tokens/fonts/*` (self-hosted DepartureMono) |
+
+`react` / `react-dom` are `peerDependencies`. Intra-repo cross-package imports
+inside `@balaur/ui` use **relative paths** (not `@balaur/tokens` etc.), so the
+single package is self-contained — no `workspace:*` leaks into the host's
+install graph.
 
 ## Cutting a release
 
 1. **Make sure `main` is clean and `bun run check` passes.**
    ```bash
-   bun run check   # typecheck + biome + tests, all workspaces
+   bun run check   # typecheck + biome + tests
    ```
-2. **Bump `version` in every package's `package.json`** in lockstep —
-   `packages/{octant-core,tokens,ui}/package.json` and the root
-   `package.json`. The shared version is the contract; a release where
-   the three packages disagree is a bug.
+2. **Bump `version` in the root `package.json`** (this is the published version).
+   Keep `packages/*/package.json` versions in lockstep for internal consistency.
 3. **Commit.** Conventional-commits style:
    ```bash
    git commit -am "chore(release): v0.1.1"
    ```
-4. **Tag the commit** with the shared version, prefixed `v`:
+4. **Tag the commit** with the version, prefixed `v`:
    ```bash
    git tag v0.1.1
    git push origin main
    git push origin v0.1.1
    ```
-5. **Verify** from a clean clone:
-   ```bash
-   git clone https://github.com/balaur-software/design.git
-   cd design && bun install && bun run check
-   ```
+5. **Verify** the host consumes the tag cleanly (see below).
 
-The tag is the release. There is no separate publish step, no registry
-login, no `dist`. A tag that doesn't match the `package.json#version`
-across all three packages is a bug — fix it by tagging the matching
-commit, never by moving the tag.
+The tag is the release. There is no separate publish step, no registry login,
+no `dist`. A tag whose root `package.json#version` doesn't match is a bug — fix
+it by tagging the matching commit, never by moving the tag.
 
-## Linking for parallel dev (the canonical consumption path)
+## Consuming from a host
 
-When developing `balaur-design` and a host (e.g. `balaur-life`) at the
-same time, link each package so edits land instantly without re-pinning
-the tag:
+`web/` (and any Bun-native host) pins the tag directly:
 
-```bash
-# in balaur-design/, one shot per package:
-cd packages/octant-core && bun link && cd ../..
-cd packages/tokens && bun link && cd ../..
-cd packages/ui && bun link && cd ../..
-
-# in the host (e.g. balaur-life/):
-bun link @balaur/octant-core
-bun link @balaur/tokens
-bun link @balaur/ui
-```
-
-The host's `package.json` should declare each package via `link:<name>`
-so `bun install` resolves them through the global link registry:
-
-```json
+```jsonc
 {
   "dependencies": {
-    "@balaur/octant-core": "link:@balaur/octant-core",
-    "@balaur/tokens": "link:@balaur/tokens",
-    "@balaur/ui": "link:@balaur/ui"
+    "@balaur/octant": "github:balaur-software/design#v0.1.1"
   }
 }
 ```
 
-### Fresh checkout recovery
-
-`link:` specs only resolve if the global link registry has the packages
-(they're a local dev convenience, not a publishable artifact). On a
-fresh machine, the recovery flow is:
-
 ```bash
-# clone and register the design packages once:
-git clone https://github.com/balaur-software/design.git ~/Projects/balaur-design
-cd ~/Projects/balaur-design && bun install
-cd packages/octant-core && bun link && cd ../..
-cd packages/tokens && bun link && cd ../..
-cd packages/ui && bun link && cd ../..
-
-# then in the host:
-bun install   # link: deps now resolve
+bun install
 ```
 
-To drop the link and resolve from a real published source (once a
-meta-package exists), use `link:` → `github:` and `bun install`. Bun
-1.3.x has no `bun unlink`; delete the symlink manually if needed:
+Because `react` is a peer dep, Bun hoists a single `react` into the host's
+`node_modules` and `@balaur/octant`'s `import "react"` resolves to that one
+copy. One instance, hooks work. This is why consumption is via a published dep
+and **not** `bun link` (see [CONSUMING.md](CONSUMING.md#cross-repo-consumption)
+for the dual-React failure mode that `bun link` causes).
+
+Verify end-to-end by rendering a component server-side — see the `/octant` route
+in `web/` ([apps/web/src/octant/OctantDemo.tsx](../../web/apps/web/src/octant/OctantDemo.tsx)).
+
+## Dev iteration against a local checkout
+
+During active design work, point the host at the local design directory instead
+of the tag so you can re-install after each edit without cutting a release:
+
+```jsonc
+// host package.json — dev only, do not commit
+"@balaur/octant": "file:../design"
+```
 
 ```bash
-rm node_modules/@balaur/ui && bun install
+# after editing something in design/:
+cd web && bun install     # recopies @balaur/octant into the host graph
 ```
+
+`file:../design` installs a **copy** (not a symlink), so edits do not appear
+until `bun install` re-runs — but it preserves the single-React peer-dep
+dedupe. Switch back to the `github:...#vX` pin before committing.
+
+Do **not** substitute `bun link @balaur/octant` for dev iteration — it
+reintroduces the dual-React hook crash.
 
 ## Cross-package dependencies inside this repo
 
-`@balaur/ui` depends on `@balaur/octant-core` and `@balaur/tokens` via
-`workspace:*`. Those resolutions stay internal to this repo — when a
-host links `@balaur/ui`, Bun resolves `@balaur/ui`'s imports of
-`@balaur/tokens` by walking up from the linked location (the design
-repo's `packages/ui/`) into the design repo's own `node_modules`, where
-the workspace symlink to `packages/tokens/` lives. So linking
-`@balaur/ui` alone is sufficient if you don't import `@balaur/tokens`
-directly; linking all three is the safe, explicit default.
-
-Never commit the host with `workspace:*` references to these packages
-unless this repo is also a workspace member of the host — `workspace:*`
-only resolves inside this repo. The host's `package.json` uses `link:`
-specs, not `workspace:*`.
+`@balaur/ui` references `@balaur/octant-core` and `@balaur/tokens` via
+**relative paths** (`…/octant-core/src/index.ts`, `…/tokens/src/index.ts`), not
+package names. This is what lets the root package be self-contained when
+published. The sub-packages still declare `name` in their own `package.json`
+for per-package tooling (typecheck, storybook), and `@balaur/ui` keeps
+`workspace:*` dev deps on them so storybook's `@balaur/tokens/tokens.css`
+import resolves inside the workspace — but those workspace refs are never
+visible to a host because the host consumes the root `@balaur/octant`, not the
+sub-packages.

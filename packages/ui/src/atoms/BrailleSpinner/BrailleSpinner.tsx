@@ -1,5 +1,5 @@
-import { GROW, ORBIT, PULSE, WAVE } from "@balaur/octant-core";
 import { type CSSProperties, useRef } from "react";
+import { GROW, ORBIT, PULSE, WAVE } from "../../../../octant-core/src/index.ts";
 import { useRafLoop } from "../../hooks/useRafLoop";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 

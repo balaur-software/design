@@ -1,5 +1,5 @@
-import { seededRandom } from "@balaur/octant-core";
 import type { CSSProperties } from "react";
+import { seededRandom } from "../../../../octant-core/src/index.ts";
 
 const ON = "█"; // █ full octant cell
 const OFF = "·"; // · middot

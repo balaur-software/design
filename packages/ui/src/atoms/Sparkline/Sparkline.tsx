@@ -1,5 +1,5 @@
-import { noise, VBLOCKS } from "@balaur/octant-core";
 import { type CSSProperties, useCallback, useEffect, useRef } from "react";
+import { noise, VBLOCKS } from "../../../../octant-core/src/index.ts";
 import { useInView } from "../../hooks/useInView";
 import { useRafLoop } from "../../hooks/useRafLoop";
 import { useReducedMotion } from "../../hooks/useReducedMotion";

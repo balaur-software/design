@@ -1,4 +1,4 @@
-import { type CSSProperties, useEffect, useMemo, useRef, useState } from "react";
+import { type CSSProperties, useEffect, useId, useMemo, useRef, useState } from "react";
 import { useControllableState } from "../../hooks/useControllableState";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 import { ScrimOverlay } from "../../primitives/ScrimOverlay";
@@ -97,6 +97,8 @@ export function CommandPalette({
   const listRef = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
   const toast = useToast();
+  const baseId = useId();
+  const listId = `${baseId}-list`;
 
   // Filtered groups keep each match's flat index so keyboard nav + highlight
   // paint stay in sync with the rendered rows.
@@ -210,6 +212,7 @@ export function CommandPalette({
       <ScrimOverlay
         open={open}
         onClose={() => setOpen(false)}
+        ariaLabel="Command palette"
         panelStyle={{
           width: 540,
           maxWidth: "calc(100vw - 32px)",
@@ -236,6 +239,11 @@ export function CommandPalette({
           <span style={{ color: "var(--bx-accent, #46c66d)", fontSize: 14 }}>{SEARCH_GLYPH}</span>
           <input
             type="text"
+            role="combobox"
+            aria-expanded={open}
+            aria-controls={listId}
+            aria-activedescendant={flat.length > 0 ? `${baseId}-opt-${hi}` : undefined}
+            aria-autocomplete="list"
             value={query}
             placeholder={placeholder}
             onChange={(e) => {
@@ -284,7 +292,12 @@ export function CommandPalette({
           </span>
         </div>
 
-        <div ref={listRef} style={{ maxHeight: 340, overflowY: "auto", padding: 6 }}>
+        <div
+          ref={listRef}
+          id={listId}
+          role="listbox"
+          style={{ maxHeight: 340, overflowY: "auto", padding: 6 }}
+        >
           {groups.map(({ group, items }) => (
             <div key={group}>
               <div
@@ -300,7 +313,10 @@ export function CommandPalette({
               {items.map(({ item, index }) => (
                 <button
                   key={item.label}
+                  id={`${baseId}-opt-${index}`}
                   type="button"
+                  role="option"
+                  aria-selected={index === hi}
                   onMouseDown={(e) => {
                     e.preventDefault();
                     run(item);

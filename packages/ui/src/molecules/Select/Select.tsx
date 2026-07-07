@@ -1,4 +1,4 @@
-import { type CSSProperties, useState } from "react";
+import { type CSSProperties, useId, useState } from "react";
 import { useControllableState } from "../../hooks/useControllableState";
 import { FloatingPanel } from "../../primitives";
 
@@ -18,6 +18,8 @@ export interface SelectProps {
   disabled?: boolean;
   /** Trigger + panel width. Defaults to 230. */
   width?: CSSProperties["width"];
+  /** Accessible name for the select (rendered as aria-label on the trigger). */
+  ariaLabel?: string;
   style?: CSSProperties;
 }
 
@@ -36,13 +38,55 @@ export function Select({
   placeholder = "SELECT",
   disabled,
   width = 230,
+  ariaLabel,
   style,
 }: SelectProps) {
   const [selected, setSelected] = useControllableState(value, defaultValue ?? "", onChange);
   const [open, setOpen] = useState(false);
-  const [hovered, setHovered] = useState(-1);
+  const [active, setActive] = useState(-1);
+  const baseId = useId();
+  const listboxId = `${baseId}-listbox`;
 
   const current = options.find((o) => o.value === selected);
+  const count = options.length;
+
+  const openList = () => {
+    if (disabled) return;
+    const idx = options.findIndex((o) => o.value === selected);
+    setActive(idx >= 0 ? idx : 0);
+    setOpen(true);
+  };
+
+  const choose = (i: number) => {
+    const opt = options[i];
+    if (!opt) return;
+    setSelected(opt.value);
+    setOpen(false);
+  };
+
+  const onTriggerKey = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (disabled) return;
+    if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+      e.preventDefault();
+      if (!open) openList();
+      else if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") choose(active);
+      else setActive((a) => Math.min(count - 1, a + 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (!open) openList();
+      else setActive((a) => Math.max(0, a - 1));
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      if (!open) openList();
+      else setActive(0);
+    } else if (e.key === "End") {
+      e.preventDefault();
+      if (!open) openList();
+      else setActive(count - 1);
+    } else if (e.key === "Escape") {
+      setOpen(false);
+    }
+  };
 
   return (
     <FloatingPanel
@@ -50,6 +94,9 @@ export function Select({
       onOpenChange={setOpen}
       align="start"
       width={width}
+      role="listbox"
+      panelId={listboxId}
+      ariaLabel={ariaLabel}
       panelStyle={{
         background: "var(--bx-surface-3, #0c0d11)",
         border: "1px solid var(--bx-border, #1c1d24)",
@@ -61,9 +108,10 @@ export function Select({
           disabled={disabled}
           aria-haspopup="listbox"
           aria-expanded={open && !disabled}
-          onClick={() => {
-            if (!disabled) setOpen(!open);
-          }}
+          aria-controls={open ? listboxId : undefined}
+          aria-activedescendant={open && active >= 0 ? `${baseId}-opt-${active}` : undefined}
+          onClick={() => (open ? setOpen(false) : openList())}
+          onKeyDown={onTriggerKey}
           style={{
             width,
             maxWidth: "100%",
@@ -90,21 +138,20 @@ export function Select({
         </button>
       }
     >
-      <div role="listbox">
+      <div>
         {options.map((opt, i) => {
           const isSelected = opt.value === selected;
+          const isActive = i === active;
           return (
             <button
               key={opt.value}
+              id={`${baseId}-opt-${i}`}
               type="button"
               role="option"
               aria-selected={isSelected}
-              onClick={() => {
-                setSelected(opt.value);
-                setOpen(false);
-              }}
-              onPointerEnter={() => setHovered(i)}
-              onPointerLeave={() => setHovered((h) => (h === i ? -1 : h))}
+              onClick={() => choose(i)}
+              onPointerEnter={() => setActive(i)}
+              onPointerMove={() => setActive(i)}
               style={{
                 display: "block",
                 width: "100%",
@@ -112,7 +159,7 @@ export function Select({
                 fontFamily: "inherit",
                 fontSize: 13,
                 padding: "10px 14px",
-                background: hovered === i ? "#15161e" : "transparent",
+                background: isActive ? "#15161e" : "transparent",
                 border: 0,
                 color: isSelected ? "var(--bx-accent, #46c66d)" : "var(--bx-text-4, #9aa0ad)",
                 cursor: "pointer",

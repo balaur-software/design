@@ -1,6 +1,6 @@
-import { seededRandom } from "@balaur/octant-core";
-import { PALETTE } from "@balaur/tokens";
 import type { CSSProperties } from "react";
+import { seededRandom } from "../../../../octant-core/src/index.ts";
+import { PALETTE } from "../../../../tokens/src/index.ts";
 import type { Agent } from "../../organisms/ChatPanel/chat-types";
 
 /** The quadrant glyphs used to build a 2×2 agent mosaic. */

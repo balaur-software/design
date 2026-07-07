@@ -1,5 +1,5 @@
-import { scrambleFrame } from "@balaur/octant-core";
 import { type RefObject, useEffect } from "react";
+import { scrambleFrame } from "../../../octant-core/src/index.ts";
 import { useReducedMotion } from "./useReducedMotion";
 
 /**

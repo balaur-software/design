@@ -9,6 +9,7 @@ node_modules/
 dist/
 storybook-static/
 *.tsbuildinfo
+*.tgz
 
 # Browser-driver scratch
 .playwright-mcp/

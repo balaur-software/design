@@ -60,6 +60,9 @@
   --bx-text-dim-2: #6b7180; /* between text-5 and text-6 */
   --bx-text-dim-3: #4b505c; /* between text-6 and text-7 */
   --bx-text-dim-4: #363943; /* below text-7 */
+  /* Legacy alias: some components reference --bx-text-dim (no number). Maps to
+     the dimmest numbered ramp step. Prefer --bx-text-7 in new code. */
+  --bx-text-dim: var(--bx-text-7);
 
   /* ---- ANSI 16-color palette (index 0..15) ---- */
   --bx-ansi-0: #15161e; /* black */

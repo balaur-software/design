@@ -1,5 +1,5 @@
-import { WAVE } from "@balaur/octant-core";
 import { type ButtonHTMLAttributes, type CSSProperties, useEffect, useRef } from "react";
+import { WAVE } from "../../../../octant-core/src/index.ts";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 
 /** Number of comet cells swept during the deploy progress animation. */

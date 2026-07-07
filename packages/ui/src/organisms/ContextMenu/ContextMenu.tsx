@@ -54,11 +54,57 @@ export function ContextMenu({ items = DEFAULT_ITEMS, children, style }: ContextM
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [ready, setReady] = useState(false);
   const [hovered, setHovered] = useState(-1);
+  const [focused, setFocused] = useState(-1);
   const menuRef = useRef<HTMLDivElement>(null);
+  const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const toast = useToast();
+
+  const actionable = items.map((it, i) => (it.divider ? -1 : i)).filter((i) => i >= 0);
+  const firstIdx = actionable[0] ?? -1;
+  const lastIdx = actionable[actionable.length - 1] ?? -1;
+
+  const nextActionable = (from: number, step: 1 | -1): number => {
+    let i = from;
+    for (let k = 0; k < items.length; k++) {
+      i += step;
+      if (i < 0 || i >= items.length) return from;
+      if (!items[i]?.divider) return i;
+    }
+    return from;
+  };
+
+  const focusItem = (i: number) => {
+    setFocused(i);
+    itemRefs.current[i]?.focus();
+  };
 
   const close = () => setOpen(false);
   useDismissable(menuRef, { onDismiss: close, active: open });
+
+  // Focus the first actionable item once the menu opens + is positioned.
+  useEffect(() => {
+    if (open && ready) focusItem(firstIdx);
+    else setFocused(-1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, ready]);
+
+  const onMenuKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      focusItem(nextActionable(focused < 0 ? firstIdx - 1 : focused, 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      focusItem(nextActionable(focused < 0 ? lastIdx + 1 : focused, -1));
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      focusItem(firstIdx);
+    } else if (e.key === "End") {
+      e.preventDefault();
+      focusItem(lastIdx);
+    } else if (e.key === "Escape") {
+      close();
+    }
+  };
 
   // Measure the freshly-mounted menu and clamp its cursor position to the
   // viewport before revealing it (mirrors the reference offsetWidth/Height clamp).
@@ -117,6 +163,7 @@ export function ContextMenu({ items = DEFAULT_ITEMS, children, style }: ContextM
         <div
           ref={menuRef}
           role="menu"
+          onKeyDown={onMenuKey}
           style={{
             position: "fixed",
             left: pos.x,
@@ -143,18 +190,26 @@ export function ContextMenu({ items = DEFAULT_ITEMS, children, style }: ContextM
             }
             const danger = item.danger ?? false;
             const isHovered = hovered === i;
+            const isFocused = focused === i;
             return (
               <button
                 // eslint-disable-next-line react/no-array-index-key
                 key={i}
+                ref={(el) => {
+                  itemRefs.current[i] = el;
+                }}
                 type="button"
                 role="menuitem"
+                tabIndex={isFocused ? 0 : -1}
                 onClick={() => {
                   setOpen(false);
                   if (item.onSelect) item.onSelect();
                   else toast({ kind: danger ? "err" : "ok", message: item.toast ?? item.label });
                 }}
-                onPointerEnter={() => setHovered(i)}
+                onPointerEnter={() => {
+                  setHovered(i);
+                  setFocused(i);
+                }}
                 onPointerLeave={() => setHovered((h) => (h === i ? -1 : h))}
                 style={{
                   display: "flex",
@@ -165,7 +220,7 @@ export function ContextMenu({ items = DEFAULT_ITEMS, children, style }: ContextM
                   fontFamily: "inherit",
                   fontSize: 13,
                   padding: "9px 12px",
-                  background: isHovered ? (danger ? "#1f1416" : "#15161e") : "transparent",
+                  background: isHovered || isFocused ? (danger ? "#1f1416" : "#15161e") : "transparent",
                   border: 0,
                   color: danger ? "#ff6b6f" : "#c8cdd6",
                   cursor: "pointer",

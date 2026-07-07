@@ -1,4 +1,4 @@
-import { type CSSProperties, useState } from "react";
+import { type CSSProperties, useId, useState } from "react";
 import { useControllableState } from "../../hooks/useControllableState";
 import { FloatingPanel } from "../../primitives";
 
@@ -13,6 +13,8 @@ export interface ComboboxProps {
   disabled?: boolean;
   /** Trigger + panel width. Defaults to 250. */
   width?: CSSProperties["width"];
+  /** Accessible name for the combobox (aria-label on the input). */
+  ariaLabel?: string;
   style?: CSSProperties;
 }
 
@@ -32,11 +34,14 @@ export function Combobox({
   placeholder = "search…",
   disabled,
   width = 250,
+  ariaLabel,
   style,
 }: ComboboxProps) {
   const [text, setText] = useControllableState(value, defaultValue ?? "", onChange);
   const [open, setOpen] = useState(false);
   const [hi, setHi] = useState(-1);
+  const baseId = useId();
+  const listboxId = `${baseId}-listbox`;
 
   const q = text.toLowerCase();
   const shown = options.filter((o) => o.toLowerCase().includes(q));
@@ -52,6 +57,7 @@ export function Combobox({
       onOpenChange={setOpen}
       align="start"
       width={width}
+      role="none"
       panelStyle={{
         background: "var(--bx-surface-3, #0c0d11)",
         border: "1px solid var(--bx-border, #1c1d24)",
@@ -65,6 +71,9 @@ export function Combobox({
           role="combobox"
           aria-expanded={open && !disabled}
           aria-autocomplete="list"
+          aria-controls={open && shown.length > 0 ? listboxId : undefined}
+          aria-activedescendant={open && hi >= 0 ? `${baseId}-opt-${hi}` : undefined}
+          aria-label={ariaLabel}
           disabled={disabled}
           placeholder={placeholder}
           value={text}
@@ -114,10 +123,11 @@ export function Combobox({
         />
       }
     >
-      <div role="listbox">
+      <div id={listboxId} role="listbox">
         {shown.map((o, i) => (
           <button
             key={o}
+            id={`${baseId}-opt-${i}`}
             type="button"
             role="option"
             aria-selected={o === text}

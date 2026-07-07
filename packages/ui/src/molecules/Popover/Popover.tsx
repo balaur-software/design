@@ -66,6 +66,8 @@ export function Popover({
       onOpenChange={setOpen}
       align={align}
       width={width}
+      role="dialog"
+      ariaLabel={title}
       panelStyle={{
         marginTop: 10,
         background: "var(--bx-surface-3, #0c0d11)",

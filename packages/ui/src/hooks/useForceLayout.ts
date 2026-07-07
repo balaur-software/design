@@ -1,5 +1,5 @@
-import { seededRandom } from "@balaur/octant-core";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { seededRandom } from "../../../octant-core/src/index.ts";
 import type { LayoutNode, MemoryEdge } from "../organisms/MemoryExplorer/memory-types";
 import { useRafLoop } from "./useRafLoop";
 import { useReducedMotion } from "./useReducedMotion";

@@ -1,5 +1,5 @@
-import { type AccentName, accentVars } from "@balaur/tokens";
 import type { CSSProperties, ReactNode } from "react";
+import { type AccentName, accentVars } from "../../../../tokens/src/index.ts";
 
 export interface AccentProviderProps {
   /** An accent name ("green" | "amber" | "cyan") or any hex. Default "green". */

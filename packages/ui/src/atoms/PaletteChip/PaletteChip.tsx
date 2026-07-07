@@ -1,4 +1,4 @@
-import { PALETTE, type PaletteColor } from "@balaur/tokens";
+import { PALETTE, type PaletteColor } from "../../../../tokens/src/index.ts";
 
 const FILL = "█████\n█████\n█████";
 

@@ -1,4 +1,4 @@
-import { type CSSProperties, type ReactNode, useEffect, useState } from "react";
+import { type CSSProperties, type ReactNode, useEffect, useId, useState } from "react";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 import { ScrimOverlay } from "../../primitives/ScrimOverlay";
 
@@ -43,6 +43,7 @@ export function Sheet({
 }: SheetProps) {
   const reduced = useReducedMotion();
   const [shown, setShown] = useState(false);
+  const titleId = useId();
 
   // Entrance: slide in from the docked edge once the panel has mounted.
   useEffect(() => {
@@ -66,6 +67,7 @@ export function Sheet({
       onClose={onClose}
       align={side === "right" ? "end" : "start"}
       trapFocus={trapFocus}
+      ariaLabelledBy={title != null ? titleId : undefined}
       panelStyle={{
         display: "flex",
         flexDirection: "column",
@@ -88,7 +90,10 @@ export function Sheet({
           borderBottom: "1px solid var(--bx-border, #1c1d24)",
         }}
       >
-        <span style={{ color: "var(--bx-text-1, #f4f6fb)", fontSize: 14, letterSpacing: "0.04em" }}>
+        <span
+          id={title != null ? titleId : undefined}
+          style={{ color: "var(--bx-text-1, #f4f6fb)", fontSize: 14, letterSpacing: "0.04em" }}
+        >
           {title}
         </span>
         <button

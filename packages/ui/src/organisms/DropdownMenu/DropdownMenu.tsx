@@ -1,4 +1,4 @@
-import { type CSSProperties, useState } from "react";
+import { type CSSProperties, useEffect, useRef, useState } from "react";
 import { FloatingPanel, useToast } from "../../primitives";
 
 /** A single actionable row, or a `{ divider: true }` separator. */
@@ -49,7 +49,53 @@ export function DropdownMenu({
 }: DropdownMenuProps) {
   const [open, setOpen] = useState(false);
   const [hovered, setHovered] = useState(-1);
+  const [focused, setFocused] = useState(-1);
+  const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const toast = useToast();
+
+  const actionable = items.map((it, i) => (it.divider ? -1 : i)).filter((i) => i >= 0);
+  const firstIdx = actionable[0] ?? -1;
+  const lastIdx = actionable[actionable.length - 1] ?? -1;
+
+  const nextActionable = (from: number, step: 1 | -1): number => {
+    let i = from;
+    for (let k = 0; k < items.length; k++) {
+      i += step;
+      if (i < 0 || i >= items.length) return from;
+      if (!items[i]?.divider) return i;
+    }
+    return from;
+  };
+
+  const focusItem = (i: number) => {
+    setFocused(i);
+    itemRefs.current[i]?.focus();
+  };
+
+  // On open, move focus to the first actionable item; on close, reset.
+  useEffect(() => {
+    if (open) focusItem(firstIdx);
+    else setFocused(-1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  const onMenuKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      focusItem(nextActionable(focused < 0 ? firstIdx - 1 : focused, 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      focusItem(nextActionable(focused < 0 ? lastIdx + 1 : focused, -1));
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      focusItem(firstIdx);
+    } else if (e.key === "End") {
+      e.preventDefault();
+      focusItem(lastIdx);
+    } else if (e.key === "Escape") {
+      setOpen(false);
+    }
+  };
 
   return (
     <FloatingPanel
@@ -69,6 +115,15 @@ export function DropdownMenu({
           aria-haspopup="menu"
           aria-expanded={open}
           onClick={() => setOpen(!open)}
+          onKeyDown={(e) => {
+            if (
+              !open &&
+              (e.key === "ArrowDown" || e.key === "Enter" || e.key === " " || e.key === "Spacebar")
+            ) {
+              e.preventDefault();
+              setOpen(true);
+            }
+          }}
           style={{
             display: "flex",
             alignItems: "center",
@@ -92,63 +147,73 @@ export function DropdownMenu({
         </button>
       }
     >
-      {items.map((item, i) => {
-        if (item.divider) {
-          // eslint-disable-next-line react/no-array-index-key
-          return (
-            <div key={i} style={{ height: 1, background: "var(--bx-border, #1c1d24)", margin: "4px 0" }} />
-          );
-        }
-        const danger = item.danger ?? false;
-        const isHovered = hovered === i;
-        return (
-          <button
+      <div onKeyDown={onMenuKey}>
+        {items.map((item, i) => {
+          if (item.divider) {
             // eslint-disable-next-line react/no-array-index-key
-            key={i}
-            type="button"
-            role="menuitem"
-            onClick={() => {
-              setOpen(false);
-              if (item.onSelect) item.onSelect();
-              else toast({ kind: danger ? "err" : "ok", message: item.toast ?? item.label });
-            }}
-            onPointerEnter={() => setHovered(i)}
-            onPointerLeave={() => setHovered((h) => (h === i ? -1 : h))}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 11,
-              width: "100%",
-              textAlign: "left",
-              fontFamily: "inherit",
-              fontSize: 13,
-              padding: "10px 14px",
-              background: isHovered ? (danger ? "#1f1416" : "#15161e") : "transparent",
-              border: 0,
-              color: danger ? "#ff6b6f" : "var(--bx-text-3, #c8cdd6)",
-              cursor: "pointer",
-              transition: "background-color .12s var(--bx-ease, cubic-bezier(.5,0,.2,1))",
-            }}
-          >
-            <span style={danger ? undefined : { color: "var(--bx-accent, #46c66d)" }}>
-              {item.glyph ?? "▛"}
-            </span>
-            <span style={{ flex: 1 }}>{item.label}</span>
-            {item.shortcut && (
-              <span
-                style={{
-                  fontSize: 11,
-                  padding: "0 5px",
-                  color: danger ? "#5b3030" : "#3f424d",
-                  border: `1px solid ${danger ? "var(--bx-border-red, #3a2020)" : "var(--bx-border-mid, #2a2c34)"}`,
-                }}
-              >
-                {item.shortcut}
+            return (
+              <div key={i} style={{ height: 1, background: "var(--bx-border, #1c1d24)", margin: "4px 0" }} />
+            );
+          }
+          const danger = item.danger ?? false;
+          const isHovered = hovered === i;
+          const isFocused = focused === i;
+          return (
+            <button
+              // eslint-disable-next-line react/no-array-index-key
+              key={i}
+              ref={(el) => {
+                itemRefs.current[i] = el;
+              }}
+              type="button"
+              role="menuitem"
+              tabIndex={open && isFocused ? 0 : -1}
+              onClick={() => {
+                setOpen(false);
+                if (item.onSelect) item.onSelect();
+                else toast({ kind: danger ? "err" : "ok", message: item.toast ?? item.label });
+              }}
+              onPointerEnter={() => {
+                setHovered(i);
+                setFocused(i);
+              }}
+              onPointerLeave={() => setHovered((h) => (h === i ? -1 : h))}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 11,
+                width: "100%",
+                textAlign: "left",
+                fontFamily: "inherit",
+                fontSize: 13,
+                padding: "10px 14px",
+                background: isHovered || isFocused ? (danger ? "#1f1416" : "#15161e") : "transparent",
+                border: 0,
+                color: danger ? "#ff6b6f" : "var(--bx-text-3, #c8cdd6)",
+                cursor: "pointer",
+                transition: "background-color .12s var(--bx-ease, cubic-bezier(.5,0,.2,1))",
+              }}
+            >
+              <span style={danger ? undefined : { color: "var(--bx-accent, #46c66d)" }}>
+                {item.glyph ?? "▛"}
               </span>
-            )}
-          </button>
-        );
-      })}
+              <span style={{ flex: 1 }}>{item.label}</span>
+              {item.shortcut && (
+                <span
+                  style={{
+                    fontSize: 11,
+                    padding: "0 5px",
+                    color: danger ? "#5b3030" : "#3f424d",
+                    border: `1px solid ${danger ? "var(--bx-border-red, #3a2020)" : "var(--bx-border-mid, #2a2c34)"}`,
+                  }}
+                >
+                  {item.shortcut}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
     </FloatingPanel>
   );
 }

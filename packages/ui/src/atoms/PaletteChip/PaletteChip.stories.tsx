@@ -1,5 +1,5 @@
-import { PALETTE } from "@balaur/tokens";
 import type { Meta, StoryObj } from "@storybook/react";
+import { PALETTE } from "../../../../tokens/src/index.ts";
 import { Palette, PaletteChip } from "./PaletteChip.tsx";
 
 const meta: Meta<typeof Palette> = {

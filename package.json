@@ -1,8 +1,7 @@
 {
-  "name": "balaur-design",
+  "name": "@balaur/octant",
   "version": "0.1.0",
-  "private": true,
-  "description": "OCTANT design system — pure encoder, tokens, and React components. Bun-native.",
+  "description": "OCTANT design system — pure encoder, tokens, and React components. Bun-native, no build step.",
   "type": "module",
   "workspaces": [
     "packages/*"
@@ -10,6 +9,28 @@
   "engines": {
     "bun": ">=1.2"
   },
+  "main": "./packages/ui/src/index.ts",
+  "module": "./packages/ui/src/index.ts",
+  "types": "./packages/ui/src/index.ts",
+  "exports": {
+    ".": "./packages/ui/src/index.ts",
+    "./core": "./packages/octant-core/src/index.ts",
+    "./tokens": "./packages/tokens/src/index.ts",
+    "./tokens/tokens.css": "./packages/tokens/src/tokens.css",
+    "./tokens/fonts/*": "./packages/tokens/fonts/*",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "packages/*/src",
+    "packages/tokens/fonts",
+    "package.json",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "react": "^19",
+    "react-dom": "^19"
+  },
+  "dependencies": {},
   "scripts": {
     "test": "bun test",
     "typecheck": "bun run --filter '*' typecheck",

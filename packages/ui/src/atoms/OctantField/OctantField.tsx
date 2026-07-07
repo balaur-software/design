@@ -1,5 +1,5 @@
-import { noise, paintBuf } from "@balaur/octant-core";
 import { type CSSProperties, useRef } from "react";
+import { noise, paintBuf } from "../../../../octant-core/src/index.ts";
 import { useOctantCanvas } from "../../hooks/useOctantCanvas";
 import { usePointerCell } from "../../hooks/usePointerCell";
 

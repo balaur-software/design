@@ -1,4 +1,4 @@
-import { type CSSProperties, type ReactNode, useEffect, useRef, useState } from "react";
+import { type CSSProperties, type ReactNode, useEffect, useId, useRef, useState } from "react";
 import { measureCell } from "../../hooks/useCellMetrics";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 import { useScramble } from "../../hooks/useScramble";
@@ -63,6 +63,7 @@ export function Modal({
   const ditherRef = useRef<HTMLPreElement>(null);
   const reduced = useReducedMotion();
   const [shown, setShown] = useState(false);
+  const titleId = useId();
 
   useScramble(titleRef, title, { dur: 540, delay: 90, active: open });
 
@@ -123,6 +124,7 @@ export function Modal({
     <ScrimOverlay
       open={open}
       onClose={onClose}
+      ariaLabelledBy={titleId}
       panelStyle={{
         width,
         maxWidth: "calc(100vw - 32px)",
@@ -165,6 +167,7 @@ export function Modal({
         >
           <span
             ref={titleRef}
+            id={titleId}
             style={{ color: "var(--bx-text-1, #f4f6fb)", fontSize: 14, letterSpacing: "0.05em" }}
           >
             {title}

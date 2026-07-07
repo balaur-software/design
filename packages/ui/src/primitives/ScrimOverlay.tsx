@@ -12,6 +12,10 @@ export interface ScrimOverlayProps {
   /** Panel alignment: centered dialog or an edge sheet. */
   align?: "center" | "start" | "end";
   panelStyle?: CSSProperties;
+  /** id of an element that labels the dialog (aria-labelledby). */
+  ariaLabelledBy?: string | undefined;
+  /** Accessible name for the dialog when no labelled child exists (aria-label). */
+  ariaLabel?: string | undefined;
 }
 
 const JUSTIFY: Record<NonNullable<ScrimOverlayProps["align"]>, CSSProperties["justifyContent"]> = {
@@ -32,6 +36,8 @@ export function ScrimOverlay({
   trapFocus = true,
   align = "center",
   panelStyle,
+  ariaLabelledBy,
+  ariaLabel,
 }: ScrimOverlayProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   useDismissable(panelRef, { onDismiss: onClose, active: open });
@@ -64,6 +70,8 @@ export function ScrimOverlay({
         ref={panelRef}
         role="dialog"
         aria-modal="true"
+        aria-labelledby={ariaLabelledBy}
+        aria-label={ariaLabel}
         style={{ position: "relative", zIndex: 1, ...panelStyle }}
       >
         {children}

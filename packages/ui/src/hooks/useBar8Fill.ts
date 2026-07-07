@@ -1,5 +1,5 @@
-import { bar8 } from "@balaur/octant-core";
 import { type RefObject, useEffect, useRef } from "react";
+import { bar8 } from "../../../octant-core/src/index.ts";
 import { measureCell } from "./useCellMetrics";
 import { useReducedMotion } from "./useReducedMotion";
 
