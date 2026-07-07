@@ -18,6 +18,20 @@ function fmtJson(v: unknown): string {
   }
 }
 
+/**
+ * Format a tool payload for display. Strings render verbatim (agent tool output
+ * is usually multi-line plain text — JSON-encoding it would bury the content
+ * behind escaped `\n`s); everything else is pretty-printed JSON.
+ */
+function fmtPayload(v: unknown): string {
+  return typeof v === "string" ? v : fmtJson(v);
+}
+
+/** Language tag for the CodeBlock header — plain `text` for string payloads. */
+function payloadLang(v: unknown): string {
+  return typeof v === "string" ? "text" : "json";
+}
+
 function fmtDuration(block: ToolCallBlockData): string | null {
   if (block.startedAt == null || block.endedAt == null) return null;
   return `${block.endedAt - block.startedAt}ms`;
@@ -55,7 +69,7 @@ export function ToolCallBlock({ block, style }: ToolCallBlockProps) {
               >
                 ARGS
               </div>
-              <CodeBlock lang="json">{fmtJson(block.args)}</CodeBlock>
+              <CodeBlock lang={payloadLang(block.args)}>{fmtPayload(block.args)}</CodeBlock>
             </div>
           )}
           {block.result !== undefined && (
@@ -63,7 +77,7 @@ export function ToolCallBlock({ block, style }: ToolCallBlockProps) {
               <div style={{ color: errColor, fontSize: 10, letterSpacing: "0.08em", marginBottom: 4 }}>
                 {block.status === "error" ? "ERROR" : "RESULT"}
               </div>
-              <CodeBlock lang="json">{fmtJson(block.result)}</CodeBlock>
+              <CodeBlock lang={payloadLang(block.result)}>{fmtPayload(block.result)}</CodeBlock>
             </div>
           )}
           {dur && <div style={{ color: "var(--bx-text-6, #5b616e)", fontSize: 11 }}>{dur}</div>}

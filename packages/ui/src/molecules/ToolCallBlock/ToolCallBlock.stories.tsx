@@ -30,3 +30,20 @@ export const ErrorState: StoryObj = {
     block: { ...base, status: "error" as const, endedAt: 1102, result: { message: "ENOENT: no such file" } },
   },
 };
+
+/** String results render verbatim (multi-line plain text) rather than JSON-escaped. */
+export const PlainTextResult: StoryObj = {
+  args: {
+    block: {
+      type: "tool_call" as const,
+      id: "t2",
+      name: "bash",
+      args: { command: "ls -la" },
+      status: "done" as const,
+      startedAt: 1000,
+      endedAt: 1044,
+      result:
+        "total 24\ndrwxr-xr-x  5 alex  160 Jul  7 12:34 .\n-rw-r--r--  1 alex  512 Jul  7 12:34 raster.ts",
+    },
+  },
+};

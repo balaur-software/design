@@ -4,7 +4,7 @@ import { useControllableState } from "../../hooks/useControllableState";
 import { ArtifactPanel } from "../../molecules/ArtifactPanel/ArtifactPanel";
 import { ChatComposer } from "../../molecules/ChatComposer/ChatComposer";
 import { ChatThread } from "../ChatThread/ChatThread";
-import type { Agent, Block, ChatMessageData } from "./chat-types";
+import type { Agent, Block, ChatBlockRenderer, ChatMessageData } from "./chat-types";
 
 export interface ChatPanelProps {
   messages: ChatMessageData[];
@@ -21,6 +21,8 @@ export interface ChatPanelProps {
   onArtifactOpen?: (id: string) => void;
   /** Header presence rows. Defaults to a single ONLINE/thinking row. */
   presence?: PresenceItem[];
+  /** Per-block render override, forwarded through the thread to each message. */
+  renderBlock?: ChatBlockRenderer;
   style?: CSSProperties;
 }
 
@@ -44,6 +46,7 @@ export function ChatPanel({
   onStop,
   onArtifactOpen,
   presence,
+  renderBlock,
   style,
 }: ChatPanelProps) {
   const [composer, setComposer] = useControllableState(
@@ -98,6 +101,7 @@ export function ChatPanel({
             {...(agents ? { agents } : {})}
             streaming={streaming}
             {...(onArtifactOpen ? { onArtifactOpen } : {})}
+            {...(renderBlock ? { renderBlock } : {})}
           />
           <ChatComposer
             value={composer}

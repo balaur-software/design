@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { CitationSourceProps } from "../../atoms/InlineCitation/InlineCitation";
 
 /** Lifecycle status for a tool call or plan step. */
@@ -42,6 +43,15 @@ export interface ChatMessageData {
   blocks: Block[];
   status?: "streaming" | "complete" | "error";
 }
+
+/**
+ * Optional per-block render override. Return a node to render a block your own
+ * way (e.g. a syntax-highlighted code block), or `null`/`undefined` to fall
+ * back to the built-in `BlockRenderer`. This is the escape hatch that keeps the
+ * design system dependency-free: highlighting, custom block types, etc. live in
+ * the caller, which can still compose OCTANT molecules like `CodeBlock`.
+ */
+export type ChatBlockRenderer = (block: Block) => ReactNode;
 
 /** A named agent in a multi-agent thread. */
 export interface Agent {

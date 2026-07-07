@@ -2,6 +2,7 @@ import { describe, expect, it } from "bun:test";
 import { renderToReadableStream } from "react-dom/server";
 import { FillButton } from "../atoms/FillButton/FillButton";
 import { TextInput } from "../molecules/TextInput/TextInput";
+import { ToolCallBlock } from "../molecules/ToolCallBlock/ToolCallBlock";
 import { ChatPanel } from "../organisms/ChatPanel/ChatPanel";
 import type { Block, ChatMessageData } from "../organisms/ChatPanel/chat-types";
 import { Table, type TableColumn } from "../organisms/Table/Table";
@@ -55,5 +56,46 @@ describe("SSR smoke", () => {
       { id: "m2", role: "user", blocks: [{ type: "text", text: "hi there" }] },
     ];
     await expectStreamContains(<ChatPanel messages={messages} onSend={() => {}} />, "hello from the agent");
+  });
+
+  it("renders a string tool result verbatim (not JSON-escaped)", async () => {
+    // `error` keeps the block expanded, so the result is in the SSR output.
+    const stream = await renderToReadableStream(
+      <ToolCallBlock
+        block={{
+          type: "tool_call",
+          id: "t1",
+          name: "bash",
+          args: { command: "ls" },
+          status: "error",
+          startedAt: 0,
+          endedAt: 5,
+          result: "line-one\nline-two",
+        }}
+      />,
+    );
+    const html = await Bun.readableStreamToText(stream);
+    expect(html).toContain("line-one");
+    expect(html).toContain("line-two");
+    expect(html).not.toContain("line-one\\nline-two");
+  });
+
+  it("applies a ChatPanel renderBlock override", async () => {
+    const messages: ChatMessageData[] = [
+      {
+        id: "m1",
+        role: "agent",
+        status: "complete",
+        blocks: [{ type: "code", language: "ts", code: "const x = 1" }],
+      },
+    ];
+    await expectStreamContains(
+      <ChatPanel
+        messages={messages}
+        onSend={() => {}}
+        renderBlock={(b: Block) => (b.type === "code" ? <span data-hl="1">{b.code}</span> : null)}
+      />,
+      'data-hl="1"',
+    );
   });
 });

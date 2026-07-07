@@ -2,7 +2,7 @@ import { type CSSProperties, useEffect, useRef, useState } from "react";
 import { ChatMessage } from "../../molecules/ChatMessage/ChatMessage";
 import { EmptyState } from "../../molecules/EmptyState/EmptyState";
 import { TypingIndicator } from "../../molecules/TypingIndicator/TypingIndicator";
-import type { Agent, ChatMessageData } from "../ChatPanel/chat-types";
+import type { Agent, ChatBlockRenderer, ChatMessageData } from "../ChatPanel/chat-types";
 
 export interface ChatThreadProps {
   messages: ChatMessageData[];
@@ -11,6 +11,8 @@ export interface ChatThreadProps {
   /** Show the typing indicator at the bottom (agent producing first block). */
   streaming?: boolean;
   onArtifactOpen?: (id: string) => void;
+  /** Per-block render override, forwarded to each `ChatMessage`. */
+  renderBlock?: ChatBlockRenderer;
   style?: CSSProperties;
 }
 
@@ -20,7 +22,14 @@ export interface ChatThreadProps {
  * appears. Shows `TypingIndicator` while `streaming`. Empty thread renders an
  * `EmptyState` prompt.
  */
-export function ChatThread({ messages, agents, streaming = false, onArtifactOpen, style }: ChatThreadProps) {
+export function ChatThread({
+  messages,
+  agents,
+  streaming = false,
+  onArtifactOpen,
+  renderBlock,
+  style,
+}: ChatThreadProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [atBottom, setAtBottom] = useState(true);
 
@@ -71,6 +80,7 @@ export function ChatThread({ messages, agents, streaming = false, onArtifactOpen
               message={m}
               {...(agent ? { agent } : {})}
               {...(onArtifactOpen ? { onArtifactOpen } : {})}
+              {...(renderBlock ? { renderBlock } : {})}
             />
           );
         })}

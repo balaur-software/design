@@ -1,7 +1,7 @@
-import type { CSSProperties } from "react";
+import { type CSSProperties, Fragment } from "react";
 import { AgentGlyph } from "../../atoms/AgentGlyph/AgentGlyph";
 import { CellAvatar } from "../../atoms/CellAvatar/CellAvatar";
-import type { Agent, ChatMessageData } from "../../organisms/ChatPanel/chat-types";
+import type { Agent, ChatBlockRenderer, ChatMessageData } from "../../organisms/ChatPanel/chat-types";
 import { BlockRenderer } from "../BlockRenderer/BlockRenderer";
 
 export interface ChatMessageProps {
@@ -9,6 +9,8 @@ export interface ChatMessageProps {
   /** The agent that produced this message, if `role === "agent"` and `agentId` is set. */
   agent?: Agent;
   onArtifactOpen?: (id: string) => void;
+  /** Per-block render override; falls back to `BlockRenderer` when it returns nullish. */
+  renderBlock?: ChatBlockRenderer;
   style?: CSSProperties;
 }
 
@@ -19,7 +21,7 @@ export interface ChatMessageProps {
  * right-aligned; system centered/dimmed; tool left-aligned with a tool avatar.
  * An `error` status paints a red hairline + ERR badge. Pure render.
  */
-export function ChatMessage({ message, agent, onArtifactOpen, style }: ChatMessageProps) {
+export function ChatMessage({ message, agent, onArtifactOpen, renderBlock, style }: ChatMessageProps) {
   const isAgent = message.role === "agent";
   const isUser = message.role === "user";
   const isSystem = message.role === "system";
@@ -93,9 +95,14 @@ export function ChatMessage({ message, agent, onArtifactOpen, style }: ChatMessa
         {message.time != null && <span style={{ color: "#3f424d" }}>{message.time}</span>}
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {message.blocks.map((block, i) => (
-          <BlockRenderer key={i} block={block} {...(onArtifactOpen ? { onArtifactOpen } : {})} />
-        ))}
+        {message.blocks.map((block, i) => {
+          const custom = renderBlock?.(block);
+          return (
+            <Fragment key={i}>
+              {custom ?? <BlockRenderer block={block} {...(onArtifactOpen ? { onArtifactOpen } : {})} />}
+            </Fragment>
+          );
+        })}
       </div>
     </div>
   );
