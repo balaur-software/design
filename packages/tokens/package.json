@@ -1,6 +1,6 @@
 {
   "name": "@balaur/tokens",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "OCTANT design tokens (palette, ramps, type, motion, accent) as typed TS + tokens.css; self-hosted DepartureMono.",
   "type": "module",
   "module": "src/index.ts",
