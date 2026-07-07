@@ -1,6 +1,6 @@
 {
   "name": "@balaur/ui",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "The OCTANT design system as atomic React components + Storybook.",
   "type": "module",
   "module": "src/index.ts",
