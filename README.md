@@ -51,8 +51,11 @@ React instances in the host, crashing hooks with `resolveDispatcher() is null`.
 bun install          # resolve the workspace
 bun run storybook    # component workshop (packages/ui) on :6006
 bun test             # run all workspace tests
-bun run check        # typecheck + lint + test
+bun run check        # fast gate: typecheck + lint + bun test (~5s)
+bun run check:full   # fast gate + Storybook interaction tests in headless Chromium
 ```
+
+The browser suite requires a Playwright Chromium (`bunx playwright install chromium`, one-time) and takes 1–2 minutes.
 
 Requires Bun ≥ 1.2.
 

@@ -47,7 +47,9 @@
     "fmt": "biome format --write .",
     "check": "bun run typecheck && bun run lint && bun test",
     "storybook": "bun run --filter '@balaur/ui' storybook",
-    "build-storybook": "bun run --filter '@balaur/ui' build-storybook"
+    "build-storybook": "bun run --filter '@balaur/ui' build-storybook",
+    "test-storybook": "bun run --filter '@balaur/ui' test-storybook",
+    "check:full": "bun run check && bun run test-storybook"
   },
   "devDependencies": {
     "@biomejs/biome": "^2",
