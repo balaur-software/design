@@ -59,22 +59,21 @@ The browser suite requires a Playwright Chromium (`bunx playwright install chrom
 
 Requires Bun ≥ 1.2.
 
-## Lint debt (known, deferred from extraction)
+## Lint policy (deliberate demotions)
 
-The Phase 2/3 UI code was landed in its previous home without `biome check`
-being run on it; the extraction auto-fixed 58 formatting issues but
-deliberately **demotes** several noisy rule categories in `biome.json` rather
-than rewrite behavior in the extraction commit:
+`bun run check` currently passes with zero lint errors and zero warnings.
+Four rules are deliberately disabled in `biome.json` rather than enforced:
 
+- `style/noNonNullAssertion` — `!` is used judiciously under
+  `noUncheckedIndexedAccess`, where the compiler already forces index checks.
 - `suspicious/noArrayIndexKey`, `correctness/useExhaustiveDependencies` —
-  common false positives in storybook stories and animation hooks.
-- `a11y/*` (7 rules) — the components were authored visually-first; a real
-  a11y pass is its own future phase, not a side effect of moving files.
+  common false positives in Storybook stories and animation hooks.
+- `a11y/useSemanticElements` — OCTANT's terminal aesthetic renders
+  role-annotated `div`/`pre` structures by design; `a11y/useValidAriaRole`
+  stays on (configured with `ignoreNonDom`).
 
-A handful of `complexity/useOptionalChain`, `style/useTemplate`,
-`performance/noAccumulatingSpread`, and `suppressions/unused` warnings
-remain in `packages/ui/`; `bun run check` passes (warnings don't fail
-the build). Tightening any of these is a separate, intentional change.
+Re-enabling any of these is a separate, intentional change, not a side effect
+of other work.
 
 ## License
 
