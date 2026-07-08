@@ -60,3 +60,19 @@ export const DisabledGroup: Story = { args: { defaultValue: "floyd", disabled: t
 export const MagentaFill: Story = {
   args: { defaultValue: "threshold", fillColor: "#c26cd0" },
 };
+
+/** Controlled with a value matching no option: the group must keep one tab stop. */
+export const NoMatchingValue: Story = {
+  args: { value: "", onChange: fn() },
+  play: async ({ canvas, userEvent, args }) => {
+    const radios = canvas.getAllByRole("radio");
+    // Exactly one radio is tabbable even though none is selected.
+    const tabbable = radios.filter((r) => r.tabIndex === 0);
+    await expect(tabbable).toHaveLength(1);
+    await expect(radios[0]!.tabIndex).toBe(0);
+    // Arrow key from the anchor selects the next enabled option.
+    radios[0]!.focus();
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(args.onChange).toHaveBeenCalled();
+  },
+};

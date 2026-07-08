@@ -161,7 +161,7 @@ export function LogStream({
     <div
       style={{
         border: "1px solid #23252e",
-        background: "var(--bx-bg, #0a0b0e)",
+        background: "var(--bx-bg, #08080a)",
         overflow: "hidden",
         fontFamily: "var(--bx-font-mono, ui-monospace, monospace)",
         ...style,

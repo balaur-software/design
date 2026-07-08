@@ -23,7 +23,7 @@ export function ArtifactPanel({ block, onOpen, previewMaxHeight = 240, style }: 
     <div
       style={{
         border: "1px solid var(--bx-border, #1c1d24)",
-        background: "var(--bx-surface-2, #15161e)",
+        background: "var(--bx-surface-2, #0b0d10)",
         ...style,
       }}
     >

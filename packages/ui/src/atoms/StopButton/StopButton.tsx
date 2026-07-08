@@ -25,7 +25,7 @@ export function StopButton({ style, disabled, ...rest }: StopButtonProps) {
         flex: "none",
         fontFamily: "inherit",
         fontSize: 14,
-        background: "var(--bx-surface-2, #15161e)",
+        background: "var(--bx-surface-2, #0b0d10)",
         border: "1px solid var(--bx-border-red, #3a2020)",
         color: disabled ? "var(--bx-text-6, #5b616e)" : "#ff6b6f",
         cursor: disabled ? "not-allowed" : "pointer",

@@ -12,7 +12,7 @@ const meta = {
         <div style={{ maxWidth: 420 }}>
           <div
             style={{
-              color: "var(--bx-text-3, #5b616e)",
+              color: "var(--bx-text-3, #c8cdd6)",
               fontSize: 11,
               letterSpacing: "0.1em",
               marginBottom: 18,

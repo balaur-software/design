@@ -34,7 +34,7 @@ const meta = {
     zoom: { control: { type: "number", min: 0.5, max: 4, step: 0.1 } },
   },
   render: (args) => (
-    <svg width={400} height={160} style={{ background: "var(--bx-bg, #0a0b0e)" }}>
+    <svg width={400} height={160} style={{ background: "var(--bx-bg, #08080a)" }}>
       <title>Node glyph</title>
       <NodeGlyph {...args} />
     </svg>
@@ -67,7 +67,7 @@ const STATUSES = [
 /** Every status colour plus the selected / hovered / pinned / dimmed variants. */
 export const States: Story = {
   render: () => (
-    <svg width={520} height={180} style={{ background: "var(--bx-bg, #0a0b0e)" }}>
+    <svg width={520} height={180} style={{ background: "var(--bx-bg, #08080a)" }}>
       <title>Node glyph states</title>
       {STATUSES.map((s, i) => (
         <NodeGlyph key={s} node={node({ status: s, importance: i % 6 })} x={40 + i * 65} y={60} />

@@ -48,8 +48,8 @@ export function CodeBlock({ lang, filename, action, children, style }: CodeBlock
   return (
     <div
       style={{
-        border: "1px solid var(--bx-border-mid, #23252e)",
-        background: "var(--bx-surface-3, #08090c)",
+        border: "1px solid var(--bx-border-mid, #2a2c34)",
+        background: "var(--bx-surface-3, #0c0d11)",
         minWidth: 0,
         fontFamily: MONO,
         ...style,

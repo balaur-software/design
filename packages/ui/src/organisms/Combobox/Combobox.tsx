@@ -154,7 +154,7 @@ export function Combobox({
           </button>
         ))}
         {shown.length === 0 && (
-          <div style={{ padding: "9px 12px", color: "var(--bx-text-dim-2, #3f424d)", fontSize: 12 }}>
+          <div style={{ padding: "9px 12px", color: "var(--bx-text-dim-2, #6b7180)", fontSize: 12 }}>
             no match
           </div>
         )}

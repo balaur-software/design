@@ -39,7 +39,7 @@ function renderInline(text: string): ReactNode[] {
             key={i}
             style={{
               fontFamily: "var(--bx-font-mono, ui-monospace, monospace)",
-              background: "var(--bx-surface-2, #15161e)",
+              background: "var(--bx-surface-2, #0b0d10)",
               border: "1px solid var(--bx-border, #1c1d24)",
               padding: "0 4px",
               fontSize: "0.92em",

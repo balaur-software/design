@@ -45,7 +45,7 @@ function PanelDemo({
             fontSize: 13,
             letterSpacing: "0.1em",
             padding: "11px 18px",
-            background: "var(--bx-surface-2, #15161e)",
+            background: "var(--bx-surface-2, #0b0d10)",
             border: "1px solid var(--bx-border, #1c1d24)",
             color: "var(--bx-text-1, #f4f6fb)",
             cursor: "pointer",

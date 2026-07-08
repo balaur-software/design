@@ -69,7 +69,7 @@ export function ChatPanel({
         flexDirection: "column",
         height: 600,
         border: "1px solid var(--bx-border, #1c1d24)",
-        background: "var(--bx-bg, #0a0b0e)",
+        background: "var(--bx-bg, #08080a)",
         ...style,
       }}
     >
@@ -141,7 +141,7 @@ export function ChatPanel({
                     fontFamily: "inherit",
                     fontSize: 11,
                     padding: "4px 8px",
-                    background: a.id === activeArtifact?.id ? "var(--bx-surface-2, #15161e)" : "transparent",
+                    background: a.id === activeArtifact?.id ? "var(--bx-surface-2, #0b0d10)" : "transparent",
                     border: "1px solid var(--bx-border, #1c1d24)",
                     color:
                       a.id === activeArtifact?.id ? "var(--bx-accent, #46c66d)" : "var(--bx-text-4, #9aa0ad)",

@@ -65,7 +65,7 @@ export const CustomPanels: Story = {
         >
           TREE
         </div>
-        <div style={{ color: "var(--bx-text-3, #7b8290)", fontSize: 12, lineHeight: 1.7 }}>
+        <div style={{ color: "var(--bx-text-3, #c8cdd6)", fontSize: 12, lineHeight: 1.7 }}>
           ├─ src
           <br />
           ├─ packages
@@ -78,7 +78,7 @@ export const CustomPanels: Story = {
       <>
         <div
           style={{
-            color: "var(--bx-border-magenta, #d94ec6)",
+            color: "var(--bx-border-magenta, #3a2540)",
             fontSize: 11,
             letterSpacing: "0.1em",
             marginBottom: 10,
@@ -86,7 +86,7 @@ export const CustomPanels: Story = {
         >
           EDITOR
         </div>
-        <div style={{ color: "var(--bx-text-3, #7b8290)", fontSize: 12, lineHeight: 1.7 }}>
+        <div style={{ color: "var(--bx-text-3, #c8cdd6)", fontSize: 12, lineHeight: 1.7 }}>
           Drag the divider to give the editor more room. Bounds honour the min/max props.
         </div>
       </>

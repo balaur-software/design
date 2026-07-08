@@ -28,7 +28,7 @@ const meta = {
     highlighted: { control: "boolean" },
   },
   render: (args) => (
-    <svg width={420} height={120} style={{ background: "var(--bx-bg, #0a0b0e)" }}>
+    <svg width={420} height={120} style={{ background: "var(--bx-bg, #08080a)" }}>
       <title>Edge arc</title>
       <EdgeArc {...args} />
     </svg>
@@ -53,7 +53,7 @@ const TYPES = EDGE_TYPES;
 /** One row per edge type, each with its own dash/colour from `EDGE_STYLE`. */
 export const Types: Story = {
   render: () => (
-    <svg width={420} height={240} style={{ background: "var(--bx-bg, #0a0b0e)" }}>
+    <svg width={420} height={240} style={{ background: "var(--bx-bg, #08080a)" }}>
       <title>Edge types</title>
       {TYPES.map((t, i) => (
         <EdgeArc key={t} x1={20} y1={20 + i * 36} x2={400} y2={20 + i * 36} edgeType={t} highlighted />
@@ -65,7 +65,7 @@ export const Types: Story = {
 /** Base, highlighted, closed (faded) and curved edges. */
 export const States: Story = {
   render: () => (
-    <svg width={420} height={180} style={{ background: "var(--bx-bg, #0a0b0e)" }}>
+    <svg width={420} height={180} style={{ background: "var(--bx-bg, #08080a)" }}>
       <title>Edge arc states</title>
       <EdgeArc x1={20} y1={30} x2={400} y2={30} edgeType="links" />
       <EdgeArc x1={20} y1={70} x2={400} y2={70} edgeType="links" highlighted />

@@ -9,7 +9,7 @@ const openBtnStyle = {
   fontSize: 13,
   letterSpacing: "0.08em",
   padding: "11px 18px",
-  background: "var(--bx-surface-2, #15161e)",
+  background: "var(--bx-surface-2, #0b0d10)",
   border: "1px solid var(--bx-border-accent, #2a3320)",
   color: "var(--bx-accent, #46c66d)",
   cursor: "pointer",
@@ -115,7 +115,7 @@ const detailFooter = (close: () => void) => (
         padding: 10,
         background: "transparent",
         border: "1px solid var(--bx-border, #1c1d24)",
-        color: "var(--bx-text-2, #9aa0ad)",
+        color: "var(--bx-text-2, #dfe3ea)",
         cursor: "pointer",
       }}
     >
@@ -173,7 +173,7 @@ export const LeftEdge: Story = {
   args: { side: "left", title: "FILTERS" },
   render: (args) => (
     <SheetDemo trigger="OPEN LEFT" {...args}>
-      <div style={{ color: "var(--bx-text-2, #9aa0ad)", fontSize: 13, lineHeight: 1.8 }}>
+      <div style={{ color: "var(--bx-text-2, #dfe3ea)", fontSize: 13, lineHeight: 1.8 }}>
         A left-docked sheet reads well as a nav or filter rail. It slides in from the leading edge and traps
         focus until dismissed via the scrim, Escape, or the × control.
       </div>
@@ -186,7 +186,7 @@ export const ScrollingBody: Story = {
   args: { title: "EVENT LOG" },
   render: (args) => (
     <SheetDemo trigger="OPEN LOG" {...args}>
-      <div style={{ fontSize: 12, lineHeight: 1.9, color: "var(--bx-text-2, #9aa0ad)" }}>
+      <div style={{ fontSize: 12, lineHeight: 1.9, color: "var(--bx-text-2, #dfe3ea)" }}>
         {Array.from({ length: 40 }, (_, i) => (
           <div key={i} style={{ borderBottom: "1px dotted var(--bx-border, #1c1d24)", padding: "4px 0" }}>
             <span style={{ color: "var(--bx-accent, #46c66d)" }}>{String(i).padStart(3, "0")}</span> cell

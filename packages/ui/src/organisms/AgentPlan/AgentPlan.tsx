@@ -59,10 +59,10 @@ export function AgentPlan({ steps, onStepClick, style }: AgentPlanProps) {
           fontFamily: "inherit",
           fontSize: 13,
           padding: "8px 10px",
-          background: running ? "var(--bx-surface-2, #15161e)" : "transparent",
+          background: running ? "var(--bx-surface-2, #0b0d10)" : "transparent",
           border: 0,
           borderLeft: `2px solid ${running ? "var(--bx-accent, #46c66d)" : "transparent"}`,
-          color: step.status === "pending" ? "var(--bx-text-6, #5b616e)" : "var(--bx-text-2, #9aa0ad)",
+          color: step.status === "pending" ? "var(--bx-text-6, #5b616e)" : "var(--bx-text-2, #dfe3ea)",
           cursor: onStepClick ? "pointer" : "default",
         };
         const content = (
