@@ -16,15 +16,15 @@
     },
     "packages/octant-core": {
       "name": "@balaur/octant-core",
-      "version": "0.4.0",
+      "version": "0.4.1",
     },
     "packages/tokens": {
       "name": "@balaur/tokens",
-      "version": "0.4.0",
+      "version": "0.4.1",
     },
     "packages/ui": {
       "name": "@balaur/ui",
-      "version": "0.4.0",
+      "version": "0.4.1",
       "dependencies": {
         "@balaur/octant-core": "workspace:*",
         "@balaur/tokens": "workspace:*",
