@@ -16,3 +16,7 @@ storybook-static/
 
 # Storybook CLI debug output
 debug-storybook.log
+
+# Vitest browser-mode run artifacts (screenshots/attachments from failed runs)
+.vitest-attachments/
+**/.vitest-attachments/
