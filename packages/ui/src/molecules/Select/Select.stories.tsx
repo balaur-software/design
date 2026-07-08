@@ -40,6 +40,39 @@ export const Default: Story = {
   },
 };
 
+/**
+ * Keyboard contract: ↓ opens and advances the active option (`aria-activedescendant`),
+ * Enter selects the active option and closes, Escape closes without firing `onChange` again.
+ */
+export const KeyboardNavigation: Story = {
+  args: { defaultValue: "octant", onChange: fn() },
+  play: async ({ canvas, userEvent, args }) => {
+    const trigger = canvas.getByRole("combobox", { name: /octant · 2×4/i });
+    trigger.focus();
+
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+    const firstActive = trigger.getAttribute("aria-activedescendant");
+    await expect(firstActive).toMatch(/-opt-\d+$/);
+
+    await userEvent.keyboard("{ArrowDown}");
+    const secondActive = trigger.getAttribute("aria-activedescendant");
+    await expect(secondActive).toMatch(/-opt-\d+$/);
+    await expect(secondActive).not.toBe(firstActive);
+
+    await userEvent.keyboard("{Enter}");
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+    await expect(args.onChange).toHaveBeenCalledWith("quadrant");
+
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+    await userEvent.keyboard("{Escape}");
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+  },
+};
+
 /** Nothing selected — the trigger shows the placeholder text. */
 export const Placeholder: Story = {
   args: { placeholder: "CHOOSE ENCODER" },
