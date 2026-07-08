@@ -1,7 +1,8 @@
-import type {
-  CSSProperties,
-  KeyboardEvent as ReactKeyboardEvent,
-  PointerEvent as ReactPointerEvent,
+import {
+  type CSSProperties,
+  memo,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type PointerEvent as ReactPointerEvent,
 } from "react";
 import { type MemoryNode, nodeRadius, STATUS_STYLE } from "../../organisms/MemoryExplorer/memory-types";
 import { typeAccent, typeGlyph } from "../NodeTypeTag/NodeTypeTag";
@@ -36,7 +37,7 @@ export interface NodeGlyphProps {
  * hovered states add an accent ring; `dimmed` fades non-neighbour nodes when a
  * selection is active.
  */
-export function NodeGlyph({
+function NodeGlyphImpl({
   node,
   x,
   y,
@@ -126,3 +127,9 @@ export function NodeGlyph({
     </g>
   );
 }
+
+/**
+ * Memoized: MemoryGraph re-renders every animation frame while the force sim
+ * settles; memo lets settled/unchanged nodes skip their render body.
+ */
+export const NodeGlyph = memo(NodeGlyphImpl);
