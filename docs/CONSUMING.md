@@ -179,7 +179,7 @@ A smoke test verifying this lives at
 ```jsonc
 // web/package.json
 "dependencies": {
-  "@balaur/octant": "github:balaur-software/design#v0.1.0"
+  "@balaur/octant": "github:balaur-software/design#v0.3.0"
 }
 ```
 
@@ -239,7 +239,7 @@ pinned tag for committed/CI/prod state:
 
 ```jsonc
 // web/package.json — committed
-"@balaur/octant": "github:balaur-software/design#v0.1.0"
+"@balaur/octant": "github:balaur-software/design#v0.3.0"
 ```
 
 Do **not** use `bun link @balaur/octant` to shadow the dep — it overrides
@@ -277,9 +277,6 @@ stories and manual testing.
 
 ## Known token-hygiene issues (non-blocking)
 
-- Several components reference `var(--bx-bg, #0a0b0e)` while `--bx-bg` is
-  `#08080a`; the fallback only fires if `tokens.css` is absent, so this is
-  cosmetic. The `#0a0b0e` fallback equals `--bx-surface-1`.
 - `--bx-text-dim` (no number) is referenced by `CommandPalette` but only
   `--bx-text-dim-1..4` are defined. A legacy alias is provided in `tokens.css`
   so the reference resolves; new code should use `--bx-text-7` / `--bx-text-dim-2`.
