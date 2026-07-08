@@ -6,6 +6,7 @@
 
 export * from "./AgentGlyph/AgentGlyph";
 export * from "./ArtifactChip/ArtifactChip";
+export * from "./AttachmentChip/AttachmentChip";
 export * from "./Avatar/Avatar";
 export * from "./Badge/Badge";
 export * from "./BrailleSpinner/BrailleSpinner";

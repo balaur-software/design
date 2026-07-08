@@ -109,7 +109,6 @@ export function ChatPanel({
             streaming={streaming}
             onSend={onSend}
             {...(onStop ? { onStop } : {})}
-            attachHint="drop a file"
           />
         </div>
 

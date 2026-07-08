@@ -53,6 +53,29 @@ export interface ChatMessageData {
  */
 export type ChatBlockRenderer = (block: Block) => ReactNode;
 
+/** A file the user has attached to the composer, app-owned end to end. */
+export interface ComposerAttachment {
+  id: string;
+  name: string;
+  /** Mirrors artifact kinds so a sent attachment can become an artifact block. */
+  kind: "code" | "document" | "image";
+  /** Optional byte size for display; formatting (KB/MB) is the component's job. */
+  size?: number;
+  /** App-owned upload lifecycle. Absent/undefined reads the same as "ready". */
+  status?: "pending" | "ready" | "error";
+}
+
+/** One entry in the composer's slash-command menu. */
+export interface SlashCommand {
+  id: string;
+  /** The typed name, matched case-insensitively against the query after `/`. */
+  name: string;
+  /** Optional one-line description shown beside the name. */
+  hint?: string;
+  /** Optional leading glyph (mirrors ToolPill/ArtifactChip's glyph-first chip shape). */
+  glyph?: string;
+}
+
 /** A named agent in a multi-agent thread. */
 export interface Agent {
   id: string;
