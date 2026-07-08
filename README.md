@@ -2,8 +2,9 @@
 
 > **The OCTANT design system** — pure encoder, design tokens, and atomic React
 > components. Bun-native, zero runtime deps in the core. Extracted from
-> [`balaur-software/harness`](https://github.com/balaur-software/harness)
-> so the design system and the life OS can evolve independently.
+> [`balaur-software/web`](https://github.com/balaur-software/web) (the
+> balaur-life personal life OS monorepo) so the design system and the life
+> OS can evolve independently.
 
 A Bun-workspace monorepo with three packages:
 
@@ -78,5 +79,5 @@ of other work.
 
 ## License
 
-TBD — same license as the host life OS, to be ratified in the first
-non-extraction commit.
+Licensed under AGPL-3.0 (same license family as the balaur life OS repos).
+See [`LICENSE`](LICENSE) for the full text.

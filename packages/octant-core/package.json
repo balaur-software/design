@@ -1,7 +1,8 @@
 {
   "name": "@balaur/octant-core",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Pure pixel->mask->Unicode-octant-glyph encoder + canvas rasterization for the OCTANT design system.",
+  "license": "AGPL-3.0-or-later",
   "type": "module",
   "module": "src/index.ts",
   "main": "src/index.ts",
