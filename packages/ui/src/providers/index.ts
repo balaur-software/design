@@ -4,3 +4,4 @@
  */
 
 export * from "./AccentProvider/AccentProvider";
+export * from "./OctantRoot/OctantRoot";

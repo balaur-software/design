@@ -32,6 +32,9 @@ export { byIdx, byName, PALETTE } from "./palette.ts";
 export { blink, border, duration, easing, radius, space } from "./space.ts";
 export { fontMono, fontSize, fonts, lineHeight } from "./type.ts";
 
+/** Subpath (relative to the package root) of the self-hosted DepartureMono font. */
+export const FONT_MONO_SUBPATH = "tokens/fonts/departure-mono.woff2";
+
 /**
  * The single aggregated token object. Every design decision in one typed tree,
  * mirrored 1:1 by the `--bx-*` custom properties in tokens.css.

@@ -47,29 +47,62 @@ extra wiring; a Next.js host must add `transpilePackages: ["@balaur/octant"]`.
 
 ## App-root wiring
 
-Three things, once, at the root of your app:
+Two things, once, at the root of your app:
 
 ```tsx
-import "@balaur/octant/tokens/tokens.css";   // 1. tokens + @font-face for DepartureMono
-import { AccentProvider } from "@balaur/octant"; // 2. accent skin
-import { ToastProvider } from "@balaur/octant";  // 3. toasts (only if you use Toast/CommandPalette/DropdownMenu/ContextMenu)
+import "@balaur/octant/tokens/tokens.css"; // 1. tokens + @font-face for DepartureMono
+import { OctantRoot } from "@balaur/octant"; // 2. providers (accent skin + toasts), correctly nested
 
 // render once:
-<ToastProvider>
-  <AccentProvider accent="green">
-    {/* app */}
-  </AccentProvider>
-</ToastProvider>
+<OctantRoot accent="green">
+  {/* app */}
+</OctantRoot>
 ```
+
+[OctantRoot](../packages/ui/src/providers/OctantRoot/OctantRoot.tsx) composes
+`AccentProvider` (outer) around `ToastProvider` (inner). It deliberately does
+**not** import `tokens.css` for you — the stylesheet stays the explicit line
+above, because no-bundler SSR hosts (like `web/`) deliver CSS outside the
+component tree entirely (see the font note below for the same pattern).
 
 Notes:
 
+- **Manual composition.** `AccentProvider` and `ToastProvider` remain exported
+  for standalone subtree use (e.g. reskinning one panel to cyan, or toasts in
+  only part of an app). If you compose them yourself at the root, the order
+  matters — `AccentProvider` OUTER, `ToastProvider` INNER:
+
+  ```tsx
+  <AccentProvider accent="green">
+    <ToastProvider>{/* app */}</ToastProvider>
+  </AccentProvider>
+  ```
+
+  The reverse order (documented here previously) was wrong: `ToastProvider`
+  renders its toast stack as a DOM **sibling** of `{children}`, so with
+  `ToastProvider` outer the stack lands outside `AccentProvider`'s div and
+  never inherits a non-default accent — toasts stay default-green.
 - `tokens.css` defines `:root { --bx-* … }` defaults **and** `@font-face` for
   DepartureMono. The font files are served from `@balaur/octant/tokens/fonts/*`
   (see the root [package.json](../package.json) `exports`). Bun serves these as
   static assets from the resolved package path; in `web/`, mount the
   `@balaur/octant/tokens/fonts` directory at a public URL and override
-  `--bx-font-mono` if you serve it elsewhere.
+  `--bx-font-mono` if you serve it elsewhere. Don't hand-type the font path:
+  the tokens layer exports `FONT_MONO_SUBPATH`
+  (`"tokens/fonts/departure-mono.woff2"`, relative to the package root), and
+  `Bun.resolveSync` (or standard-ESM `import.meta.resolve`) turns it into an
+  absolute file path to serve — the pattern `web/`'s `server.tsx` uses in
+  production:
+
+  ```ts
+  import { FONT_MONO_SUBPATH } from "@balaur/octant/tokens";
+
+  const monoFontPath = Bun.resolveSync(`@balaur/octant/${FONT_MONO_SUBPATH}`, import.meta.dir);
+  // serve it, e.g.:
+  if (pathname === "/fonts/departure-mono.woff2") {
+    return new Response(Bun.file(monoFontPath), { headers: { "content-type": "font/woff2" } });
+  }
+  ```
 - `AccentProvider` only sets `--bx-accent` / `--bx-accent-bright` on a wrapper
   div. Because `:root` already defines accent defaults, **components render
   correctly without it** — `AccentProvider` is only needed to reskin a subtree
@@ -77,8 +110,10 @@ Notes:
   [packages/ui/src/providers/AccentProvider/AccentProvider.tsx](../packages/ui/src/providers/AccentProvider/AccentProvider.tsx).
   Accents: `"green" | "amber" | "cyan"`, or any hex string.
 - `ToastProvider` is required by any component that calls `useToast()`:
-  `CommandPalette`, `DropdownMenu`, `ContextMenu`, `Popover`, `ScrambleButton`,
-  `DeployButton`. Wrap at the root.
+  `DropdownMenu`, `CommandPalette`, `Menubar`, `ContextMenu`, `Toast`,
+  `Popover`. Wrap at the root (`OctantRoot` does this for you). Forgetting it
+  does **not** throw — the context default is a no-op, so `toast()` calls
+  silently do nothing.
 - Global keyframes (`bx-blink`, `bx-spin`) live in
   [tokens.css](../packages/tokens/src/tokens.css) — they ship with the CSS
   import, no extra stylesheet needed.
