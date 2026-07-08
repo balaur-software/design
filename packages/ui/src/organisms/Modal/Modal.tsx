@@ -186,7 +186,7 @@ export function Modal({
               lineHeight: 1,
               background: "transparent",
               border: 0,
-              color: "var(--bx-text-3, #5b616e)",
+              color: "var(--bx-text-3, #c8cdd6)",
               cursor: "pointer",
               padding: "2px 4px",
             }}
@@ -196,7 +196,7 @@ export function Modal({
         </div>
 
         <div
-          style={{ padding: "22px 18px", color: "var(--bx-text-2, #9aa0ad)", fontSize: 13, lineHeight: 1.75 }}
+          style={{ padding: "22px 18px", color: "var(--bx-text-2, #dfe3ea)", fontSize: 13, lineHeight: 1.75 }}
         >
           {children}
         </div>
@@ -220,7 +220,7 @@ export function Modal({
               padding: "10px 16px",
               background: "transparent",
               border: "1px solid var(--bx-border, #1c1d24)",
-              color: "var(--bx-text-2, #9aa0ad)",
+              color: "var(--bx-text-2, #dfe3ea)",
               cursor: "pointer",
             }}
           >
@@ -237,7 +237,7 @@ export function Modal({
               fontSize: 13,
               letterSpacing: "0.06em",
               padding: "10px 16px",
-              background: "var(--bx-surface-2, #15161e)",
+              background: "var(--bx-surface-2, #0b0d10)",
               cursor: "pointer",
               ...confirmStyle,
             }}

@@ -255,7 +255,7 @@ export function MemoryGraph({
       preserveAspectRatio="xMidYMid meet"
       style={{
         display: "block",
-        background: "var(--bx-bg, #0a0b0e)",
+        background: "var(--bx-bg, #08080a)",
         cursor: panning ? "grabbing" : "default",
         touchAction: "none",
         ...style,

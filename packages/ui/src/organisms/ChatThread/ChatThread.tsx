@@ -101,7 +101,7 @@ export function ChatThread({
             fontFamily: "var(--bx-font-mono, ui-monospace, monospace)",
             fontSize: 11,
             padding: "5px 10px",
-            background: "var(--bx-surface-2, #15161e)",
+            background: "var(--bx-surface-2, #0b0d10)",
             border: "1px solid var(--bx-border-accent, #2a3320)",
             color: "var(--bx-accent, #46c66d)",
             cursor: "pointer",

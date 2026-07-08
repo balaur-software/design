@@ -51,7 +51,7 @@ export function ProgressBar({
             display: "flex",
             justifyContent: "space-between",
             fontSize: 11,
-            color: "var(--bx-text-3, #5b616e)",
+            color: "var(--bx-text-3, #c8cdd6)",
             marginBottom: 4,
           }}
         >

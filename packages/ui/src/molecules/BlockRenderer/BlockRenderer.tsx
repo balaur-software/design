@@ -60,11 +60,16 @@ export function BlockRenderer({ block, onArtifactOpen, style }: BlockRendererPro
       // CitationList owns no style prop — wrap so the documented style prop still applies.
       return style ? <div style={style}>{list}</div> : list;
     }
-    default:
+    default: {
+      // Compile-time exhaustiveness: adding a Block variant without a case above
+      // fails typecheck here. At runtime, unknown types still fall through to the
+      // dim placeholder (consumers may feed newer data than this build knows).
+      block satisfies never;
       return (
         <div style={{ color: "var(--bx-text-6, #5b616e)", fontSize: 12, ...style }}>
           unknown block: {(block as { type: string }).type}
         </div>
       );
+    }
   }
 }

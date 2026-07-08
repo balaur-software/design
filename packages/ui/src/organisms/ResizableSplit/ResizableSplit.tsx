@@ -36,7 +36,7 @@ const defaultLeft = (
     >
       INSPECTOR
     </div>
-    <div style={{ color: "var(--bx-text-3, #7b8290)", fontSize: 12, lineHeight: 1.7 }}>
+    <div style={{ color: "var(--bx-text-3, #c8cdd6)", fontSize: 12, lineHeight: 1.7 }}>
       Cell 04,12
       <br />
       mask 0xB6
@@ -52,7 +52,7 @@ const defaultRight = (
   <>
     <div
       style={{
-        color: "var(--bx-border-cyan, #2bd9d9)",
+        color: "var(--bx-border-cyan, #1d3540)",
         fontSize: 11,
         letterSpacing: "0.1em",
         marginBottom: 10,
@@ -60,7 +60,7 @@ const defaultRight = (
     >
       PREVIEW
     </div>
-    <div style={{ color: "var(--bx-text-3, #7b8290)", fontSize: 12, lineHeight: 1.7 }}>
+    <div style={{ color: "var(--bx-text-3, #c8cdd6)", fontSize: 12, lineHeight: 1.7 }}>
       The two panels share this row. Drag the divider to rebalance — bounded to {"18–82%"}.
     </div>
   </>
@@ -136,7 +136,7 @@ export function ResizableSplit({
         height,
         border: "1px solid var(--bx-border, #1c1d24)",
         overflow: "hidden",
-        background: "var(--bx-bg, #0a0b0e)",
+        background: "var(--bx-bg, #08080a)",
         ...style,
       }}
     >
@@ -159,7 +159,7 @@ export function ResizableSplit({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          color: "var(--bx-text-4, #5b616e)",
+          color: "var(--bx-text-4, #9aa0ad)",
           fontSize: 11,
           userSelect: "none",
           touchAction: "none",

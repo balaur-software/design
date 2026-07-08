@@ -51,7 +51,11 @@ export function RadioGroup({
     onChange,
   );
   const containerRef = useRef<HTMLDivElement>(null);
-  const activeIndex = options.findIndex((o) => o.value === selected);
+  // Roving tabindex anchor: the selected option, else the first (APG radio pattern).
+  const activeIndex = Math.max(
+    0,
+    options.findIndex((o) => o.value === selected),
+  );
 
   const nextEnabled = (from: number, dir: number): number | null => {
     const n = options.length;
@@ -106,6 +110,7 @@ export function RadioGroup({
           index={i}
           label={opt.label}
           selected={opt.value === selected}
+          tabbable={i === activeIndex}
           disabled={!!(disabled || opt.disabled)}
           fillColor={fillColor}
           onSelect={() => select(i)}
@@ -119,12 +124,13 @@ interface RadioOptionProps {
   index: number;
   label: string;
   selected: boolean;
+  tabbable: boolean;
   disabled: boolean;
   fillColor: string;
   onSelect: () => void;
 }
 
-function RadioOption({ index, label, selected, disabled, fillColor, onSelect }: RadioOptionProps) {
+function RadioOption({ index, label, selected, tabbable, disabled, fillColor, onSelect }: RadioOptionProps) {
   const fillRef = useRef<HTMLPreElement>(null);
   useBar8Fill(fillRef, selected ? 1 : 0, { ease: EASE });
 
@@ -134,7 +140,7 @@ function RadioOption({ index, label, selected, disabled, fillColor, onSelect }: 
       aria-checked={selected}
       aria-disabled={disabled}
       data-radio-index={index}
-      tabIndex={disabled ? -1 : selected ? 0 : -1}
+      tabIndex={disabled ? -1 : tabbable ? 0 : -1}
       onClick={onSelect}
       onKeyDown={(e) => {
         if (e.key === " " || e.key === "Enter") {

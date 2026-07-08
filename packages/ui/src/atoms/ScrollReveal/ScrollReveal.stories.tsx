@@ -18,7 +18,7 @@ const card = {
   border: "1px solid var(--bx-border, #1c1d24)",
   background: "var(--bx-surface-3, #0c0d11)",
   padding: 22,
-  color: "var(--bx-text-2, #cfd3db)",
+  color: "var(--bx-text-2, #dfe3ea)",
   lineHeight: 1.7,
   fontSize: 13,
 } as const;

@@ -31,7 +31,7 @@ export function ArtifactChip({ kind, title, onClick, style }: ArtifactChipProps)
         fontFamily: "var(--bx-font-mono, 'DepartureMono', ui-monospace, monospace)",
         fontSize: 12,
         padding: "5px 10px",
-        background: "var(--bx-surface-2, #15161e)",
+        background: "var(--bx-surface-2, #0b0d10)",
         border: "1px solid var(--bx-border, #1c1d24)",
         color: "var(--bx-text-3, #c8cdd6)",
         cursor: onClick ? "pointer" : "default",

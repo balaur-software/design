@@ -45,7 +45,7 @@ export const CustomLines: Story = {
 /** Recoloured splash using a cyan boot tint instead of the accent green. */
 export const CyanBoot: Story = {
   args: {
-    accent: "var(--bx-border-cyan, #2b6cb0)",
+    accent: "var(--bx-border-cyan, #1d3540)",
     lines: ["COLD START .......... 0x1CD00", "SCAN SURFACES ....... 8/8", "CALIBRATE RASTER .... DONE"],
   },
 };

@@ -160,7 +160,7 @@ export function MemoryExplorer({
         flexDirection: "column",
         height: 720,
         border: "1px solid var(--bx-border, #1c1d24)",
-        background: "var(--bx-bg, #0a0b0e)",
+        background: "var(--bx-bg, #08080a)",
         fontFamily: "var(--bx-font-mono, 'DepartureMono', ui-monospace, monospace)",
         ...style,
       }}
