@@ -97,14 +97,40 @@ export const Default: Story = {
     const body = within(document.body);
     await expect(body.queryByRole("dialog")).toBeNull();
 
-    await userEvent.click(canvas.getByRole("button", { name: /open overlay/i }));
+    const trigger = canvas.getByRole("button", { name: /open overlay/i });
+    await userEvent.click(trigger);
     const dialog = await body.findByRole("dialog");
     await expect(dialog).toBeVisible();
     await expect(dialog).toHaveAccessibleName("Buffer inspector");
     // Focus trap moves focus to the first focusable inside the panel.
     await waitFor(() => expect(body.getByRole("button", { name: /focusable child/i })).toHaveFocus());
+    // Opening locks body scroll (module-level ref-counted, see ScrimOverlay.tsx).
+    await expect(document.body.style.overflow).toBe("hidden");
 
     await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(body.queryByRole("dialog")).toBeNull());
+    await expect(args.onClose).toHaveBeenCalledTimes(1);
+    // Closing restores focus to the trigger that opened it and releases the scroll lock.
+    await waitFor(() => expect(trigger).toHaveFocus());
+    await expect(document.body.style.overflow).not.toBe("hidden");
+  },
+};
+
+/** Clicking the scrim (the dialog's aria-hidden backdrop sibling) dismisses, same as outside-click. */
+export const ScrimClickDismiss: Story = {
+  args: { onClose: fn() },
+  render: (args) => <ScrimDemo {...args} />,
+  play: async ({ canvas, userEvent, args }) => {
+    const body = within(document.body);
+    await userEvent.click(canvas.getByRole("button", { name: /open overlay/i }));
+    const dialog = await body.findByRole("dialog");
+    await expect(dialog).toBeVisible();
+
+    // The scrim is the dialog's previous sibling: an aria-hidden div covering the viewport.
+    const scrim = dialog.previousElementSibling as HTMLElement;
+    await expect(scrim).toHaveAttribute("aria-hidden", "true");
+    await userEvent.click(scrim);
+
     await waitFor(() => expect(body.queryByRole("dialog")).toBeNull());
     await expect(args.onClose).toHaveBeenCalledTimes(1);
   },

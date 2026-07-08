@@ -115,6 +115,40 @@ export const Default: Story = {
   },
 };
 
+/** Clicking outside the panel dismisses via `onOpenChange(false)`, same contract as Escape. */
+export const OutsideClickDismiss: Story = {
+  args: { width: 240, onOpenChange: fn() },
+  render: (args) => (
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      <PanelDemo {...args} />
+      <button
+        type="button"
+        style={{
+          alignSelf: "flex-start",
+          fontFamily: "inherit",
+          fontSize: 12,
+          padding: "9px 16px",
+          background: "var(--bx-surface-2, #0b0d10)",
+          border: "1px solid var(--bx-border, #1c1d24)",
+          color: "var(--bx-text-3, #c8cdd6)",
+          cursor: "pointer",
+        }}
+      >
+        OUTSIDE
+      </button>
+    </div>
+  ),
+  play: async ({ canvas, userEvent, args }) => {
+    await userEvent.click(canvas.getByRole("button", { name: /options/i }));
+    const menu = await canvas.findByRole("menu");
+    await waitFor(() => expect(menu).toBeVisible());
+
+    await userEvent.click(canvas.getByRole("button", { name: /^outside$/i }));
+    await expect(args.onOpenChange).toHaveBeenLastCalledWith(false);
+    await waitFor(() => expect(canvas.queryByRole("menu")).toBeNull());
+  },
+};
+
 /** `align="end"` anchors the panel's right edge to the trigger's right edge. */
 export const AlignEnd: Story = {
   args: { align: "end", width: 260 },

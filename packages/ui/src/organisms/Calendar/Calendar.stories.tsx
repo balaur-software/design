@@ -28,6 +28,40 @@ export const Default: Story = {
   },
 };
 
+/** Boundary: February in a leap year has a 29th. */
+export const LeapFebruary: Story = {
+  args: { defaultMonth: new Date(2024, 1, 1) },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText(/^february 2024$/i)).toBeVisible();
+    await expect(canvas.getByRole("button", { name: /^29 february 2024$/i })).toBeVisible();
+  },
+};
+
+/** Boundary: February in a non-leap year stops at the 28th — no 29th cell. */
+export const NonLeapFebruary: Story = {
+  args: { defaultMonth: new Date(2025, 1, 1) },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText(/^february 2025$/i)).toBeVisible();
+    await expect(canvas.getByRole("button", { name: /^28 february 2025$/i })).toBeVisible();
+    await expect(canvas.queryByRole("button", { name: /^29 february 2025$/i })).toBeNull();
+  },
+};
+
+/** Boundary: December → January year rollover, and back down through November. */
+export const YearRollover: Story = {
+  args: { defaultMonth: new Date(2025, 11, 1) },
+  play: async ({ canvas, userEvent }) => {
+    await expect(canvas.getByText(/^december 2025$/i)).toBeVisible();
+
+    await userEvent.click(canvas.getByRole("button", { name: "Next month" }));
+    await expect(canvas.getByText(/^january 2026$/i)).toBeVisible();
+
+    await userEvent.click(canvas.getByRole("button", { name: "Previous month" }));
+    await userEvent.click(canvas.getByRole("button", { name: "Previous month" }));
+    await expect(canvas.getByText(/^november 2025$/i)).toBeVisible();
+  },
+};
+
 /** Opens with the 15th of the current month pre-selected. */
 export const WithSelection: Story = {
   args: { defaultValue: new Date(new Date().getFullYear(), new Date().getMonth(), 15) },
