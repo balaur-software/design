@@ -24,9 +24,11 @@ install graph.
 
 ## Cutting a release
 
-1. **Make sure `main` is clean and `bun run check` passes.**
+1. **Make sure `main` is clean and `bun run check:full` passes, and that
+   `bun run build-storybook` succeeds.**
    ```bash
-   bun run check   # typecheck + biome + tests
+   bun run check:full       # typecheck + biome + tests + Storybook interaction suite
+   bun run build-storybook  # confirms the Storybook production build still works
    ```
 2. **Bump `version` in the root `package.json`** (this is the published version).
    Keep `packages/*/package.json` versions in lockstep for internal consistency.
