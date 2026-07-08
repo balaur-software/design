@@ -95,7 +95,7 @@ export function ChatPanel({
       </div>
 
       <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
-        <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
+        <div style={{ flex: 1, minWidth: 0, minHeight: 0, display: "flex", flexDirection: "column" }}>
           <ChatThread
             messages={messages}
             {...(agents ? { agents } : {})}

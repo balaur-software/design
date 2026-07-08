@@ -54,14 +54,14 @@ export function ChatThread({
 
   if (messages.length === 0 && !streaming) {
     return (
-      <div style={{ position: "relative", height: "100%", ...style }}>
+      <div style={{ position: "relative", height: "100%", flex: 1, minHeight: 0, ...style }}>
         <EmptyState title="NO MESSAGES" description="Start a conversation — the agent will respond here." />
       </div>
     );
   }
 
   return (
-    <div style={{ position: "relative", height: "100%", ...style }}>
+    <div style={{ position: "relative", height: "100%", flex: 1, minHeight: 0, ...style }}>
       <div
         ref={scrollRef}
         role="log"
