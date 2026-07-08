@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { initLayout, type LayoutNode, pinById, stepLayout } from "./useForceLayout";
+import { initLayout, type LayoutNode, pinById, reconcileLayout, stepLayout } from "./useForceLayout";
 
 const ids = ["a", "b", "c", "d", "e"];
 
@@ -88,5 +88,47 @@ describe("stepLayout", () => {
       if (i > 250) late += e;
     }
     expect(late).toBeLessThan(early);
+  });
+});
+
+describe("reconcileLayout", () => {
+  it("retains positions, velocity, and pin state for retained ids", () => {
+    const layout = initLayout(ids);
+    byId(layout, "c").x = 999;
+    pinById(layout, "d");
+
+    const reconciled = reconcileLayout(layout, ids);
+
+    expect(byId(reconciled, "c").x).toBe(999);
+    expect(byId(reconciled, "d").pinned).toBe(true);
+  });
+
+  it("drops removed ids", () => {
+    const layout = initLayout(ids);
+    const reconciled = reconcileLayout(layout, ["a", "b"]);
+
+    expect(reconciled.length).toBe(2);
+    expect(reconciled.find((n) => n.id === "c")).toBeUndefined();
+  });
+
+  it("seeds new ids deterministically while keeping retained ones", () => {
+    const layout = initLayout(ids);
+    byId(layout, "a").x = 111;
+    byId(layout, "b").x = 222;
+
+    const reconciled = reconcileLayout(layout, ["a", "b", "f"]);
+
+    expect(byId(reconciled, "a").x).toBe(111);
+    expect(byId(reconciled, "b").x).toBe(222);
+    expect(byId(reconciled, "f")).toEqual(byId(initLayout(["a", "b", "f"]), "f"));
+  });
+
+  it("reconciling from an empty layout equals initLayout", () => {
+    expect(reconcileLayout([], ids)).toEqual(initLayout(ids));
+  });
+
+  it("reconciling to an empty id set yields an empty layout", () => {
+    const layout = initLayout(ids);
+    expect(reconcileLayout(layout, [])).toEqual([]);
   });
 });
