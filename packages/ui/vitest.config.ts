@@ -29,12 +29,16 @@ export default defineConfig({
           },
         },
       },
-      // SPIKE (plans/011): a separate project so `bun run test-storybook`
-      // (`vitest run --project=storybook`) is unaffected. Not part of the
-      // storybookTest auto-discovery — a hand-written test file mounts
-      // composed stories directly and asserts `toMatchScreenshot`. See
-      // plans/011-findings.md for the writeup. Run with:
-      //   cd packages/ui && bunx vitest run --project=vrt-spike
+      // VRT (plans/011 spike, plan 016 rollout): a separate project so
+      // `bun run test-storybook` (`vitest run --project=storybook`) is
+      // unaffected, and so `bun run check`/`check:full` are unaffected too
+      // (plan 016 keeps `test-vrt` out of both gates until proven stable).
+      // Not part of the storybookTest auto-discovery — a hand-written test
+      // file enumerates every `*.stories.tsx` via `import.meta.glob`, mounts
+      // each primary export, and asserts `toMatchScreenshot`. See
+      // plans/011-findings.md and plans/016-vrt-rollout.md for the writeup.
+      // Run with:
+      //   cd packages/ui && bunx vitest run --project=vrt
       //
       // File extension is `.vrt.tsx`, NOT `.test.tsx`: this file imports
       // `vitest/browser`, which throws when imported outside Vitest's
@@ -45,7 +49,7 @@ export default defineConfig({
         extends: true,
         plugins: [react()],
         test: {
-          name: "vrt-spike",
+          name: "vrt",
           include: ["src/__vrt__/**/*.vrt.tsx"],
           testTimeout: 30_000,
           setupFiles: [path.join(dirname, ".storybook/vitest.setup.ts")],

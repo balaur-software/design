@@ -53,6 +53,7 @@ bun run storybook    # component workshop (packages/ui) on :6006
 bun test             # run all workspace tests
 bun run check        # fast gate: typecheck + lint + bun test (~5s)
 bun run check:full   # fast gate + Storybook interaction tests in headless Chromium
+bun run test-vrt     # visual regression suite; baselines under packages/ui/src/__vrt__; regenerate with `bunx vitest run --project=vrt -u` after intentional visual changes
 ```
 
 The browser suite requires a Playwright Chromium (`bunx playwright install chromium`, one-time) and takes 1–2 minutes.

@@ -49,6 +49,7 @@
     "storybook": "bun run --filter '@balaur/ui' storybook",
     "build-storybook": "bun run --filter '@balaur/ui' build-storybook",
     "test-storybook": "bun run --filter '@balaur/ui' test-storybook",
+    "test-vrt": "bun run --filter '@balaur/ui' test-vrt",
     "check:full": "bun run check && bun run test-storybook"
   },
   "devDependencies": {
