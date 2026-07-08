@@ -1,6 +1,7 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
+import react from "@vitejs/plugin-react";
 import { playwright } from "@vitest/browser-playwright";
 import { defineConfig } from "vitest/config";
 
@@ -24,6 +25,39 @@ export default defineConfig({
             enabled: true,
             headless: true,
             provider: playwright({}),
+            instances: [{ browser: "chromium" }],
+          },
+        },
+      },
+      // SPIKE (plans/011): a separate project so `bun run test-storybook`
+      // (`vitest run --project=storybook`) is unaffected. Not part of the
+      // storybookTest auto-discovery — a hand-written test file mounts
+      // composed stories directly and asserts `toMatchScreenshot`. See
+      // plans/011-findings.md for the writeup. Run with:
+      //   cd packages/ui && bunx vitest run --project=vrt-spike
+      //
+      // File extension is `.vrt.tsx`, NOT `.test.tsx`: this file imports
+      // `vitest/browser`, which throws when imported outside Vitest's
+      // browser mode — and the repo's `bun test` (run by `bun run check`)
+      // auto-discovers every `*.test.tsx` file across the whole monorepo,
+      // so it would otherwise try (and fail) to import this one directly.
+      {
+        extends: true,
+        plugins: [react()],
+        test: {
+          name: "vrt-spike",
+          include: ["src/__vrt__/**/*.vrt.tsx"],
+          testTimeout: 30_000,
+          setupFiles: [path.join(dirname, ".storybook/vitest.setup.ts")],
+          browser: {
+            enabled: true,
+            headless: true,
+            // Determinism lever (plan's hunch, confirmed): force
+            // prefers-reduced-motion at the Playwright BrowserContext level so
+            // every rAF-driven component (useRafLoop/useBar8Fill via
+            // useReducedMotion) renders its static resting frame instead of a
+            // mid-animation one.
+            provider: playwright({ contextOptions: { reducedMotion: "reduce" } }),
             instances: [{ browser: "chromium" }],
           },
         },
