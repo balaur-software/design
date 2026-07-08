@@ -58,6 +58,22 @@ export function initLayout(
   });
 }
 
+/**
+ * Reconcile an existing layout with a new id set: retained ids keep their
+ * position/velocity/pin, new ids get their deterministic `initLayout`
+ * placement, removed ids are dropped. Preserves user arrangement across
+ * filter changes — a full re-scatter is only for explicit `reseed()`.
+ */
+export function reconcileLayout(
+  prev: readonly LayoutNode[],
+  ids: readonly string[],
+  opts: { width?: number; height?: number; seed?: string } = {},
+): LayoutNode[] {
+  const byId = new Map(prev.map((n) => [n.id, n]));
+  const fresh = initLayout(ids, opts);
+  return fresh.map((seeded) => byId.get(seeded.id) ?? seeded);
+}
+
 /** Pin a node by id (optionally at a specific point). No-op if absent. */
 export function pinById(layout: LayoutNode[], id: string, xy?: { x: number; y: number }): void {
   const n = layout.find((l) => l.id === id);
@@ -225,10 +241,12 @@ export function useForceLayout(
   const [, forceTick] = useState(0);
   const [converged, setConverged] = useState(false);
 
-  // Re-seed when the id set changes (added/removed nodes).
+  // Reconcile when the id set changes: keep settled/dragged/pinned positions
+  // for retained ids, seed only new ids, drop removed ones. (Full re-scatter
+  // remains available via `reseed()`.)
   const key = ids.join("\n");
   useEffect(() => {
-    positions.current = initLayout(ids, initOpts());
+    positions.current = reconcileLayout(positions.current, ids, initOpts());
     setConverged(false);
     forceTick((t) => (t + 1) % 1_000_000);
   }, [key, opts.width, opts.height, seed]);
@@ -243,19 +261,15 @@ export function useForceLayout(
       .filter(([a, b]) => a >= 0 && b >= 0) as AdjPair[];
   }, [ids, edges]);
 
-  const activeRef = useRef(!reduced && !converged);
-
   useRafLoop(() => {
     const energy = stepLayout(positions.current, adj, merged);
     if (energy < merged.settleThreshold) {
       setConverged(true);
-      activeRef.current = false;
     }
   }, !reduced && !converged);
 
   const wake = () => {
     setConverged(false);
-    activeRef.current = true;
   };
 
   const pin = (id: string, xy?: { x: number; y: number }) => {
