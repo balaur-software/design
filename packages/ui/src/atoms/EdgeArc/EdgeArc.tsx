@@ -1,4 +1,4 @@
-import type { KeyboardEvent } from "react";
+import { type KeyboardEvent, memo } from "react";
 import { edgeStyle } from "../../organisms/MemoryExplorer/memory-types";
 
 export interface EdgeArcProps {
@@ -25,7 +25,7 @@ export interface EdgeArcProps {
  * set — TEMPORAL.md) render at ~40% opacity. A slight quadratic curve avoids
  * overlap on bidirectional pairs.
  */
-export function EdgeArc({
+function EdgeArcImpl({
   x1,
   y1,
   x2,
@@ -83,5 +83,11 @@ export function EdgeArc({
     />
   );
 }
+
+/**
+ * Memoized: MemoryGraph re-renders every animation frame while the force sim
+ * settles; memo lets settled/unchanged edges skip their render body.
+ */
+export const EdgeArc = memo(EdgeArcImpl);
 
 export { edgeIsClosed, edgeStyle } from "../../organisms/MemoryExplorer/memory-types";

@@ -9,7 +9,7 @@ import {
 } from "react";
 import { EdgeArc } from "../../atoms/EdgeArc/EdgeArc";
 import { NodeGlyph } from "../../atoms/NodeGlyph/NodeGlyph";
-import { useForceLayout } from "../../hooks/useForceLayout";
+import { type LayoutNode, useForceLayout } from "../../hooks/useForceLayout";
 import { edgeIsClosed, type MemoryEdge, type MemoryNode } from "../MemoryExplorer/memory-types";
 
 export interface MemoryGraphProps {
@@ -86,7 +86,7 @@ export function MemoryGraph({
     startY: 0,
     panning: false,
   });
-  const dragRef = useRef<{ id: string; moved: boolean } | null>(null);
+  const dragRef = useRef<{ id: string; moved: boolean; lay: LayoutNode | null } | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
   // Sync external pinnedIds into the layout (e.g. when the caller restores pins).
@@ -165,28 +165,31 @@ export function MemoryGraph({
 
   const onNodeDown = (e: ReactPointerEvent<SVGGElement>, id: string) => {
     e.stopPropagation();
-    dragRef.current = { id, moved: false };
+    const lay = positions.current.find((l) => l.id === id) ?? null;
+    dragRef.current = { id, moved: false, lay };
     (e.currentTarget as SVGGElement).setPointerCapture(e.pointerId);
   };
 
   const onNodeMove = (e: ReactPointerEvent<SVGGElement>) => {
     const d = dragRef.current;
     if (!d) return;
+    // A node can be removed from the layout mid-drag (e.g. a filter toggle);
+    // the stashed `lay` then belongs to no live layout — writes to it are
+    // harmless (the object is disconnected), so just bail out.
+    if (!d.lay) return;
     const g = toGraph(e.clientX, e.clientY);
-    const lay = positions.current.find((l) => l.id === d.id);
-    if (lay) {
-      if (!d.moved && Math.hypot(g.x - lay.x, g.y - lay.y) > DRAG_THRESHOLD) d.moved = true;
-      if (d.moved) {
-        lay.x = g.x;
-        lay.y = g.y;
-        lay.vx = 0;
-        lay.vy = 0;
-        pin(d.id, { x: g.x, y: g.y });
-        // The sim may already be converged (its rAF re-render loop stopped), so
-        // force a render to redraw the dragged node at its new position.
-        tickFrame.current++;
-        setTick((t) => (t + 1) % 1_000_000);
-      }
+    const lay = d.lay;
+    if (!d.moved && Math.hypot(g.x - lay.x, g.y - lay.y) > DRAG_THRESHOLD) d.moved = true;
+    if (d.moved) {
+      lay.x = g.x;
+      lay.y = g.y;
+      lay.vx = 0;
+      lay.vy = 0;
+      pin(d.id, { x: g.x, y: g.y });
+      // The sim may already be converged (its rAF re-render loop stopped), so
+      // force a render to redraw the dragged node at its new position.
+      tickFrame.current++;
+      setTick((t) => (t + 1) % 1_000_000);
     }
   };
 
