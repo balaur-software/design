@@ -3,7 +3,8 @@
 //
 // NOTE: the canvas painters (paintBuf, paintVal, paintLUT) require a DOM canvas
 // 2D context and are not unit-tested (bun test has no DOM); they are exercised
-// only in the browser. The framebuffer rasterizers (drawLine, strokeArc) are
+// only in the browser. The framebuffer rasterizers (drawLine, strokeArc) and
+// the painters' pixel-fill helpers (fillRGBA, fillRGBALut, fillRGBAVal) are
 // pure and unit-tested.
 
 /** A 1-bit-per-cell framebuffer: nonzero = lit. */
@@ -17,6 +18,34 @@ export type MutBuf = { length: number; [index: number]: number };
  * entry) is treated as transparent / background.
  */
 export type LUT = ReadonlyArray<readonly [number, number, number] | null | undefined>;
+
+// One reusable frame per 2D context: painters run per animation frame, and
+// allocating a fresh ImageData on every call is ~dw*dh*4 bytes of garbage per
+// frame. WeakMap keys on the context so canvases can be GC'd normally.
+const frames = new WeakMap<CanvasRenderingContext2D, ImageData>();
+
+function frameFor(ctx: CanvasRenderingContext2D, dw: number, dh: number): ImageData {
+  let im = frames.get(ctx);
+  if (!im || im.width !== dw || im.height !== dh) {
+    im = ctx.createImageData(dw, dh);
+    frames.set(ctx, im);
+  } else {
+    im.data.fill(0); // painters only write lit cells — must clear stale pixels
+  }
+  return im;
+}
+
+/** Write lit cells of `buf` into an RGBA pixel array (assumed pre-cleared). */
+export function fillRGBA(d: Uint8ClampedArray, buf: Buf, r: number, g: number, b: number): void {
+  for (let i = 0, j = 0; i < buf.length; i++, j += 4) {
+    if (buf[i]) {
+      d[j] = r;
+      d[j + 1] = g;
+      d[j + 2] = b;
+      d[j + 3] = 255;
+    }
+  }
+}
 
 /**
  * Paint a boolean framebuffer to a canvas at 1 pixel per cell in a single solid
@@ -36,16 +65,8 @@ export function paintBuf(
     c.width = dw;
     c.height = dh;
   }
-  const im = ctx.createImageData(dw, dh);
-  const d = im.data;
-  for (let i = 0, j = 0; i < buf.length; i++, j += 4) {
-    if (buf[i]) {
-      d[j] = r;
-      d[j + 1] = g;
-      d[j + 2] = b;
-      d[j + 3] = 255;
-    }
-  }
+  const im = frameFor(ctx, dw, dh);
+  fillRGBA(im.data, buf, r, g, b);
   ctx.putImageData(im, 0, 0);
 }
 
@@ -124,6 +145,23 @@ export function strokeArc(
 }
 
 /**
+ * Write `buf` codes into an RGBA pixel array via `lut[code]` (assumed
+ * pre-cleared). Code `0` (and any nullish LUT entry) is left untouched.
+ */
+export function fillRGBALut(d: Uint8ClampedArray, buf: Buf, lut: LUT): void {
+  for (let i = 0, j = 0; i < buf.length; i++, j += 4) {
+    const code = buf[i];
+    if (!code) continue;
+    const col = lut[code];
+    if (!col) continue;
+    d[j] = col[0];
+    d[j + 1] = col[1];
+    d[j + 2] = col[2];
+    d[j + 3] = 255;
+  }
+}
+
+/**
  * Paint a code framebuffer to a canvas at 1 pixel per cell, coloring each cell
  * via `lut[code]`. Like {@link paintBuf}, but `buf` holds small integer codes
  * (e.g. 1 = dim, 2 = accent, 3 = head) and `lut` maps them to colors; code `0`
@@ -142,19 +180,27 @@ export function paintLUT(
     c.width = dw;
     c.height = dh;
   }
-  const im = ctx.createImageData(dw, dh);
-  const d = im.data;
-  for (let i = 0, j = 0; i < buf.length; i++, j += 4) {
-    const code = buf[i];
-    if (!code) continue;
-    const col = lut[code];
-    if (!col) continue;
-    d[j] = col[0];
-    d[j + 1] = col[1];
-    d[j + 2] = col[2];
-    d[j + 3] = 255;
-  }
+  const im = frameFor(ctx, dw, dh);
+  fillRGBALut(im.data, buf, lut);
   ctx.putImageData(im, 0, 0);
+}
+
+/**
+ * Write `vbuf` values into an RGBA pixel array (assumed pre-cleared),
+ * modulating (r,g,b) by the per-cell value (clamped to [0,1]); cells <= 0 are
+ * left untouched.
+ */
+export function fillRGBAVal(d: Uint8ClampedArray, vbuf: ValBuf, r: number, g: number, b: number): void {
+  for (let i = 0, j = 0; i < vbuf.length; i++, j += 4) {
+    let v = vbuf[i] ?? 0;
+    if (v > 0) {
+      if (v > 1) v = 1;
+      d[j] = r * v;
+      d[j + 1] = g * v;
+      d[j + 2] = b * v;
+      d[j + 3] = 255;
+    }
+  }
 }
 
 /**
@@ -175,17 +221,7 @@ export function paintVal(
     c.width = dw;
     c.height = dh;
   }
-  const im = ctx.createImageData(dw, dh);
-  const d = im.data;
-  for (let i = 0, j = 0; i < vbuf.length; i++, j += 4) {
-    let v = vbuf[i] ?? 0;
-    if (v > 0) {
-      if (v > 1) v = 1;
-      d[j] = r * v;
-      d[j + 1] = g * v;
-      d[j + 2] = b * v;
-      d[j + 3] = 255;
-    }
-  }
+  const im = frameFor(ctx, dw, dh);
+  fillRGBAVal(im.data, vbuf, r, g, b);
   ctx.putImageData(im, 0, 0);
 }
