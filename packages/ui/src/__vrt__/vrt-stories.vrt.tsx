@@ -129,22 +129,6 @@ const SKIP = new Set<string>([
   // the same nondeterminism surfaces at the screen level. Confirmed
   // empirically: failed on all 3 consecutive `--project=vrt` compare runs.
   "opsdashboard-default",
-  // `MemoryGraph.tsx` runs its own re-render rAF loop gated only on
-  // `converged` (`if (converged) return;`), not on `useReducedMotion`.
-  // `converged` is set exclusively by `useForceLayout`'s internal simulation
-  // loop, which never runs under forced reduced motion (`!reduced &&
-  // !converged` is `false`) — so `converged` never flips true and
-  // `MemoryGraph` re-renders every animation frame for as long as it's
-  // mounted, even though the (seeded-deterministic) node positions
-  // themselves never move. This is a continuously-looping render path whose
-  // reduced-motion gating is incomplete (plan 016's pre-identified SKIP
-  // category). Confirmed empirically: failed on 2 of 3 consecutive
-  // `--project=vrt` compare runs with genuine pixel-count mismatches (not
-  // timeouts) — likely repaint/anti-aliasing jitter from the continuous
-  // re-render, not a position change. Determinism candidate for a future fix
-  // (out of scope here): gate `MemoryGraph`'s local re-render loop on
-  // `!reduced` in addition to `!converged`.
-  "memorygraph-default",
   // `Ticker.tsx`'s number count-up and `useBar8Fill` bar-fill both correctly
   // snap to their final value under `useReducedMotion` (both gate on
   // `reduced`), but only after `useOnVisible`'s `IntersectionObserver`

@@ -270,6 +270,9 @@ export function useForceLayout(
 
   const wake = () => {
     setConverged(false);
+    // Under reduced motion the sim loop is off and setConverged(false) is a
+    // no-op (already false), so nothing would re-render; force one repaint.
+    if (reduced) forceTick((t) => (t + 1) % 1_000_000);
   };
 
   const pin = (id: string, xy?: { x: number; y: number }) => {
@@ -290,5 +293,5 @@ export function useForceLayout(
     forceTick((t) => (t + 1) % 1_000_000);
   };
 
-  return { positions, pin, release, settle, converged, reseed };
+  return { positions, pin, release, settle, converged: reduced || converged, reseed };
 }

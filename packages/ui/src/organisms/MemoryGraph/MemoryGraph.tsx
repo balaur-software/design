@@ -60,7 +60,6 @@ export function MemoryGraph({
   const ids = useMemo(() => nodes.map((n) => n.id), [nodes]);
   const { positions, pin, release, converged } = useForceLayout(ids, edges, { width, height });
   const [, setTick] = useState(0);
-  const tickFrame = useRef(0);
 
   // Re-render while the sim is awake so we read fresh positions each frame.
   useEffect(() => {
@@ -68,7 +67,6 @@ export function MemoryGraph({
     let raf = 0;
     const loop = () => {
       setTick((t) => (t + 1) % 1_000_000);
-      tickFrame.current++;
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
@@ -188,7 +186,6 @@ export function MemoryGraph({
       pin(d.id, { x: g.x, y: g.y });
       // The sim may already be converged (its rAF re-render loop stopped), so
       // force a render to redraw the dragged node at its new position.
-      tickFrame.current++;
       setTick((t) => (t + 1) % 1_000_000);
     }
   };
@@ -234,12 +231,12 @@ export function MemoryGraph({
     return set;
   }, [selectedId, edges]);
 
-  const posById = useMemo(() => {
-    const m = new Map<string, { x: number; y: number; pinned: boolean }>();
-    for (const l of positions.current) m.set(l.id, { x: l.x, y: l.y, pinned: l.pinned });
-    return m;
-    // Rebuild every render so we read fresh positions during the sim.
-  }, [positions, tickFrame.current]);
+  // Built every render (not memoized): the sim mutates `positions.current` in
+  // place, so node geometry + pin flags must be read fresh each render. Cheap
+  // (one Map of N nodes); the memoized NodeGlyph/EdgeArc children skip when
+  // their own props are unchanged.
+  const posById = new Map<string, { x: number; y: number; pinned: boolean }>();
+  for (const l of positions.current) posById.set(l.id, { x: l.x, y: l.y, pinned: l.pinned });
 
   const grid = useMemo(() => {
     if (!showGrid) return null;
